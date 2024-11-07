@@ -123,7 +123,7 @@ export function Chat({ className, /* user, missingKeys, */ room, onConnect }: Ch
         name: (user as any).name as string,
         previewUrl: (user as any).preview_url as string || defaultUserPreviewUrl,
         capabilities: [
-          'human',
+          'human'
         ],
       };
       setMultiplayerConnectionParameters({

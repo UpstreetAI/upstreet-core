@@ -12,6 +12,7 @@ export const formatConversationMessage = (rawMessage: PendingActionMessage, {
 }) => {
   const { id: userId, name } = agent;
   const { method, args, attachments } = rawMessage;
+  
   const timestamp = new Date();
   const newMessage = {
     userId,
@@ -20,7 +21,6 @@ export const formatConversationMessage = (rawMessage: PendingActionMessage, {
     args,
     attachments,
     timestamp,
-    human: false,
     hidden: false,
   };
   return newMessage;

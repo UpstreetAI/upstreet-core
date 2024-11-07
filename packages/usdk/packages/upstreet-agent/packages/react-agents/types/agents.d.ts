@@ -144,7 +144,6 @@ export type ActionMessage = {
   method: string;
   args: object;
   attachments?: Attachment[];
-  human: boolean; // XXX can be converted to flags
   hidden: boolean;
   timestamp: Date;
 };

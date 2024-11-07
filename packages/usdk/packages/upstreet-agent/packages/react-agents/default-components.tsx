@@ -108,6 +108,7 @@ import {
 import { r2EndpointUrl } from './util/endpoints.mjs';
 import { webbrowserActionsToText } from './util/browser-action-utils.mjs';
 import { createBrowser/*, testBrowser*/ } from 'react-agents/util/create-browser.mjs';
+import { PlayerType } from 'react-agents/constants.mjs';
 
 // Note: this comment is used to remove imports before running tsdoc
 // END IMPORTS
@@ -1025,6 +1026,20 @@ export const JsonFormatter = () => {
 };
 
 // perceptions
+const shouldThink = (e: PerceptionEvent): boolean => {
+  const { message } = e.data;
+
+  // XXX: get player type from capabilites
+  const playerType = 'human';
+
+  // condition for not replying when the perception is from a non-human source
+  if (playerType && playerType !== PlayerType.Human) {
+    // console.log('Ignoring say perception for non-human player');
+    return false;
+  }
+
+  return true;
+};
 
 /**
  * Renders the default perceptions components.
@@ -1038,6 +1053,9 @@ export const DefaultPerceptions = () => {
       <Perception
         type="say"
         handler={async (e) => {
+          if (!shouldThink(e)) {
+            return;
+          }
           await e.data.targetAgent.think();
         }}
       />

@@ -186,7 +186,6 @@ export function MultiplayerActionsProvider({ children }: MultiplayerActionsProvi
           name,
           args,
           attachments,
-          human: typeof opts?.human === 'boolean' ? opts.human : true,
           hidden: !!opts?.hidden,
           timestamp,
         };

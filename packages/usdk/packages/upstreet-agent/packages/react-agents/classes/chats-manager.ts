@@ -127,6 +127,9 @@ export class ChatsManager {
           previewUrl,
           model,
           address,
+          capabilites: [
+            'agent',
+          ]
         };
       };
       const profile = getProfile();
@@ -367,9 +370,9 @@ export class ChatsManager {
 
           // try to reconnect, if applicable
           if (this.chatsSpecification.roomSpecifications.some((spec) => roomsSpecificationEquals(spec, roomSpecification))) {
-            console.log('rejoining room', roomSpecification);
+            // console.log('rejoining room', roomSpecification);
             await this.#join(roomSpecification);
-            console.log('rejoined room', roomSpecification);
+            // console.log('rejoined room', roomSpecification);
           }
         });
       };
@@ -398,11 +401,11 @@ export class ChatsManager {
       endpointUrl,
     } = roomSpecification;
     const key = getChatKey(roomSpecification);
-    console.log('chats manager leave room', {
-      room,
-      endpointUrl,
-      key,
-    });
+    // console.log('chats manager leave room', {
+    //   room,
+    //   endpointUrl,
+    //   key,
+    // });
     await this.roomsQueueManager.waitForTurn(key, async () => {
       const realms = this.rooms.get(key);
       if (realms) {

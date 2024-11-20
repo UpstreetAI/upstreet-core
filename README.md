@@ -19,26 +19,25 @@ This repository contains the open source apps for the Upstreet platform.
 ## Install
 Run install from the root directory:
 ```bash
-npm install
+pnpm install
 ```
 
 ## Run
 #### Run Chat
 From the root directory run:
 ```bash
-npm run chat dev
+pnpm run chat dev
 ```
 #### Run Docs
 From the root directory run:
 ```bash
-npm run docs start
+pnpm run docs start
 ```
-#### Install SDK
+#### Install development SDK
 From the root directory run:
 ```bash
 cd packages/usdk
-npm i
-npm i -g .
+sudo ln -sf $(pwd)/usdk.js /usr/local/bin/usdk # add usdk to PATH
 usdk --version
 ```
 
@@ -48,11 +47,11 @@ usdk --version
 
 #### Chat
 ```bash
-npm i PACKAGE_NAME --workspace=@upstreet/chat
+pnpm i PACKAGE_NAME --workspace=@upstreet/chat
 ```
 
 #### Docs
 ```bash
-npm i PACKAGE_NAME --workspace=@upstreet/docs
+pnpm i PACKAGE_NAME --workspace=@upstreet/docs
 ```
 

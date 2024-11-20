@@ -1,7 +1,7 @@
 {
   "name": "usdk",
   "description": "AI Agents SDK in TypeScript and React.",
-  "version": "0.0.92",
+  "version": "0.0.93",
   "homepage": "https://upstreet.ai/",
   "author": "Upstreet <hello@upstreet.ai> (https://github.com/UpstreetAI)",
   "contributors": [
@@ -107,6 +107,7 @@
     "ws": "^8.17.0",
     "yjs": "^13.6.18",
     "zjs": "file:./packages/upstreet-agent/packages/react-agents-client/packages/multiplayer/packages/zjs",
+    "zod": "^3.23.8",
     "zod-to-ts": "^1.2.0"
   },
   "optionalDependencies": {

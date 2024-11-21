@@ -7,12 +7,20 @@ import {
   join,
   leave,
 } from '../util/connect-utils.mjs';
+import { warnIfAgentsUseNewerSDKVersion } from './version.mjs';
 
 //
 
 export const chat = async (args, opts) => {
   // console.log('got chat args', args);
   const agentSpecs = await parseAgentSpecs(args._[0]);
+
+  try {
+    await warnIfAgentsUseNewerSDKVersion(agentSpecs, opts);
+  } catch (error) {
+    // do nothing
+  }
+
   const room = args.room;
   const browser = args.browser;
   const runtime = args.runtime ?? 'node';

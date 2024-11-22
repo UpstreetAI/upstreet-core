@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { ForwardedRef, forwardRef } from 'react';
 import { IconButton } from 'ucom';
 
 interface AgentDeleteProps {
@@ -8,14 +8,18 @@ interface AgentDeleteProps {
   loading: boolean;
 }
 
-export function AgentDelete({ handleClick, loading }: AgentDeleteProps) {
+function AgentDelete({ handleClick, loading }: AgentDeleteProps, ref: ForwardedRef<HTMLDivElement>) {
   return (
-    <IconButton
-      onClick={handleClick}
-      icon="Trash"
-      size="small"
-      variant="primary"
-      disabled={loading}
+    <div ref={ref}>
+      <IconButton
+        onClick={handleClick}
+        icon="Trash"
+        size="small"
+        variant="primary"
+        disabled={loading}
     />
+    </div>
   );
 }
+
+export default forwardRef(AgentDelete);

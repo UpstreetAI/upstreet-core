@@ -19,17 +19,18 @@ export default async function Page(props: {
 
   const MDX = page.data.body;
 
+  console.log("page", page);
+
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}
       footer={{
         enabled: page.url === '/docs' ? false : true,
       }}
-      // editOnGithub={{
-      //   owner: 'UpstreetAI',
-      //   // path: `docs-upstreet/${page.url.replace('/docs/', '')}.mdx`,
-      //   path: '',
-      //   repo: 'monorepo',
-      // }}
+      editOnGithub={{
+        owner: 'UpstreetAI',
+        path: `apps/docs/content/docs/${page.file.path}`,
+        repo: 'upstreet-core',
+      }}
       breadcrumb={{
         enabled: true,
         full: true,

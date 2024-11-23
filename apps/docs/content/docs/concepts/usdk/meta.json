@@ -1,5 +1,5 @@
 {
-    "title": "The Agents SDK",
+    "title": "Upstreet Agents SDK",
     "pages": ["architecture", "agent-structure", "command-reference"],
     "defaultOpen": true
 }

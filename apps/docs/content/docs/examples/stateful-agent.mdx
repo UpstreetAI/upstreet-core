@@ -2,15 +2,25 @@
 title: Stateful Agent
 description: This section describes how to build an Agent capable of maintaining its own state.
 full: false
+authorName: Avaer Kazmer
+src: /images/team/avaer_kazmer.jpeg
+thumbnailSrc: /images/example-thumbnails/stateful-agent.png
 ---
 
 In this guide, we build a **simple guessing game** which can maintain its own state, and uses NPM libraries to enhance the game's experience.
 
 <Callout>
-We define a **Stateful Agent** as an Agent which can take maintain its own memory and event lifecycle.
+  We define a **Stateful Agent** as an Agent which can take maintain its own
+  memory and event lifecycle.
 </Callout>
 
 The source code for this example is available on [GitHub](https://github.com/UpstreetAI/usdk-examples/tree/main/guessingGame).
+
+## Video Tutorial
+
+You can follow along this example by watching the video below:
+
+<iframe style={{maxWidth: '90vw'}} width="560" height="315" src="https://www.youtube.com/embed/fP18dmtW7l0?si=QMovwytQ5cmldI47" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ## Guide
 
@@ -33,15 +43,17 @@ This will directly scaffold an agent for you in `<your-agent-directory>`. [Learn
 Your agent directory now contains the Node application and `git` repository for your agent, should you choose to use `git`.
 
 <Callout>
-The `-y` flag means to skip the [Agent Interview](/create-an-agent#step-2-complete-the-agent-interview) process, which we don't need here.
-You can also omit the agent directory. In that case, a directory will be created for you.
+  The `-y` flag means to skip the [Agent
+  Interview](/create-an-agent#step-2-complete-the-agent-interview) process,
+  which we don't need here. You can also omit the agent directory. In that case,
+  a directory will be created for you.
 </Callout>
 
 ### Step 3: Start the agentic developer environment
 
 Start a chat with your agent in the terminal:
 
-```
+```bash
 cd <your-agent-directory>
 usdk chat
 ```
@@ -65,33 +77,45 @@ cd <your-agent-directory>
 npm install unique-names-generator
 ```
 
-<Callout>
-  When [customizing your Agent](/customize-your-agent), you can install any library from `npm` and use it in your code.
-</Callout>
+Note: You can also install any library from `npm`.
 
 Edit your `agent.tsx` by adding the following code stub:
 
-```tsx
-import { uniqueNamesGenerator, animals } from 'unique-names-generator'; // [!code ++]
-const generateRandomName = () => uniqueNamesGenerator({ // [!code ++]
-  dictionaries: [animals], // [!code ++]
-  separator: ' ', // [!code ++]
-}); // [!code ++]
+```tsx title="agent.tsx"
+import React from "react";
+import { uniqueNamesGenerator, animals } from 'unique-names-generator' // [!code ++]
+const generateRandomName = () => // [!code ++]
+  uniqueNamesGenerator({ // [!code ++]
+    // [!code ++]
+    dictionaries: [animals], // [!code ++]
+    separator: ' ' // [!code ++]
+  }) // [!code ++]
 
-const GuessingGame = () => {
-    // Guessing game logic goes here
+const GuessingGame = () => {// [!code ++]
+// [!code ++]
+  // Guessing game logic goes here
+  return <></>// [!code ++]
+}// [!code ++]
 
-    return (
-        <>
-        </>
-    )
-};
+export default function MyAgent() {
+  return (
+    <Agent>
+      {/*  */}
+    </Agent>
+  )
+}
+
 ```
 
 Next, let's write up our guessing game logic! To maintain state, we'll use [`useState`](https://react.dev/reference/react/useState) in React - for the sake of simplicity.
 
-```tsx
-import { uniqueNamesGenerator, animals } from 'unique-names-generator';
+```tsx title="agent.tsx"
+import React from "react";
+import { Agent, Prompt, Action } from "react-agents"; // [!code ++]
+import { useState } from "react"; // [!code ++]
+import { uniqueNamesGenerator, animals } from "unique-names-generator";
+import { z } from "zod"; // [!code ++]
+
 const generateRandomName = () => uniqueNamesGenerator({
   dictionaries: [animals],
   separator: ' ',
@@ -101,24 +125,24 @@ const GuessingGame = () => {
   const [secretWord, setSecretWord] = useState(generateRandomName); // [!code ++]
 
   return (
-    {/* [!code ++] */} 
+    {/* [!code ++] */}
     <>
-    {/* [!code ++] */} 
+    {/* [!code ++] */}
       <Prompt>
-        {/* [!code ++]  */}
+        {/* [!code ++] */}
         Play a guessing game with the user.
-        {/* [!code ++] */} 
+        {/* [!code ++] */}
         The secret word that the user is must guess is {secretWord}.
-        {/* [!code ++] */} 
+        {/* [!code ++] */}
         You can give them very subtle hints about the phrase, e.g. "this animal really likes treats".
-        {/* [!code ++] */} 
+        {/* [!code ++] */}
         You can also answer general questions if they don't give too much away.
-        {/* [!code ++] */} 
+        {/* [!code ++] */}
         However, be cryptic. Don't make the game so easy.
-        {/* [!code ++] */} 
+        {/* [!code ++] */}
         When the user guesses the secret word or gives up, call the "guessingGameDone" action with an apppropriate message to reset the secret word.
       {/* [!code ++] */}
-      </Prompt> 
+      </Prompt>
       <Action // [!code ++]
         name="guessingGameDone" // [!code ++]
         description="The user has guessed the secret word" // [!code ++]
@@ -143,12 +167,32 @@ const GuessingGame = () => {
 };
 ```
 
-### Step 4: (optional) Test the Guessing Game Agent
+### Step 4: Import the GuessingGame component in our agent.
+
+```tsx title="agent.tsx"
+
+// ... all the other code
+
+export default function MyAgent() {
+  return (
+    <Agent>
+      {/* [!code ++] */}
+      <GuessingGame />
+    </Agent>
+  )
+}
+```
+
+### Step 5: (optional) Test the Guessing Game Agent
 
 Run [`usdk chat`](/test-your-agent) to test the Agent in your CLI.
 
-How long does it take you to guess your first animal? Join our [Discord community](https://upstreet.ai/usdk-discord); we'd love to know!
+You can start the game by asking:
+
+> I want to play!
+
+How long does it take you to guess your first animal? Join our [Discord community](https://upstreet.ai/usdk-discord) and tell us; we'd love to know!
 
 ## Further Challenges
 
-- "20 questions": Put a limit on the number of questions, and have the AI answer only YES or NO. If the user makes a guess, the game is considered done!
+- ["20 questions"](https://contentrules.com/20-questions-a-game-of-taxonomy/#:~:text=The%20premise%20of%20the%20game,within%2020%20questions%2C%20they%20win.): Put a limit on the number of questions, and have the AI answer only YES or NO. If the user makes a guess, the game is considered done!

@@ -1,6 +1,6 @@
 ---
 title: Hooks
-description: React agents hooks
+description: Hooks let you use different React features from your components. You can either use the built-in Hooks or combine them to build your own. This page lists all built-in Hooks in usdk.
 full: true
 ---
 import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
@@ -50,7 +50,7 @@ Returns the current authentication token.
 
 Generally, you should not need to use this.
 
-> **Warning:** Do not put this token into the prompt context or use it anywhere it might be seen by a user, as it can be used to take over the agent.
+<Callout type="warn"> Do not put this token into the prompt context or use it anywhere it might be seen by a user, as it can be used to take over the agent.</Callout>
 
 ## Utility Hooks
 

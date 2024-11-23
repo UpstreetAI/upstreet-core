@@ -42,7 +42,7 @@ const DocsIndexPage = () => {
             description="Create your first AI Agent. Complete with its own backstory, and motives."
           />
         </Link>
-        <Link href={'/examples/hello-world'}>
+        <Link href={'/examples'}>
           <LargeCard
             src={'/images/general/eb708406-76c3-464c-93f3-eb87db218354.webp'}
             title={'Examples'}

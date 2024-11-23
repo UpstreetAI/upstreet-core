@@ -1,5 +1,5 @@
 {
     "title": "API Reference",
-    "pages": ["overview", "agent", "hooks", "integrations"],
+    "pages": ["overview", "components", "hooks", "integrations", "command-reference"],
     "defaultOpen": false
 }

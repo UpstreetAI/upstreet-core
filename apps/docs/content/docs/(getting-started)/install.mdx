@@ -43,13 +43,27 @@ Before getting started, make sure you have the following:
 
 To install the `usdk` command-line tool, use the following command:
 
-<Tabs items={["npm",]}>
+  {/* "pnpm (recommended)", */}
+<Tabs items={[
+  "npm",
+]}>
+  {/* "yarn" */}
  
+{/* ```bash tab="pnpm (recommended)"
+pnpm install -g usdk
+``` */}
+
 ```bash tab="npm"
 npm install -g usdk
 ```
 
+{/* ```bash tab="yarn"
+yarn add -g usdk
+``` */}
+
 </Tabs>
+
+{/* We recommend using the [`pnpm`](https://pnpm.io/installation`) (Performant Node Package Manager) package manager with `usdk`. */}
 
 ### Verify Installation (optional)
 
@@ -70,10 +84,10 @@ usdk version
 </div>
 </Wrapper>
 
-This command should return the installed version number. For additional version details, you can view all available versions of `usdk` on [NPM](https://www.npmjs.com/package/usdk?activeTab=versions).
+This command should return the installed version number. You can view all available versions of `usdk` on [NPM](https://www.npmjs.com/package/usdk?activeTab=versions).
 
 <Callout>
-**Tip:** While you can use `npx usdk@latest <subcommand>` to run usdk directly, we recommend specifying a fixed version for consistency.
+**Tip:** While you can use `npx usdk@latest <subcommand>` to run `usdk` directly, we recommend specifying a fixed version for consistency.
 </Callout>
 
 ## Log into the SDK

@@ -1,66 +1,207 @@
 ---
 title: Overview
-description: Overview of React Agents rendering
+description: The Upstreet Agents SDK is the first React-based SDK for building and deploying headless AI agents, locally and in the cloud.
 full: true
 ---
+ 
 import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
 
-<InlineTOC defaultOpen items={toc} />
+<InlineTOC items={toc} />
 
-### What is React Agents?
+React Agents is a groundbreaking framework that brings the power and familiarity of [React](https://react.dev) to AI agent development. Built on React's [reconciliation engine](https://github.com/facebook/react/blob/main/packages/react-reconciler/README.md), it enables developers to create intelligent, autonomous agents using the same tools and patterns they love from React development.
 
-React Agents is a framework for building AI agents with React.
-
-It allows you to build AI agents using the same technology, tools, and libraries as you'd use in a traditional React application.
-
-The main difference is that instead of rendering an interface for the user, you're rendering an prompt for the agent.
-
-e.g. suppose you want to write an app that controls a smart home.
-
-#### React app
+## Quick Start
 
 ```jsx
-<form
-  onSubmit={(e) => {
-    turnOnLights(e.target.lightName.value);
-  }}>
-  <label>Light Name:</label>
-  <input
-    type="text"
-    value={lightName}
-    onChange={(e) => setLightName(e.target.value)}
-  />
-  <button type="submit">Turn On Light</button>
-</form>
+import { Agent, Action } from '@upstreet/agents';
+import { z } from 'zod';
+
+function SmartHomeAgent() {
+  return (
+    <Agent>
+      <Action
+        name="turnOnLights"
+        description="Turn on the lights in my room"
+        schema={z.object({ lightName: z.string() })}
+        examples={[{ lightName: 'bedroom' }]}
+        handler={(e) => {
+          turnOnLights();
+          e.data.agent.monologue(`Lights changed: ${e.data.message.args.lightName}`);
+        }}
+      />
+    </Agent>
+  );
+}
 ```
 
-#### React Agents app
+## Core Concepts
+
+### The React Agents Architecture
+
+React Agents leverages the [React Reconciler API](https://github.com/facebook/react/blob/main/packages/react-reconciler/README.md) to create a custom renderer specifically designed for AI agents. This architecture provides several key advantages:
+
+1. **Server-First Design**: Optimized for server-side execution
+2. **Platform Agnostic**: Ready for multi-platform and edge deployments
+3. **Declarative**: Uses React's component model and lifecycle
+4. **Type Safety**: Full TypeScript support throughout the stack
+
+### Traditional React vs React Agents
+
+Let's compare how you'd implement similar functionality in traditional React versus React Agents:
+
+#### Traditional React
+```jsx
+// User interface focused
+function LightControl() {
+  const [lightName, setLightName] = useState('');
+  
+  return (
+    <form onSubmit={(e) => turnOnLights(e.target.lightName.value)}>
+      <label>Light Name:</label>
+      <input
+        type="text"
+        value={lightName}
+        onChange={(e) => setLightName(e.target.value)}
+      />
+      <button type="submit">Turn On Light</button>
+    </form>
+  );
+}
+```
+
+#### React Agents
+```jsx
+// Agent behavior focused
+function LightControlAgent() {
+  return (
+    <Agent>
+      <Action
+        name="turnOnLights"
+        description="turn on the lights in my room"
+        schema={z.object({ lightName: z.string() })}
+        examples={[{ lightName: 'bedroom' }]}
+        handler={handleLightChange}
+      />
+    </Agent>
+  );
+}
+```
+
+The key difference lies in the focus: traditional React components render user interfaces, while React Agents components render agent behaviors and capabilities.
+
+## Core Components
+
+### Agent
+The root component that initializes an agent instance.
 
 ```jsx
-<Agent>
-  <Action
-    name="turnOnLights"
-    description="turn on the lights in my room"
-    schema={z.object({ lightName: z.string() })}
-    examples={[{ lightName: 'bedroom' }]}
-    handler={(e) => {
-      turnOnLights();
-      e.data.agent.monologue(`lights changed: ${e.data.message.args.lightName}`);
-    }}
-  />
+<Agent
+  name="HomeAssistant"
+  description="A helpful assistant for home automation"
+>
+  {/* Agent actions and behaviors */}
 </Agent>
 ```
 
-(some state management code is omitted for brevity)
+### Action
+Defines discrete capabilities that an agent can perform.
 
-In the first example, you're rendering a form that the user can fill out and submit to turn on the lights.
+```jsx
+<Action
+  name="setTemperature"
+  description="Set the temperature of a room"
+  schema={z.object({
+    room: z.string(),
+    temperature: z.number()
+  })}
+  handler={handleTemperatureChange}
+/>
+```
 
-In the second example, you're rendering an agent that can perform an action to turn on the lights.
+## How It Works
 
-Note that similar to the first example where we use a form to collect user input text, the agent generates data that conforms to the given `zod` schema. The difference is that the agent operates autonomously.
+React Agents operates through a sophisticated pipeline:
 
-### How does it work?
+1. **JSX Transformation**: Your component code is transformed into an agent execution plan
+2. **Prompt Generation**: The execution plan is converted into a series of prompts
+3. **Chain-of-Thought Runtime**: Prompts are processed through a reasoning engine
+4. **Action Execution**: The agent performs actions based on its reasoning
+5. **State Updates**: Results are reconciled back through React's system
 
-React Agents translates JSX code into an agentic loop, generating and executing a series of prompts and structured outputs.
+## Best Practices
 
-It contains a React renderer, chain of thought runtime, integrations, and premade components that work together to execute the agentic app.
+### 1. Schema Definition
+Always define precise schemas for your actions:
+
+```jsx
+const schema = z.object({
+  action: z.enum(['on', 'off']),
+  device: z.string(),
+  room: z.string().optional()
+});
+```
+
+### 2. Provide Examples
+Include clear examples for better agent understanding:
+
+```jsx
+const examples = [
+  { action: 'on', device: 'lights', room: 'living room' },
+  { action: 'off', device: 'thermostat' }
+];
+```
+
+### 3. Error Handling
+Implement robust error handling in your handlers:
+
+```jsx
+const handler = async (e) => {
+  try {
+    await performAction(e.data.message.args);
+    e.data.agent.monologue('Action completed successfully');
+  } catch (error) {
+    e.data.agent.monologue(`Error: ${error.message}`);
+  }
+};
+```
+
+## Command Reference
+
+For a complete list of available commands and their usage, refer to our [Command Reference Guide](/concepts/agents-sdk/command-reference).
+
+## Advanced Topics
+
+### Custom Renderers
+Create specialized renderers for unique use cases:
+
+```jsx
+const customRenderer = createAgentRenderer({
+  supportedEvents: ['custom.event'],
+  transformEvent: (event) => ({
+    type: 'custom.event',
+    payload: event
+  })
+});
+```
+
+### State Management
+Integrate with existing React state management solutions:
+
+```jsx
+function AgentWithState() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  
+  return (
+    <Agent context={{ state, dispatch }}>
+      {/* Agent components */}
+    </Agent>
+  );
+}
+```
+
+## Resources
+
+- [GitHub Repository](https://github.com/upstreet/react-agents)
+- [Components](/api/components)
+- [Examples](/examples)
+- [Community Discord](https://upstreet.ai/usdk-discord)

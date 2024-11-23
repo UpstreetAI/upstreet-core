@@ -2,6 +2,9 @@
 title: Action Agent (Personal Assistant)
 description: This section describes how to build your own personal assistant Agent with Upstreet and the Google Calendar API, using custom React Hooks.
 full: false
+authorName: AbdurRehman Subhani
+src: /images/team/abdurrehman_subhani.jpeg
+thumbnailSrc: /images/example-thumbnails/action-agent.png
 ---
 
 In this guide, we build an **Action Agent** capable of scheduling events on our Google Calendar for us, using the [Google Calendar API](https://developers.google.com/Calendar/api/guides/overview). We use [custom React Hooks](https://react.dev/learn/reusing-logic-with-custom-hooks) in this example - We want to use nice, clean coding practices.
@@ -11,6 +14,12 @@ In this guide, we build an **Action Agent** capable of scheduling events on our 
 </Callout>
 
 The source code for this example is available on [GitHub](https://github.com/UpstreetAI/usdk-examples/tree/main/personalAssistant).
+
+## Video Tutorial
+
+You can follow along this example by watching the video below:
+
+<iframe style={{maxWidth: '90vw'}} width="560" height="315" src="https://www.youtube.com/embed/Fr78GhpaYB4?si=lD7x1HKFQevl0Pxe" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ## Guide
 
@@ -67,7 +76,7 @@ const useCalendarKeysJson = () => { // [!code ++]
 } // [!code ++]
 ```
 
-In the same file there is `AppContextValue` mention. Make the below modification in your code.
+In the same file, there is `AppContextValue` mention. Make the below modification in your code.
 
 ```tsx
 this.appContextValue = new AppContextValue({
@@ -85,7 +94,7 @@ this.appContextValue = new AppContextValue({
 })
 ```
 
-Now make some changes in `app-value-context.tsx` file's `AppContextValue` class .
+Now make some changes in `app-value-context.tsx` file's `AppContextValue` class:
 
 ```tsx title="/packages/upstreet-agent/packages/react-agents/classes/app-context-value.ts"
 export class AppContextValue {
@@ -113,7 +122,7 @@ export class AppContextValue {
 }
 ```
 
-In the same file add `useCalendarKeysJson` custom hooks
+In the same file, add the`useCalendarKeysJson` custom hooks:
 
 ```tsx
 
@@ -154,17 +163,20 @@ Let's build our `GoogleCalendarManager`, which will leverage a service account f
 
 ---
 
-Ensure you have your Google Calendar API credentials, including:
-`GOOGLE_CALENDAR_ID`, `GOOGLE_API_KEY`, `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_PRIVATE_KEY`
+First, you'll need some Google Calendar API credentials:
+
+- Calendar ID
+- API Key
+- Service Account Email
+- Private Key
+
 <Callout>
-This tutorial will **not** cover how to obtain these credentials. For more information, you can refer to the [Google Calendar API's documentation](https://developers.google.com/calendar/api/guides/overview).
+🔑 Need help getting these? Check out the [Google Calendar API docs](https://developers.google.com/calendar/api/guides/overview).
 </Callout>
 
-After obtaining the keys, add them to the `wrangler.toml` file.
+Add them to your `wrangler.toml`:
 
-Here's how it might look like:
-
-```toml
+```toml title="wrangler.toml"
 ...
 CALENDER_KEYS_JSON = "{\"GOOGLE_API_KEY\":\"\",\"GOOGLE_SERVICE_ACCOUNT_EMAIL\":\"\",\"GOOGLE_PRIVATE_KEY\":\"",\"GOOGLE_CALENDAR_ID\":\"\"}"
 ...

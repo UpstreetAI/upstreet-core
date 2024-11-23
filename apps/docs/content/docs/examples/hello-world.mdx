@@ -2,9 +2,12 @@
 title: Hello World Agent
 description: This section describes how to build a simple Agent with a personality.
 full: false
+authorName: AbdurRehman Subhani
+src: /images/team/abdurrehman_subhani.jpeg
+thumbnailSrc: /images/example-thumbnails/hello-world.png
 ---
 
-In this guide, we build a simple Agent named "Scillia" with a personality inspired by [Cortana](https://halofanon.fandom.com/wiki/Cortana_(CB)) from the [Halo](https://halofanon.fandom.com/wiki/Main_Page) gaming franchise. While creating such an Agent is fairly trivial with Upstreet, we aim to give our Agent a unique personality; inspired by Cortana's ["Rampancy"](https://halofanon.fandom.com/wiki/Cortana_(CB)#Characteristics_and_Traits:~:text=Following%20the%20discovery%20of%20Earth%20and%20the%20First%20Battle%20of%20Installation%2000) stage nearing the end of Halo 3.
+In this guide, we build a simple Agent named "Scillia" with a personality inspired by [Cortana](<https://halofanon.fandom.com/wiki/Cortana_(CB)>) from the [Halo](https://halofanon.fandom.com/wiki/Main_Page) gaming franchise. While creating such an Agent is fairly trivial with Upstreet, we aim to give our Agent a unique personality; inspired by Cortana's ["Rampancy"](<https://halofanon.fandom.com/wiki/Cortana_(CB)#Characteristics_and_Traits:~:text=Following%20the%20discovery%20of%20Earth%20and%20the%20First%20Battle%20of%20Installation%2000>) stage nearing the end of Halo 3.
 
 The source code for this example is available on [GitHub](https://github.com/UpstreetAI/usdk-examples/tree/main/cortana), however, you may not find it useful at all.
 
@@ -12,7 +15,17 @@ The source code for this example is available on [GitHub](https://github.com/Ups
 
 You can follow along this example by watching the video below:
 
-<iframe style={{maxWidth: '90vw'}} width="560" height="315" src="https://www.youtube.com/embed/Fr78GhpaYB4?si=lD7x1HKFQevl0Pxe" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe
+  style={{ maxWidth: '90vw' }}
+  width="560"
+  height="315"
+  src="https://www.youtube.com/embed/Fr78GhpaYB4?si=lD7x1HKFQevl0Pxe"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+  referrerpolicy="strict-origin-when-cross-origin"
+  allowfullscreen
+></iframe>
 
 ## Guide
 
@@ -24,14 +37,15 @@ Follow _[Setup the SDK](/install)_ to set up NodeJS and `usdk`.
 
 Run `usdk create <your-agent-directory>` to start the interview process.
 
-Here, you can take inspiration from [Cortana's Wiki](https://halofanon.fandom.com/wiki/Cortana_(CB)#Physical_Appearance), related to her appearance:
+Here, you can take inspiration from [Cortana's Wiki](<https://halofanon.fandom.com/wiki/Cortana_(CB)#Physical_Appearance>), related to her appearance:
 
 ```
 ? What do you want your agent to do?
 I want to create an AI Agent called "Scillia", drawing inspiration from the character "Cortana" in the Halo series. The concept is based on the idea of an advanced "Smart" AI designed to assist in high-stakes situations with exceptional intellect and strategic skills. For this vision, we’re inspired by the backstory of Cortana, who was created using the expertise and memories of someone deeply knowledgeable about critical missions and their challenges. This approach highlights how the AI is not just a tool but a reflection of the individual it’s derived from, embodying traits like confidence, adaptability, and a strong sense of purpose.
 ```
 
-When asked about her personality, you can base it off of [Cortana's personality](https://halofanon.fandom.com/wiki/Cortana_(CB)#Personality_and_Behaviour) in her normal mode:
+When asked about her personality, you can base it off of [Cortana's personality](<https://halofanon.fandom.com/wiki/Cortana_(CB)#Personality_and_Behaviour>) in her normal mode:
+
 ```
 ? Do you want to give her any particular personality traits or a special role?
 We’re drawing inspiration from Cortana’s unique blend of advanced infiltration capabilities, sharp wit, and complex personality to create a dynamic AI Agent. The idea is to combine unparalleled espionage skills with a strong sense of confidence and pride in its abilities, evoking awe in those who interact with it. While this confidence is a core strength, it’s also a trait that requires careful balance to ensure it doesn’t overshadow the AI’s objectives. Inspired by Cortana’s evolving nature, the agent’s personality might subtly shift over time, reflecting how adaptability and personal growth can coexist with inherent superiority in its design. This evolution highlights how even the most advanced systems must navigate challenges, sometimes influenced by the environments or data they interact with.
@@ -55,6 +69,7 @@ We’re taking inspiration from the concept of rampancy as explored in Cortana's
 ```
 
 Test Scillia again. Ask her:
+
 > Hey Scillia, who holds the Mantle of Responsibility?
 
 Share her response in our [Discord community](https://upstreet.ai/usdk-discord); we'd love to know what she responds to you.

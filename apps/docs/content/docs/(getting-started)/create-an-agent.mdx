@@ -69,6 +69,7 @@ Assuming you’ve named your project directory “my-agent,” here’s the stru
     <Folder name="packages" />
     <Folder name="codecs" />
     <Folder name="tests" />
+    <File name=".gitignore" />
     <File name="agent.tsx" />
     <File name="jest.config.mjs" />
     <File name="jest.setup.mjs" />
@@ -84,7 +85,7 @@ Assuming you’ve named your project directory “my-agent,” here’s the stru
 For a breakdown of these files, see our [Agent Structure guide](/concepts/agents-sdk/agent-structure).
 
 <Callout>
-Remember to keep your Agent’s configuration secure. Avoid making this repository public on platforms like GitHub, as sensitive keys could be exposed.
+Remember to keep your Agent's configuration secure. Avoid committing your secret keys to GitHub, and use [Environment Variables](/customize-your-agent#using-environment-variables) to store secrets.
 </Callout>
 
 ---

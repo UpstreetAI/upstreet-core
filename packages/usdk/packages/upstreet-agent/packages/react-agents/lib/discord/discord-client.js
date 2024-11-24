@@ -385,6 +385,18 @@ export class DiscordBotClient extends EventTarget {
       jwt,
     });
   }
+
+  #activeVoiceBuffer = {
+    data: [],
+    userInfo: null,
+    timer: null
+  };
+  #VOICE_IDLE_TIMEOUT = 1000; // 1 second
+
+  #generateStreamId() {
+    return Math.random().toString(36).substring(2, 10);
+  }
+
   async status() {
     const res = await fetch(`${discordBotEndpointUrl}/status`, {
       headers: {
@@ -444,10 +456,9 @@ export class DiscordBotClient extends EventTarget {
             // console.log('voice data', args);
             const {
               // userId,
-              streamId,
               uint8Array,
             } = args;
-            this.output.pushStreamUpdate(streamId, uint8Array);
+            this.#bufferVoiceData(uint8Array);
             break;
           }
           default: {
@@ -497,16 +508,25 @@ export class DiscordBotClient extends EventTarget {
           }
           case 'voicestart': {
             console.log('voice start', args);
-            this.output.pushStreamStart(args);
+            // Store user info if this is the start of a new utterance
+            if (!this.#activeVoiceBuffer.userInfo) {
+              this.#activeVoiceBuffer.userInfo = {
+                userId: args.userId,
+                username: args.username,
+                channelId: args.channelId,
+                streamId: this.#generateStreamId()
+              };
+              this.output.pushStreamStart(this.#activeVoiceBuffer.userInfo);
+            }
             break;
           }
           case 'voiceend': {
             console.log('voice end', args);
-            this.output.pushStreamEnd(args);
             break;
           }
-          case 'voiceidle': { // feedback that discord is no longer listening
+          case 'voiceidle': {
             console.log('voice idle', args);
+            this.#processVoiceBuffer();
             this.input.cancelStream(args);
             break;
           }
@@ -528,7 +548,64 @@ export class DiscordBotClient extends EventTarget {
     await readyPromise;
   }
 
+  #bufferVoiceData(newData) {
+    // Only buffer if we have valid user info
+    if (!this.#activeVoiceBuffer.userInfo) {
+      console.warn('Received voice data before stream start');
+      return;
+    }
+
+    // Reset or start the processing timer
+    if (this.#activeVoiceBuffer.timer) {
+      clearTimeout(this.#activeVoiceBuffer.timer);
+    }
+
+    // Add new data to buffer
+    this.#activeVoiceBuffer.data.push(newData);
+
+    // Set new timer
+    this.#activeVoiceBuffer.timer = setTimeout(() => {
+      this.#processVoiceBuffer();
+    }, this.#VOICE_IDLE_TIMEOUT);
+  }
+
+  #processVoiceBuffer() {
+    const buffer = this.#activeVoiceBuffer;
+    
+    if (buffer.data.length > 0 && buffer.userInfo) {
+      try {
+        // Process each packet individually to maintain opus packet integrity
+        for (const packet of buffer.data) {
+          this.output.pushStreamUpdate(buffer.userInfo.streamId, packet);
+        }
+        
+        // End the stream properly after all packets are processed
+        this.output.pushStreamEnd(buffer.userInfo);
+      } catch (err) {
+        console.error('Error processing voice buffer:', err);
+      }
+
+      // Clear the buffer AFTER processing
+      buffer.data = [];
+      buffer.userInfo = null;
+    }
+
+    if (buffer.timer) {
+      clearTimeout(buffer.timer);
+      buffer.timer = null;
+    }
+  }
+
   destroy() {
+    if (this.#activeVoiceBuffer.timer) {
+      clearTimeout(this.#activeVoiceBuffer.timer);
+    }
+    this.#activeVoiceBuffer = {
+      data: [],
+      userInfo: null,
+      timer: null
+    };
+    
     this.ws && this.ws.close();
     this.input.destroy();
     this.output.destroy();

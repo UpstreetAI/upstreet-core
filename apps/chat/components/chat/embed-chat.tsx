@@ -94,8 +94,8 @@ export function EmbedChat({ className, agent, onConnect }: ChatProps) {
   useEffect(() => {
     if (room) {
       const localPlayerSpec: PlayerSpec = {
-        id: "anon",
-        name: "GEORGE",
+        id: "embed",
+        name: "User#" + Math.floor(Math.random() * 9000 + 1000),
         previewUrl: defaultUserPreviewUrl,
         capabilities: ['human'],
       };
@@ -105,7 +105,7 @@ export function EmbedChat({ className, agent, onConnect }: ChatProps) {
       });
       agentJoinRoom(agent.id, room);
     } 
-  }, [room]);
+  }, [room, setMultiplayerConnectionParameters, agentJoinRoom]);
 
   const messages = rawMessages.map((rawMessage: any, index: number) => {
     const message = {
@@ -193,7 +193,7 @@ function getMessageComponent(room: string, message: Message, id: string, players
     case 'say': {
       const player = playersCache.get(message.userId);
       const media = (message.attachments ?? []).filter(a => !!a.url)[0] ?? null;
-      const isOwnMessage = user && user.id === message.userId || message.userId === 'anon';
+      const isOwnMessage = user && user.id === message.userId || message.userId === 'embed';
       const profileUrl = `/${message.human ? 'accounts' : 'agents'}/${message?.userId}`;
 
       return (

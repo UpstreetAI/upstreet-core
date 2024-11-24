@@ -1,16 +1,9 @@
-import path from 'path';
-import fs from 'fs';
 import spawn from 'cross-spawn';
-
-const pnpmPackageJsonPath = import.meta.resolve('pnpm').replace('file://', '');
-const pnpmPackageJsonString = fs.readFileSync(pnpmPackageJsonPath, 'utf8');
-const pnpmPackageJson = JSON.parse(pnpmPackageJsonString);
-const pnpmPath = path.resolve(path.dirname(pnpmPackageJsonPath), pnpmPackageJson.bin.pnpm);
 
 export const hasNpm = async () => {
   // check if the npm command exists
   return await new Promise((resolve) => {
-    const child = spawn(pnpmPath, ['--version'], {
+    const child = spawn('npm', ['--version'], {
       stdio: 'ignore',
     });
     child.on('close', (code) => {
@@ -28,24 +21,24 @@ export const hasNpm = async () => {
 
 export const npmInstall = async (dstDir) => {
   await new Promise((resolve, reject) => {
-    const child = spawn(pnpmPath, ['install'], {
+    const child = spawn('npm', ['install'], {
       cwd: dstDir,
       stdio: 'inherit',
     });
+
     child.on('close', (code) => {
       if (code !== 0) {
-        reject(new Error(`pnpm install failed with code ${code}`));
+        reject(new Error(`npm install failed with code ${code}`));
       } else {
         resolve();
       }
     });
-    child.on('error', reject);
   });
 };
 
 const getNpmRoot = async () => {
   const { stdout } = await new Promise((resolve, reject) => {
-    const child = spawn(pnpmPath, ['root', '--quiet', '-g']);
+    const child = spawn('npm', ['root', '--quiet', '-g']);
 
     let output = '';
     child.stdout.on('data', (data) => {
@@ -54,7 +47,7 @@ const getNpmRoot = async () => {
 
     child.on('close', (code) => {
       if (code !== 0) {
-        reject(new Error(`pnpm root failed with code ${code}`));
+        reject(new Error(`npm root failed with code ${code}`));
       } else {
         resolve({ stdout: output });
       }

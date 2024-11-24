@@ -5,7 +5,7 @@ import { getCurrentDirname} from '../react-agents/util/path-util.mjs'
 
 //
 
-const localDirectory = getCurrentDirname(import.meta);
+const localDirectory = getCurrentDirname(import.meta, process);
 
 //
 

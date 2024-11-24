@@ -18,8 +18,8 @@ import path from 'path';
 //
 
 // this file should be running from the agent's directory, so we can find the wrangler.toml file relative to it
-const wranglerTomlPath = path.join(getCurrentDirname(import.meta), '../../../../wrangler.toml');
-const envTxtPath = path.join(getCurrentDirname(import.meta), '../../../../.env.txt');
+const wranglerTomlPath = path.join(getCurrentDirname(import.meta, process), '../../../../wrangler.toml');
+const envTxtPath = path.join(getCurrentDirname(import.meta, process), '../../../../.env.txt');
 
 //
 

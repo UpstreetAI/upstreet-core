@@ -8,7 +8,7 @@ const loadWasm = p => {
   return m;
 };
 
-let dirname = getCurrentDirname(import.meta);
+let dirname = getCurrentDirname(import.meta, process);
 const wasm = loadWasm(path.join(dirname, '/libopus.wasm'));
 
 const location = new URL('http://localhost');

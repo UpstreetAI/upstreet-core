@@ -7,7 +7,7 @@ import { getCurrentDirname } from '../react-agents/util/path-util.mjs';
 
 //
 
-const dirname = getCurrentDirname(import.meta);
+const dirname = getCurrentDirname(import.meta, process);
 
 const bindProcess = (cp) => {
   process.on('exit', () => {

@@ -12,7 +12,7 @@ const loadWasm = p => {
   return m;
 };
 
-let dirname = getCurrentDirname(import.meta);
+let dirname = getCurrentDirname(import.meta, process);
 const wasmAudioDecoderCommon = loadWasm(path.join(dirname, '/wasm-audio-decoder-common.wasm'));
 const emscriptenWasm = loadWasm(path.join(dirname, '/emscripten-wasm.wasm'));
 

@@ -4,7 +4,7 @@ import fs from 'fs';
 import https from 'https';
 
 import { program } from 'commander';
-// import WebSocket from 'ws';
+import WebSocket from 'ws';
 import EventSource from 'eventsource';
 import open from 'open';
 import pc from 'picocolors';
@@ -12,8 +12,10 @@ import { mkdirp } from 'mkdirp';
 import { rimraf } from 'rimraf';
 
 import Table from 'cli-table3';
+// import * as ethers from 'ethers';
 
 import { QueueManager } from './packages/upstreet-agent/packages/queue-manager/queue-manager.mjs';
+// import { lembed } from './packages/upstreet-agent/packages/react-agents/util/embedding.mjs';
 import { parseAgentSpecs } from './lib/agent-spec-utils.mjs';
 import {
   getAgentPublicUrl,
@@ -36,6 +38,7 @@ import {
   getConnectedWalletsFromMnemonic,
 } from './packages/upstreet-agent/packages/react-agents/util/ethereum-utils.mjs';
 import { ReactAgentsWranglerRuntime } from './packages/upstreet-agent/packages/react-agents-wrangler/wrangler-runtime.mjs';
+import { ReactAgentsNodeRuntime } from './packages/upstreet-agent/packages/react-agents-node/node-runtime.mjs';
 import {
   deployEndpointUrl,
   chatEndpointUrl,
@@ -105,6 +108,8 @@ import { getLatestVersion } from './lib/version.mjs';
 // import {
 //   getDirectoryHash,
 // } from './util/hash-util.mjs';
+
+globalThis.WebSocket = WebSocket; // polyfill for multiplayer library
 
 //
 
@@ -981,33 +986,6 @@ const unpublish = async (args, opts) => {
     }
   }
 };
-const voiceSubCommands = [
-  {
-    name: 'ls',
-    description: 'Lists all available voices for the current user.',
-    usage: 'usdk voice ls'
-  },
-  {
-    name: 'get',
-    description: 'Retrieves details about a specific voice.',
-    usage: 'usdk voice get <voice_name>'
-  },
-  {
-    name: 'play',
-    description: 'Plays the given text using the specified voice.',
-    usage: 'usdk voice play <voice_name> <text>'
-  },
-  {
-    name: 'add',
-    description: 'Adds new audio files to create or update a voice.',
-    usage: 'usdk voice add <voice_name> <file1.mp3> [file2.mp3] ...'
-  },
-  {
-    name: 'remove',
-    description: 'Removes a voice from the user\'s account.',
-    usage: 'usdk voice remove <voice_id>'
-  }
-];
 const voice = async (args) => {
   const subcommand = args._[0] ?? '';
   const subcommandArgs = args._[1] ?? [];
@@ -1231,15 +1209,7 @@ const voice = async (args) => {
         break;
       }
       default: {
-        if (subcommand) {
-          console.warn(`unknown subcommand${subcommand}`);
-        }
-        console.log('Available subcommands:');
-        const maxNameLength = Math.max(...voiceSubCommands.map(cmd => cmd.name.length));
-        voiceSubCommands.forEach(cmd => {
-          const paddedName = cmd.name.padEnd(maxNameLength);
-          console.log(`  ${paddedName}  ${cmd.description}`);
-        });
+        console.warn(`unknown subcommand: ${subcommand}`);
         process.exit(1);
       }
     }
@@ -1255,7 +1225,8 @@ const handleError = async (fn) => {
     process.exit(1);
   }
 };
-export const main = async () => {
+
+export const createProgram = () => {
   try {
 
     const ver = version();
@@ -1850,30 +1821,57 @@ export const main = async () => {
           await disable(args);
         });
       }); */
-    program
-      .command('voice')
-      .description(
-        'Manage agent voices',
-      )
-      .argument(
-        `[subcommand]`,
-        `What voice action to perform; one of [${voiceSubCommands.map(cmd => cmd.name).join(', ')}]`,
-      )
-      .argument(
-        `[args...]`,
-        `Arguments to pass to the subcommand`,
-      )
-      .action(async (subcommand = '', args = [], opts = {}) => {
-        await handleError(async () => {
-          commandExecuted = true;
-          args = {
-            _: [subcommand, args],
-            ...opts,
-          };
-          await voice(args);
-        });
-      })
-      .addHelpText('after', `\nSubcommands:\n${voiceSubCommands.map(cmd => `  ${cmd.name}\t${cmd.description}\n\t\t${cmd.usage}`).join('\n')}`);
+    const voiceSubCommands = [
+      {
+        name: 'ls',
+        description: 'Lists all available voices for the current user.',
+        usage: 'usdk voice ls'
+      },
+      {
+        name: 'get',
+        description: 'Retrieves details about a specific voice.',
+        usage: 'usdk voice get <voice_name>'
+      },
+      {
+        name: 'play',
+        description: 'Plays the given text using the specified voice.',
+        usage: 'usdk voice play <voice_name> <text>'
+      },
+      {
+        name: 'add',
+        description: 'Adds new audio files to create or update a voice.',
+        usage: 'usdk voice add <voice_name> <file1.mp3> [file2.mp3] ...'
+      },
+      {
+        name: 'remove',
+        description: 'Removes a voice from the user\'s account.',
+        usage: 'usdk voice remove <voice_id>'
+      }
+    ];
+    // program
+    //   .command('voice')
+    //   .description(
+    //     'Manage agent voices',
+    //   )
+    //   .argument(
+    //     `[subcommand]`,
+    //     `What voice action to perform; one of [${voiceSubCommands.map(cmd => cmd.name).join(', ')}]`,
+    //   )
+    //   .argument(
+    //     `[args...]`,
+    //     `Arguments to pass to the subcommand`,
+    //   )
+    //   .action(async (subcommand = '', args = [], opts = {}) => {
+    //     await handleError(async () => {
+    //       commandExecuted = true;
+    //       args = {
+    //         _: [subcommand, args],
+    //         ...opts,
+    //       };
+    //       await voice(args);
+    //     });
+    //   })
+    //   .addHelpText('after', `\nSubcommands:\n${voiceSubCommands.map(cmd => `  ${cmd.name}\t${cmd.description}\n\t\t${cmd.usage}`).join('\n')}`);
     // program
     //   .command('logs')
     //   .description(`Stream an agent's logs`)
@@ -1986,8 +1984,12 @@ export const main = async () => {
           await withdraw(args);
         });
       });*/
+    } catch (error) {
+      console.error(error);
+    }
+    return program // always return the program
+}
+
+export const main = async () => {
     await program.parseAsync();
-  } catch (error) {
-    console.error(error);
-  }
 };

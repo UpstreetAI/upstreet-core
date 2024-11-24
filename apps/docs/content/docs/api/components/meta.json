@@ -1,5 +1,4 @@
 {
     "title": "Components",
-    "pages": ["agent", "agent-class", "conversation", "action", "action-modifier", "perception", "perception-modifier", "uniform"],
-    "defaultOpen": true
+    "pages": ["agent", "prompt", "conversation", "action", "action-modifier", "perception", "perception-modifier", "uniform"]
 }

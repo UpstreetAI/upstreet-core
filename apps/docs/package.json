@@ -12,8 +12,9 @@
     "discord.js": "^14.16.3",
     "esbuild": "0.24.0",
     "framer-motion": "^11.11.9",
-    "fumadocs-core": "14.0.2",
+    "fumadocs-core": "^14.5.3",
     "fumadocs-mdx": "11.0.0",
+    "fumadocs-twoslash": "^2.0.1",
     "fumadocs-ui": "14.0.2",
     "next": "14.2.14",
     "postinstall": "0.7.5",
@@ -21,6 +22,7 @@
     "usdk": "file:../../packages/usdk"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.13",
     "@types/mdx": "^2.0.13",
     "@types/node": "22.7.8",
     "autoprefixer": "^10.4.20",

@@ -1,0 +1,43 @@
+---
+title: X (formerly Twitter)
+description: Integrate your Agent with X, one of the world's most viral social apps.
+full: false
+---
+
+X integration allows your agent to interact with Twitter by responding to mentions.
+
+## Step 1: Create a Twitter Developer Account
+   - Go to https://developer.twitter.com/
+   - Sign up for a developer account if you haven't already
+   - Create a new project and app
+   - Make sure your "User authentication settings" are set to "Native app" (Public client)
+   - Copy your OAuth 2.0 application credentials (Client ID and Client Secret)
+
+## Step 2: Log in with OAuth
+   - Log in with OAuth at https://twitter-auth.upstreet.ai/
+   - Use the Client ID and Client Secret from step 1
+
+## Step 3: Configure your agent
+   - Add the following component to your agent:
+   ```tsx
+   import { Twitter } from 'react-agents';
+
+   return (
+     <Agent>
+       {/* ... */}
+       <Twitter
+         token="YOUR_TWITTER_TOKEN" // OAuth 2.0 token
+       />
+       {/* ... */}
+     </Agent>
+   );
+   ```
+
+## Additional Notes
+   - The bot will automatically listen for and respond to mentions of your Twitter account
+   - The token should be kept secure and not committed to version control
+     - You can use `.env.txt` and the useEnv() hook to load it at runtime
+   - The bot polls for new mentions every 10 seconds
+   - Twitter API rate limits apply - see Twitter's [developer documentation](https://developer.twitter.com/en/docs/twitter-api/rate-limits) for details
+   - The bot requires a stable internet connection to maintain communication with Twitter
+   - Note: if you haven't created the agent yet, please follow this [Create an Agent](/create-an-agent) first.

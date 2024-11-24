@@ -1,21 +1,18 @@
 ---
 title: <Conversation>
 description: For each conversation of your agent.
-full: true
+full: false
 ---
-import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
-
-<InlineTOC defaultOpen items={toc} />
 
 The `Conversation` component represents an ongoing conversation that an agent is managing. It serves as a container for multiple conversation instances, allowing each conversation to be rendered separately along with its context.
 
-### Import
+## Import
 
 ```javascript
 import { Conversation } from 'react-agents';
 ```
 
-### Usage
+## Usage
 
 ```javascript
 <Conversation>
@@ -26,11 +23,26 @@ import { Conversation } from 'react-agents';
 
 When using the Conversation component, you can provide any number of child components that will be rendered for each individual conversation managed by the agent. This allows the agent to maintain awareness of each conversation and its context separately.
 
-### Properties
+## Props
 
-children (optional): React nodes (components) that will be rendered within each conversation instance.
+import { TypeTable } from 'fumadocs-ui/components/type-table';
 
-### How It Works
+export const conversationProps = {
+  children: {
+    description: 'React nodes (components) that will be rendered within each conversation instance.',
+    type: 'ReactNode',
+    typeDescription: 'Any valid React elements, such as JSX, strings, or numbers, that can be rendered.',
+    typeDescriptionLink: '', // Add a link if applicable
+    default: 'undefined', // Optional, so no default value
+  },
+};
+
+<TypeTable
+  type={conversationProps}
+/>
+
+
+## How It Works
 The Conversation component utilizes two contexts:
 
 - AgentContext: Provides access to the agent managing the conversation.
@@ -48,7 +60,7 @@ const cachedMessages = useCachedMessages(); // get the current conversation chat
 
 This hook provides access to the specific conversation's state, allowing you to interact with or respond to the context of that conversation as needed.
 
-### Example
+## Example
 
 ```javascript
 import { useEffect } from 'react';

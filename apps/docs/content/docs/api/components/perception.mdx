@@ -1,22 +1,19 @@
 ---
 title: <Perception>
-description: Define how your agent handles incoming events.
-full: true
+description: The <Perception /> Component allows the Agent to perceive and react to real-world events.
+full: false
 ---
-import { InlineTOC } from 'fumadocs-ui/components/inline-toc';
 
-<InlineTOC defaultOpen items={toc} />
-The `<Perception />` allows the Agent to perceive and react to real-world events.
+The `<Perception />` component is used to define and register a perception within the Agent's context. It allows the agent to handle specific types of perceptions with custom logic.
 
-## Importing the Perception Component
-To use the `Perception` component, import it as follows:
-```javascript
+## Import
+
+```tsx
 import { Perception } from 'react-agents';
 ```
 
-The `<Perception />` component is used to define and register a perception within the agent's context. It allows the agent to handle specific types of perceptions with custom logic.
 
-## Example
+## Usage
 Here's an example of how to use the `<Perception />` component:
 ```javascript
 import { Perception } from 'react-agents';
@@ -36,13 +33,37 @@ function MyComponent() {
 ```
 
 ## Props
-The `<Perception />` component accepts the following props:
-- type: string
-The type of perception being registered. This is a required prop and is used to identify the perception.
-handler: Function
-A function that handles the perception logic. This function is executed when the perception is triggered.
-- children: ReactNode (optional)
-Any child components or elements to be rendered within the Perception component.
+
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+export const perceptionProps = {
+  type: {
+    description: 'The type of perception being registered.',
+    type: 'string',
+    typeDescription: 'A string that identifies the type of perception being handled.',
+    typeDescriptionLink: '', // Add a link to further documentation if needed
+    default: 'N/A', // This is a required prop, so no default value
+  },
+  handler: {
+    description: 'A function that handles the perception logic.',
+    type: 'Function',
+    typeDescription: 'A function that is executed when the perception is triggered.',
+    typeDescriptionLink: '',
+    default: 'N/A', // This prop is required, so no default value
+  },
+  children: {
+    description: 'Any child components or elements to be rendered within the Perception component.',
+    type: 'ReactNode',
+    typeDescription: 'A ReactNode can be anything renderable by React, such as JSX elements, strings, numbers, etc.',
+    typeDescriptionLink: '',
+    default: 'N/A', // This is optional, so default can be omitted or marked as 'undefined'
+  },
+};
+
+<TypeTable
+  type={perceptionProps}
+/>
+
 
 ## Methods
 The `<Perception>` component does not expose any public methods. All interaction should be handled through props or by wrapping the component with additional logic.

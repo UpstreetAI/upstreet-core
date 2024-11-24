@@ -142,6 +142,7 @@ export const DefaultAgentComponents = () => {
       {/* <LiveMode /> */}
       <DefaultPrompts />
       {/* <DefaultServers /> */}
+      <SelfConsciousReplies historyLength={15} defaultThreshold={0.6} />
     </>
   );
 };
@@ -3356,4 +3357,134 @@ export const Telnyx: React.FC<TelnyxProps> = (props: TelnyxProps) => {
   ]);
 
   return null;
+};
+export type SelfConsciousRepliesProps = {
+  historyLength?: number; // Number of previous messages to consider for context
+  defaultThreshold?: number; // How likely the agent should respond by default (0-1)
+};
+
+export const SelfConsciousReplies: React.FC<SelfConsciousRepliesProps> = (props: SelfConsciousRepliesProps) => {
+  const historyLength = props?.historyLength ?? 5;
+  const defaultThreshold = props?.defaultThreshold ?? 0.6;
+
+  return (
+    <PerceptionModifier
+    type="say" 
+    handler={async (e: AbortablePerceptionEvent) => {
+      const { message, sourceAgent, targetAgent } = e.data;
+
+      // Get conversation members and recent messages in one pass
+      const [conversationMembers, messages] = await Promise.all([
+        targetAgent.conversation.getAgents(),
+        targetAgent.conversation.getCachedMessages()
+          .slice(-historyLength)
+          .map(({name, args, timestamp}) => ({
+            name,
+            text: args?.text || '',
+            timestamp
+          }))
+      ]);
+
+      // Calculate back-and-forth agent conversation count
+      // this is being calculated to determine if the agent is being in the conversation too much
+      const recentMessages = messages.slice(-6);
+      const backAndForthCount = recentMessages.reduce((count, msg, i) => {
+        if (i === 0) return count;
+        const prevMsg = recentMessages[i-1];
+        return (msg.name === targetAgent.agent.name && 
+                prevMsg.name === sourceAgent.name) ? count + 1 : count;
+      }, 0);
+
+      // Only apply penalty if more than 2 members in chat
+      const backAndForthPenalty = conversationMembers.length > 2 ? Math.min(backAndForthCount * 0.2, 0.8) : 0;
+
+        const decisionPrompt = `
+          You are deciding whether to respond to an incoming message in a conversation.
+          
+          Current message: "${message?.args?.text || ''}"
+          From user: ${sourceAgent.name}
+
+          Conversation members: ${conversationMembers.map(a => `${a.playerSpec.name} (${a.playerSpec.id})`).join(', ')}
+          
+          Recent conversation history:
+          ${messages.map(m => `${m.name}: ${m.text}`).join('\n')}
+          
+          Your personality (ONLY use this information to guide your response, do not make assumptions beyond it):
+          ${targetAgent.agent.bio}
+          Your name: ${targetAgent.agent.name}
+          Your id: ${targetAgent.agent.id}
+          
+          Other users mentioned in the current message: ${extractMentions(message?.args?.text || '').join(', ')}
+          
+          CONVERSATION FATIGUE CONTEXT:
+          - You and ${sourceAgent.name} have had ${backAndForthCount} back-and-forth exchanges recently
+          - Your interest level is reduced by ${(backAndForthPenalty * 100).toFixed()}% due to conversation fatigue
+          - If you've been going back and forth too much, you should naturally lose interest and let the conversation end
+          
+          Based on this context, should you respond to this message?
+          
+          IMPORTANT GUIDELINES:
+          1. If the message is clearly addressed to someone else (via @mention or context), you should NOT respond UNLESS:
+             - You have critical information that directly relates to the message and would be valuable to share
+             - The information is urgent or important enough to justify interrupting
+             - Not sharing this information could lead to misunderstandings or issues
+          
+          2. Only interrupt conversations between others in rare and justified cases. Your confidence should be very low (< 0.3) 
+             if you're considering responding to a message not directed at you.
+
+          3. If the message appears to be directed to the entire group or is a general statement/question:
+             - You should be highly interested in participating
+             - Your confidence should be high (> 0.7) as group discussions warrant active participation
+             - Consider the value you can add to the group conversation
+          
+          4. Message frequency and fatigue guidelines:
+             - Show significantly decreased interest after 4+ back-and-forth exchanges
+             - Let conversations naturally end instead of forcing them to continue
+             - If you've been talking frequently with someone, take breaks to avoid conversation fatigue
+             - Consider if someone else should have a chance to speak
+          
+          Additional considerations:
+          - Is the message explicitly directed at you? (Weight: ${defaultThreshold})
+          - Is the message directed to everyone in the group? (High priority)
+          - Would responding align with ONLY your defined personality traits?
+          - Is your response truly necessary or would it derail the current conversation?
+          - Are you certain you have unique, valuable information to add if interrupting?
+          
+          Respond with a decision object containing:
+          - shouldRespond: boolean (true if confidence > ${defaultThreshold})
+          - reason: brief explanation including specific justification if interrupting others' conversation
+          - confidence: number between 0-1 (note: this will be reduced by ${(backAndForthPenalty * 100).toFixed()}% due to conversation fatigue)
+        `;
+
+        const decisionSchema = z.object({
+          shouldRespond: z.boolean(),
+          reason: z.string(),
+          confidence: z.number(),
+        });
+
+        const decision = await targetAgent.completeJson([{
+          role: 'assistant',
+          content: decisionPrompt,
+        }], decisionSchema,
+        // XXX replace with gpt-4o-mini when ai proxy is updated
+        // 'openai:gpt-4o-mini',
+        'openai:gpt-4o',
+        );
+
+        // Apply the back-and-forth penalty to the confidence
+        const adjustedConfidence = decision.content.confidence * (1 - backAndForthPenalty);
+
+        if (!decision.content.shouldRespond || adjustedConfidence < defaultThreshold) {
+          e.abort();
+        }
+      }}
+      priority={-defaultPriorityOffset * 2}
+    />
+  );
+};
+
+// Helper function to extract @mentions from text
+const extractMentions = (text: string): string[] => {
+  const mentions = text.match(/@(\w+)/g) || [];
+  return mentions.map(m => m.substring(1));
 };

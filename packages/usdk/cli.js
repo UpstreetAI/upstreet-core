@@ -1225,7 +1225,8 @@ const handleError = async (fn) => {
     process.exit(1);
   }
 };
-export const main = async () => {
+
+export const createProgram = () => {
   try {
 
     const ver = version();
@@ -1983,8 +1984,12 @@ export const main = async () => {
           await withdraw(args);
         });
       });*/
+    } catch (error) {
+      console.error(error);
+    }
+    return program // always return the program
+}
+
+export const main = async () => {
     await program.parseAsync();
-  } catch (error) {
-    console.error(error);
-  }
 };

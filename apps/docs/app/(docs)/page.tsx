@@ -20,7 +20,7 @@ const DocsIndexPage = () => {
   return (
     <div className="w-full h-full pt-12 flex flex-col justify-center items-center min-w-0 max-w-[var(--fd-page-width)] md:transition-[max-width]">
       <DocsTitle className="mb-6">
-        <span className="flex justify-center items-center gap-2">
+        <span className="text-2xl md:text-4xl flex justify-center items-center gap-2 whitespace-nowrap">
           Build AI Agents with{' '}
           <pre className="font-mono px-1 bg-fd-primary-foreground rounded-md">
             {'<React />'}

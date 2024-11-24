@@ -8,7 +8,7 @@ import pc from 'picocolors';
 
 export const pull = async (args, opts) => {
   const agentId = args._[0] ?? '';
-  const dstDir = args._[1];
+  let dstDir = args._[1];
   const force = !!args.force;
   const forceNoConfirm = !!args.forceNoConfirm;
   const noInstall = !!args.noInstall;

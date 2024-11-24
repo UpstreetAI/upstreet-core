@@ -49,7 +49,7 @@ export default async function Page(props: {
   return (
     <DocsPage toc={toc} full={page.data.full}
       footer={{
-        enabled: page.url === '/docs' ? false : true,
+        enabled: page.url === '/' ? false : true,
       }}
       editOnGithub={{
         owner: 'UpstreetAI',
@@ -58,8 +58,8 @@ export default async function Page(props: {
       }}
       breadcrumb={{
         enabled: true,
-        full: true,
-        includeSeparator: true,        
+        full: false,
+        includeSeparator: true,     
       }}
       tableOfContent={{
         style: 'clerk',

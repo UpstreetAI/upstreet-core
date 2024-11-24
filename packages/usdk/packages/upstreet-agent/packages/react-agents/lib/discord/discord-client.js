@@ -19,6 +19,13 @@ import {
 import {
   discordBotEndpointUrl,
 } from '../../util/endpoints.mjs';
+import {
+  floatTo16Bit,
+} from 'codecs/convert.mjs';
+import { mulaw } from '../alawmulaw/dist/alawmulaw.mjs';
+import { AudioChunker } from '../../util/audio-chunker.mjs';
+import { resample } from '../../../codecs/resample.mjs';
+
 
 //
 
@@ -379,12 +386,221 @@ export class DiscordBotClient extends EventTarget {
 
     this.token = token;
     this.codecs = codecs;
+    this.jwt = jwt;
     this.input = new DiscordInput();
     this.output = new DiscordOutput({
       codecs,
       jwt,
     });
+
+    // Create reusable decoder
+    this.initializeDecoder();
+    
+    // Initialize VAD
+    this.#initializeVAD();
+
+    this.audioChunker = new AudioChunker({
+      sampleRate: 16000, // TranscribedVoiceInput.transcribeSampleRate
+      chunkSize: 1536,
+    });
+
+    // Add queue manager for opus conversion
+    this.conversionQueue = new QueueManager();
   }
+
+  #activeVoiceBuffer = {
+    data: [],
+    userInfo: null,
+    timer: null,
+    collecting: false,
+  };
+  #VOICE_IDLE_TIMEOUT = 1000;
+
+  async #initializeVAD() {
+    try {
+      const u = new URL(`https://vad.fly.dev/`.replace(/^http/, 'ws'));
+      u.searchParams.set('apiKey', this.jwt);
+      const ws = new WebSocket(u);
+      ws.binaryType = 'arraybuffer';
+
+      ws.addEventListener('open', () => {
+        console.log('VAD connection established');
+      });
+
+      ws.addEventListener('message', async (e) => {
+        const message = JSON.parse(e.data);
+        console.log('VAD message', message);
+        const { type } = message;
+        
+        switch (type) {
+          case 'speechstart': {
+            console.log('speech start detected');
+            // Start collecting voice data
+            this.#activeVoiceBuffer.collecting = true;
+            break;
+          }
+          case 'speechend': {
+            console.log('speech end detected');
+            // Process collected voice data
+            this.#processVoiceBuffer();
+            this.#activeVoiceBuffer.collecting = false;
+            break;
+          }
+          case 'speechcancel': {
+            console.log('speech detection cancelled');
+            // this.#activeVoiceBuffer.collecting = false;
+            // this.#clearBuffer();
+            break;
+          }
+        }
+      });
+
+      this.vadConnection = ws;
+    } catch (err) {
+      console.error('Failed to initialize VAD:', err);
+    }
+  }
+
+  #clearBuffer() {
+    const buffer = this.#activeVoiceBuffer;
+    buffer.data = [];
+    buffer.userInfo = null;
+    buffer.collecting = false;
+    if (buffer.timer) {
+      clearTimeout(buffer.timer);
+      buffer.timer = null;
+    }
+  }
+
+  async initializeDecoder() {
+    try {
+      this.decoder = createOpusDecodeTransformStream({
+        sampleRate: 48000,
+        codecs: this.codecs,
+      });
+      console.log('Opus decoder initialized');
+    } catch (err) {
+      console.error('Failed to initialize decoder:', err);
+      this.decoder = null;
+    }
+  }
+
+  async #convertOpusToPCM(opusData) {
+    return await this.conversionQueue.waitForTurn(async () => {
+      try {
+        if (!this.decoder) {
+          await this.initializeDecoder();
+        }
+        
+        const writer = this.decoder.writable.getWriter();
+        const reader = this.decoder.readable.getReader();
+        
+        try {
+          // Start reading first
+          const readPromise = reader.read();
+          
+          // Then write the data
+          await writer.write(opusData);
+          
+          // Wait for the read to complete
+          const { value } = await readPromise;
+          
+          if (!value) {
+            return new Float32Array(0);
+          }
+          
+          // Resample the PCM data to 16kHz for VAD
+          return resample(value, 48000, 16000);
+        } finally {
+          // Always release the locks
+          writer.releaseLock();
+          reader.releaseLock();
+        }
+      } catch (err) {
+        console.error('Error in convertOpusToPCM:', err);
+        // If we hit an error, null out the decoder so we can try to recreate it
+        this.decoder = null;
+        return new Float32Array(0);
+      }
+    });
+  }
+
+  #bufferVoiceData(newData) {
+    if (!this.#activeVoiceBuffer.userInfo) {
+      console.warn('Received voice data before stream start');
+      return;
+    }
+
+    // First, buffer the data regardless of VAD state
+    this.#activeVoiceBuffer.data.push(newData);
+    
+    // Always reset/start the processing timer
+    if (this.#activeVoiceBuffer.timer) {
+      clearTimeout(this.#activeVoiceBuffer.timer);
+    }
+
+    this.#activeVoiceBuffer.timer = setTimeout(() => {
+      console.log('Voice idle timeout reached, processing buffer, collecting:', this.#activeVoiceBuffer.collecting,
+        'data length:', this.#activeVoiceBuffer.data.length,
+      );
+      if (this.#activeVoiceBuffer.collecting) {
+        // If we were collecting speech, process what we have
+        this.#processVoiceBuffer();
+        this.#activeVoiceBuffer.collecting = false;
+      } else {
+        // If no speech was detected, clear the buffer without processing
+        this.#clearBuffer();
+      }
+    }, this.#VOICE_IDLE_TIMEOUT);
+
+    // Convert and send to VAD asynchronously
+    this.#convertOpusToPCM(newData).then(pcmData => {
+      if (this.vadConnection?.readyState === WebSocket.OPEN) {
+        // Chunk the PCM data like the microphone implementation
+        const frames = this.audioChunker.write(pcmData);
+        
+        // Send each frame to VAD
+        for (const frame of frames) {
+          const i16 = floatTo16Bit(frame);
+          const mulawBuffer = mulaw.encode(i16);
+          console.log('Sending VAD frame:', {
+            frameLength: frame.length,
+            mulawLength: mulawBuffer.length
+          });
+          this.vadConnection.send(mulawBuffer);
+        }
+      }
+    }).catch(err => {
+      console.error('Error processing voice data:', err);
+    });
+  }
+
+  #processVoiceBuffer() {
+    const buffer = this.#activeVoiceBuffer;
+    
+    console.log('processing voice buffer', buffer.data.length, buffer.userInfo);
+    if (buffer.data.length > 0 && buffer.userInfo) {
+      try {
+        for (const packet of buffer.data) {
+          this.output.pushStreamUpdate(buffer.userInfo.streamId, packet);
+        }
+        
+        this.output.pushStreamEnd(buffer.userInfo);
+      } catch (err) {
+        console.error('Error processing voice buffer:', err);
+      }
+
+      buffer.data = [];
+      // Don't clear userInfo here as we might get more voice data
+      // buffer.userInfo = null;
+    }
+
+    if (buffer.timer) {
+      clearTimeout(buffer.timer);
+      buffer.timer = null;
+    }
+  }
+
   async status() {
     const res = await fetch(`${discordBotEndpointUrl}/status`, {
       headers: {
@@ -441,13 +657,11 @@ export class DiscordBotClient extends EventTarget {
         } = o;
         switch (method) {
           case 'voicedata': {
-            // console.log('voice data', args);
-            const {
-              // userId,
-              streamId,
-              uint8Array,
-            } = args;
-            this.output.pushStreamUpdate(streamId, uint8Array);
+            // Only process voice data if we have user info
+            if (this.#activeVoiceBuffer.userInfo) {
+              const {uint8Array} = args;
+              this.#bufferVoiceData(uint8Array);
+            }
             break;
           }
           default: {
@@ -497,16 +711,27 @@ export class DiscordBotClient extends EventTarget {
           }
           case 'voicestart': {
             console.log('voice start', args);
-            this.output.pushStreamStart(args);
+            // Set up user info BEFORE processing any voice data
+            this.#activeVoiceBuffer.userInfo = {
+              userId: args.userId,
+              username: args.username,
+              channelId: args.channelId,
+              streamId: this.#generateStreamId()
+            };
+            this.output.pushStreamStart(this.#activeVoiceBuffer.userInfo);
             break;
           }
           case 'voiceend': {
             console.log('voice end', args);
-            this.output.pushStreamEnd(args);
+            // Don't clear user info here, let VAD handle it
             break;
           }
-          case 'voiceidle': { // feedback that discord is no longer listening
+          case 'voiceidle': {
             console.log('voice idle', args);
+            // Only process if VAD isn't collecting
+            if (!this.#activeVoiceBuffer.collecting) {
+              this.#processVoiceBuffer();
+            }
             this.input.cancelStream(args);
             break;
           }
@@ -528,7 +753,28 @@ export class DiscordBotClient extends EventTarget {
     await readyPromise;
   }
 
+  #generateStreamId() {
+    return Math.random().toString(36).substring(2, 10);
+  }
+
   destroy() {
+    if (this.#activeVoiceBuffer.timer) {
+      clearTimeout(this.#activeVoiceBuffer.timer);
+    }
+    
+    if (this.vadConnection) {
+      this.vadConnection.close();
+    }
+
+    // Clean up the decoder
+    if (this.decoder) {
+      this.decoder.readable.cancel();
+      this.decoder.writable.abort();
+      this.decoder = null;
+    }
+
+    this.#activeVoiceBuffer = null;
+    
     this.ws && this.ws.close();
     this.input.destroy();
     this.output.destroy();

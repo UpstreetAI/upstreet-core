@@ -1,5 +1,5 @@
 {
     "title": "Concepts",
-    "pages": ["what-are-agents", "personalities", "memories", "defining-agent-objectives", "agents-sdk"],
+    "pages": ["what-are-agents", "personalities", "memories", "defining-agent-objectives", "usdk"],
     "defaultOpen": false
 }

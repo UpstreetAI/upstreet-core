@@ -20,7 +20,7 @@ const DocsIndexPage = () => {
   return (
     <div className="w-full h-full pt-12 flex flex-col justify-center items-center min-w-0 max-w-[var(--fd-page-width)] md:transition-[max-width]">
       <DocsTitle className="mb-6">
-        <span className="flex justify-center items-center gap-2">
+        <span className="text-2xl md:text-4xl flex justify-center items-center gap-2 whitespace-nowrap">
           Build AI Agents with{' '}
           <pre className="font-mono px-1 bg-fd-primary-foreground rounded-md">
             {'<React />'}
@@ -42,7 +42,7 @@ const DocsIndexPage = () => {
             description="Create your first AI Agent. Complete with its own backstory, and motives."
           />
         </Link>
-        <Link href={'/examples/hello-world'}>
+        <Link href={'/examples'}>
           <LargeCard
             src={'/images/general/eb708406-76c3-464c-93f3-eb87db218354.webp'}
             title={'Examples'}

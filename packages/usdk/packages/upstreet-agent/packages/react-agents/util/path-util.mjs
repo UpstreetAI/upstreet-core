@@ -1,6 +1,6 @@
 import path from 'path';
 
-export const getCurrentDirname = (importMeta, _process = process) => {
+export const getCurrentDirname = (importMeta = import.meta, _process = process) => {
   if (importMeta.dirname) {
     return importMeta.dirname;
   } else if (importMeta.url) {

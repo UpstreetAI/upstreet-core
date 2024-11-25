@@ -4,11 +4,33 @@ import {
   DocsBody,
   DocsDescription,
   DocsTitle,
+  DocsCategory,
 } from 'fumadocs-ui/page';
 import { notFound } from 'next/navigation';
-import defaultMdxComponents from 'fumadocs-ui/mdx';
+import { Popup, PopupContent, PopupTrigger } from 'fumadocs-twoslash/ui';
 import Socials from '@/components/socials';
 import Link from 'next/link';
+import {
+  type ComponentProps,
+  type FC,
+  // Fragment,
+  // type ReactElement,
+  // type ReactNode,
+} from 'react';
+import defaultComponents from 'fumadocs-ui/mdx';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+// import { AutoTypeTable } from '@/components/type-table';
+
+// function PreviewRenderer({ preview }: { preview: string }): ReactNode {
+//   if (preview && preview in Preview) {
+//     const Comp = Preview[preview as keyof typeof Preview];
+//     return <Comp />;
+//   }
+
+//   return null;
+// }
 
 export default async function Page(props: {
   params: Promise<{ slug?: string[] }>;
@@ -17,23 +39,27 @@ export default async function Page(props: {
   const page = source.getPage(params.slug);
   if (!page) notFound();
 
-  const MDX = page.data.body;
+  // const preview = page.data.preview;
+  const {
+    body: Mdx,
+    toc, 
+    // lastModified 
+  } = await page.data;
 
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full}
+    <DocsPage toc={toc} full={page.data.full}
       footer={{
-        enabled: page.url === '/docs' ? false : true,
+        enabled: page.url === '/' ? false : true,
       }}
-      // editOnGithub={{
-      //   owner: 'UpstreetAI',
-      //   // path: `docs-upstreet/${page.url.replace('/docs/', '')}.mdx`,
-      //   path: '',
-      //   repo: 'monorepo',
-      // }}
+      editOnGithub={{
+        owner: 'UpstreetAI',
+        path: `apps/docs/content/docs/${page.file.path}`,
+        repo: 'upstreet-core',
+      }}
       breadcrumb={{
         enabled: true,
-        full: true,
-        includeSeparator: true,        
+        full: false,
+        includeSeparator: true,     
       }}
       tableOfContent={{
         style: 'clerk',
@@ -49,7 +75,28 @@ export default async function Page(props: {
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
-        <MDX components={{ ...defaultMdxComponents }} />
+        {/* {preview ? <PreviewRenderer preview={preview} /> : null} */}
+        <Mdx
+          components={{
+            ...defaultComponents,
+            Popup,
+            PopupContent,
+            PopupTrigger,
+            Tabs,
+            Tab,
+            TypeTable,
+            // AutoTypeTable,
+            Accordion,
+            Accordions,
+            // Wrapper,
+            // blockquote: Callout as unknown as FC<ComponentProps<'blockquote'>>,
+            // APIPage: openapi.APIPage,
+            // HeadlessOnly:
+              // params.slug[0] === 'headless' ? Fragment : () => undefined,
+            // UIOnly: params.slug[0] === 'ui' ? Fragment : () => undefined,
+          }}
+        />
+        {page.data.index ? <DocsCategory page={page} from={source} /> : null}
       </DocsBody>
     </DocsPage>
   );

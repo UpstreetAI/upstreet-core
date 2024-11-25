@@ -1,0 +1,74 @@
+---
+title: <Agent>
+description: Learn how to use the Agent Component to lay out the foundation of your Agent.
+full: false
+---
+
+The `Agent` component serves as a high-level wrapper component that provides the core infrastructure for AI agent functionality in a React application. It acts as a container that:
+
+- Establishes the communication context for AI interactions
+- Manages the state and lifecycle of AI agent operations
+- Provides necessary context and configuration to child components
+- Enables action handling and event processing for nested agent functionalities
+
+## Import
+
+```tsx
+import { Agent } from 'react-agents';
+```
+
+## Usage
+
+The `Agent` class has represents a currently running agent. It corresponds 1:1 to an `<Agent>` tag in your code.
+
+```tsx
+import { Agent } from 'react-agents'
+
+const MyAgent = () => {
+  return (
+    <Agent>
+      {/* Child components that need access to agent capabilities */}
+      <YourAgentLogic />
+    </Agent>
+  )
+}
+```
+
+<Callout>
+You do not construct the `Agent` class yourself. It is created for you when your `<Agent>` gets rendered by the runtime.
+</Callout>
+
+## Reference
+
+The `Agent` class exposes helpful functions to help build your Agent. When you have a handle to your agent, you can access its methods.
+
+### `useAgent` hook
+Any component nested within an `<Agent>` can call the `useAgent` hook to get a handle to the underlying `Agent` class. [See reference](/api/hooks/useAgent)
+
+### `handler` callback: 
+Each `handler` in your agent (such as `<Action handler={(event) => {/* ... */}}>` or `<Perception handler={(event) => {/* ... */}}>`) has an `agent` key on the `event.data`. You can use this for convenient access to the currently running `agent`. e.g.
+
+### `useRef` hook
+Every `<Agent>` has an internal `ref` that resolves to the `Agent` instance. You can access it the usual way using React's [`useRef`](https://react.dev/reference/react/useRef):
+```tsx
+import { useRef } from 'react'; // [!code ++]
+import { Agent } from 'react-agents';
+
+const MyAgent = () => {
+  // [!code ++]
+  const agentRef = useRef(null); // now you can use agentRef.current to access the Agent tags functions. 
+
+  return (
+    // [!code ++]
+    <Agent ref={agentRef}>
+      {/* Child components that need access to agent capabilities */}
+      <YourAgentLogic />
+    </Agent>
+  )
+}
+
+```
+
+## Source code
+
+You can see the code for the Agent Component in our [GitHub](https://github.com/UpstreetAI/monorepo/blob/main/packages/usdk/packages/upstreet-agent/packages/react-agents/components.tsx#L90).

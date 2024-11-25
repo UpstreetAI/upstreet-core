@@ -1992,7 +1992,7 @@ export const createProgram = () => {
   } catch (error) {
     console.error("Error creating program:", error);
   }
-  return program
+  return program // always return the program
 };
 
 export const main = async () => {

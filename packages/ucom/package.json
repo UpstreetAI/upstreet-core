@@ -5,14 +5,14 @@
   "homepage": "https://ucom.upstreet.ai/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/UpstreetAI/monorepo.git"
+    "url": "https://github.com/UpstreetAI/upstreet-core.git"
   },
   "author": "Upstreet <support@upstreet.ai> (https://github.com/UpstreetAI)",
   "contributors": [
     "Hayk Mavisakalyan <mavisakalyan@gmail.com> (https://github.com/mavisakalyan)"
   ],
   "bugs": {
-    "url": "https://github.com/UpstreetAI/monorepo/issues"
+    "url": "https://github.com/UpstreetAI/upstreet-core/issues"
   },
   "license": "MIT",
   "keywords": [

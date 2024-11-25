@@ -1,0 +1,37 @@
+---
+title: <Prompt>
+description: Learn how to use the Prompt Component to have your Agent think.
+full: false
+---
+
+When it's time for your agent to `.think()`, it will concatenate all of its prompts, in the order they are rendered in React, and use that prompt for inference to generate the next action. Therefore the prompts you use form the bread and butter of your agent's thought process and have a large impact on its behavior.
+
+## Import
+
+```tsx
+import { Prompt } from 'react-agents'
+```
+
+## Usage
+
+Prompts can be either static (strings) or dynamic (depending on external data or memory). You can render anything you like inside of a prompt tag, and your agent will consider it when thinking!
+
+```tsx
+import { 
+    Agent,
+    Prompt // [!code ++]
+} from 'react-agents'
+
+const MyAgent = () => {
+  return (
+    <Agent>
+        {/* [!code ++] */}
+        <Prompt>This agent is female</Prompt>
+        {/* [!code ++] */}
+        <Prompt>They have a sarcastic personality</Prompt>
+    </Agent>
+  )
+}
+```
+
+You can have a complete, working Agent with an `agent.tsx` file using just the [`Agent`](/api/components/agent) tag and the `Prompt` tag.

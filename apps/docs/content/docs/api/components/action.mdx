@@ -1,0 +1,123 @@
+---
+title: <Action>
+description: Define actions your Agent can perform.
+full: false
+---
+
+The `Action` component from `react-agents` represents an action that a React AI agent can perform. It registers a new action with an agent registry, allowing the agent to trigger the action in response to certain events. This component is useful for defining discrete, reusable actions with associated schemas and event handlers, making it easier to define and handle actions within an AI-driven context.
+
+## Import
+
+```tsx
+import { Action } from 'react-agents';
+```
+
+
+## Usage
+Here is an example of how the Action component might be used:
+```javascript
+import { Action } from 'react-agents';
+import { z } from 'zod';
+
+const sendMessageSchema = z.object({
+  message: z.string(),
+  recipientId: z.string(),
+});
+
+const handleSendMessage = async (e) => {
+  console.log("Sending message:", e);
+  // Code to send a message goes here
+};
+
+function MyComponent() {
+  return (
+    <Action
+      name="SendMessage"
+      description="Sends a message to a specific recipient."
+      state="ready"
+      schema={sendMessageSchema}
+      examples={[
+        { message: "Hello!", recipientId: "12345" },
+        { message: "How are you?", recipientId: "67890" },
+      ]}
+      handler={handleSendMessage}
+    />
+  );
+}
+```
+
+### Example Breakdown:
+
+name is set to "SendMessage" to identify the action.
+description provides a brief summary of the action's purpose.
+state is set to "ready" to indicate the current status of the action.
+schema defines the expected input parameters, validating that message and recipientId are strings.
+examples show sample data for the message and recipientId inputs.
+handler is an asynchronous function that handles the SendMessage action when it is triggered.
+Component Lifecycle
+When the Action component is mounted, it registers the action with the agent registry using the registerAction method, associating the action with a unique symbol. When unmounted, it unregisters the action, ensuring no memory leaks.
+
+
+## Props
+
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+export const actionProps = {
+  name: {
+    description: 'The name of the action.',
+    type: 'string',
+    typeDescription: 'The name is used to identify the action within the agent registry.',
+    typeDescriptionLink: '', // Add a link if needed
+    default: 'N/A', // Required, so no default
+  },
+  description: {
+    description: 'A human-readable description of what the action does.',
+    type: 'string',
+    typeDescription: 'Helpful for documenting the action\'s purpose or behavior.',
+    typeDescriptionLink: '', // Add a link if needed
+    default: 'N/A', // Required, so no default
+  },
+  state: {
+    description: 'An optional state associated with the action.',
+    type: 'string',
+    typeDescription: 'This state provides additional contextual information and may influence the action\'s behavior.',
+    typeDescriptionLink: '', // Add a link if needed
+    default: 'undefined', // Optional, so can be undefined
+  },
+  schema: {
+    description: 'A Zod schema object that defines the structure and validation of the action\'s input parameters.',
+    type: 'ZodTypeAny',
+    typeDescription: 'Used to validate the data passed to the action, ensuring it conforms to the expected format.',
+    typeDescriptionLink: '', // Add a link if needed
+    default: 'N/A', // Required, so no default
+  },
+  examples: {
+    description: 'An array of example objects demonstrating the expected structure of the action\'s inputs.',
+    type: 'Array<object>',
+    typeDescription: 'Illustrates typical usage scenarios for the action.',
+    typeDescriptionLink: '', // Add a link if needed
+    default: 'N/A', // Required, so no default
+  },
+  handler: {
+    description: 'A function or asynchronous function that handles the action when triggered.',
+    type: 'function',
+    typeDescription: 'Receives a `PendingActionEvent` and defines the action\'s behavior. If asynchronous, it must return a Promise.',
+    typeDescriptionLink: '', // Add a link if needed
+    default: 'undefined', // Optional, so can be undefined
+  },
+};
+
+<TypeTable
+  type={actionProps}
+/>
+
+
+
+## Dependencies
+The component recalculates and registers the action if any of the following dependencies change:
+
+`name`
+`description`
+Serialized schema (printZodSchema)
+Serialized examples
+Serialized handler function

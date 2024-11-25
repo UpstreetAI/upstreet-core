@@ -1,7 +1,10 @@
 ---
 title: Informative Agent
-description: This section describes how to build an Agent with Upstreet, with custom Components.
+description: This section describes how to build an Agent with with custom Components.
 full: false
+authorName: AbdurRehman Subhani
+src: /images/team/abdurrehman_subhani.jpeg
+thumbnailSrc: /images/example-thumbnails/informative-agent.png
 ---
 
 In this guide, we build an **Informative Agent** inspired by the [Pokédex](https://www.pokemon.com/us/pokedex) in the Pokémon franchise, an encyclopedia device capable of retrieving Pokémon information and having conversations with its user.
@@ -40,7 +43,7 @@ As of November 12, 2024, there are **1,025** Pokémon in the National Pokédex. 
 
 So instead of keeping the Pokédex database in memory, we'll use [PokéAPI](https://pokeapi.co/) - an open-source (and free) Pokémon API - to retrieve Pokémon information at runtime.
 
-We'll have to create a [custom Component](/concepts/agents-sdk/creating-custom-components) to retrieve Pokémon information from the PokéAPI. For the sake of this example, we'll keep it simple:
+We'll have to create a [custom Component](/concepts/usdk/creating-custom-components) to retrieve Pokémon information from the PokéAPI. For the sake of this example, we'll keep it simple:
 
 ```tsx
 const PokemonDexAssistant = () => {

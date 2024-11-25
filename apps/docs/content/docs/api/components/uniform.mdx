@@ -1,0 +1,92 @@
+---
+title: <Uniform>
+description: Generate metadata for each action.
+full: false
+---
+
+The concept is borrowed from [Uniforms in a shader](https://en.wikipedia.org/wiki/Shader).
+
+## Import
+
+```tsx
+import { Uniform } from 'react-agents';
+```
+
+## Usage
+Here's a simple example of using the `Uniform` component:
+
+```tsx
+import { Uniform, Agent, Action } from 'react-agents';
+
+function MyComponent() {
+  return (
+    <Agent>
+      <Uniform
+        name="mood"
+        description="Current emotional state of the agent"
+        handler={(message) => {
+          // Analyze message and return mood
+          return {
+            mood: 'positive',
+            confidence: 0.8
+          };
+        }}
+      >
+        <Action name="respond" handler={(data) => {
+          // Access uniform data in action
+          console.log('Current mood:', data.uniform.mood);
+        }} />
+      </Uniform>
+    </Agent>
+  );
+}
+```
+
+## Props
+
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+export const uniformProps = {
+  name: {
+    description: 'Identifier for the uniform',
+    type: 'string',
+    typeDescription: 'A string representing the unique identifier for the uniform.',
+    typeDescriptionLink: '', // You can link to further documentation if available
+    default: 'N/A', // You can specify default or leave it as 'N/A'
+  },
+  description: {
+    description: 'Describes the purpose of the uniform',
+    type: 'string',
+    typeDescription: 'A string providing a clear explanation of the uniform’s purpose.',
+    typeDescriptionLink: '',
+    default: 'N/A',
+  },
+  handler: {
+    description: 'Function that generates the uniform data',
+    type: 'Function(message) => any',
+    typeDescription: 'A function that takes a message and returns metadata.',
+    typeDescriptionLink: '',
+    default: 'N/A',
+  },
+};
+
+<TypeTable
+  type={uniformProps}
+/>
+
+
+## Best Practices
+
+- Keep handlers lightweight and efficient
+- Use meaningful names for uniforms
+- Implement proper error handling
+- Cache expensive computations when possible
+- Document the uniform's purpose clearly
+
+## Common Use Cases
+
+- Tracking conversation topics
+- Monitoring agent mood or state
+- Generating consistency metrics
+- Adding timestamps or identifiers
+- Maintaining context across actions

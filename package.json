@@ -1,6 +1,6 @@
 {
-  "name": "@upstreet/monorepo",
-  "description": "Upstreet monorepo",
+  "name": "@upstreet/upstreet-core",
+  "description": "Upstreet core monorepo.",
   "private": true,
   "type": "module",
   "scripts": {

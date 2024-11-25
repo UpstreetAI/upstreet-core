@@ -9,7 +9,7 @@
 
 <div align="center" style="text-align: center">
 
-![upstreet-logo](https://github.com/user-attachments/assets/56a1469a-1a2f-4fd2-a1d3-32fa44d7b02d)
+[![upstreet-logo](https://github.com/user-attachments/assets/56a1469a-1a2f-4fd2-a1d3-32fa44d7b02d)](https://upstreet.ai)
 
 
 <!-- [![](https://dcbadge.limes.pink/api/server/TfKW36rMj7)](https://discord.gg/TfKW36rMj7) -->

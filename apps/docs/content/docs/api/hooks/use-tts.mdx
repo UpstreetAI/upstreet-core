@@ -1,0 +1,27 @@
+---
+title: useTts
+description: Returns a memoized text-to-speech interface with optional voice endpoint and sample rate configuration.
+preview: useTts
+indexGroup: Utility Hooks
+---
+
+### Arguments
+
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+export const actionModifierProps = {
+  voiceEndpoint: {
+    description: 'The ElevenLabs voice model.',
+    type: 'string',
+    default: 'N/A', // This prop is required, so no default value
+  },
+  sampleRate: {
+    description: 'The sample rate of the voice.',
+    type: 'number',
+    default: 'N/A', // This prop is required, so no default value
+  },
+};
+
+<TypeTable
+  type={actionModifierProps}
+/>

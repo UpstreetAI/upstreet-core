@@ -1,0 +1,84 @@
+---
+title: X (formerly Twitter)
+description: Integrate your Agent with X, one of the world's most viral social apps.
+full: false
+---
+
+## Responding to Mentions
+
+Twitter integration allows your agent to interact with Twitter by responding to mentions.
+
+1. Create a Twitter Developer Account:
+   - Go to https://developer.twitter.com/
+   - Sign up for a developer account if you haven't already
+   - Create a new project and app
+   - Make sure your "User authentication settings" are set to "Native app" (Public client)
+   - Copy your OAuth 2.0 application credentials (Client ID and Client Secret)
+
+2. Log in with oauth at https://twitter-auth.upstreet.ai/
+   - Use the Client ID and Client Secret from step 1
+
+3. Configure your agent:
+   - Add the following component to your agent:
+   ```json
+   import { Twitter } from 'react-agents';
+
+   return (
+     <Agent>
+       {/* ... */}
+       <Twitter
+         token="YOUR_TWITTER_TOKEN" // OAuth 2.0 token
+       />
+       {/* ... */}
+     </Agent>
+   );
+   ```
+
+   **Additional Notes:**
+   - The bot will automatically listen for and respond to mentions of your Twitter account
+   - The token should be kept secure and not committed to version control
+     - You can use `.env.txt` and the useEnv() hook to load it at runtime
+   - The bot polls for new mentions every 10 seconds
+   - Twitter API rate limits apply - see Twitter's [developer documentation](https://developer.twitter.com/en/docs/twitter-api/rate-limits) for details
+   - The bot requires a stable internet connection to maintain communication with Twitter
+   - Note: if you haven't created the agent yet, please follow this [Create an Agent](/create-an-agent) first.
+
+### Twitter Spaces
+
+The Twitter Spaces integration allows your agent to create and join Twitter Spaces audio rooms.
+
+1. Get your Twitter auth token:
+   - Log into Twitter in your browser
+   - Open the browser developer tools (F12)
+   - Go to the Application/Storage tab
+   - Find the `auth_token` cookie under Cookies > twitter.com
+   - Copy the value of the `auth_token` cookie
+
+2. Configure your agent:
+   ```json
+   import { TwitterSpaces } from 'react-agents';
+
+   return (
+     <Agent>
+       {/* ... */}
+       <TwitterSpaces
+         token="YOUR_AUTH_TOKEN" // Twitter auth_token cookie value
+         url="OPTIONAL_SPACE_URL" // URL of an existing Space to join (optional)
+       />
+       {/* ... */}
+     </Agent>
+   );
+   ```
+
+   **Additional Notes:**
+   - If no `url` is provided, the bot will create a new Twitter Space
+   - If a `url` is provided, the bot will attempt to join that existing Space
+   - The bot will automatically:
+     - Create/join the Space
+     - Request speaking permissions if joining
+     - Unmute itself when ready
+   - The token should be kept secure and not committed to version control
+     - You can use `.env.txt` and the useEnv() hook to load it at runtime
+   - The bot requires a stable internet connection to maintain the Space connection
+   - Twitter's standard rate limits and Space restrictions apply
+   - Note: if you haven't created the agent yet, please follow this [Create an Agent](/create-an-agent) first.

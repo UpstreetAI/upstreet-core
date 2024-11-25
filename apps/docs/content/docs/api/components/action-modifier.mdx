@@ -1,0 +1,74 @@
+---
+title: <ActionModifier>
+description: Intercept and modify agent action handling.
+full: false
+---
+
+The `ActionModifier` enables middleware-like modification of actions within your agent system, allowing for pre and post-processing of actions. The `ActionModifier` component serves as a wrapper that intercepts and modifies actions before and after execution.
+
+## Import
+```tsx
+import { ActionModifier } from 'react-agents';
+```
+
+
+## Usage
+Here's a basic example of using the `ActionModifier`:
+
+```tsx
+
+import { ActionModifier, Action } from 'react-agents';
+
+function MyComponent() {
+  return (
+    <ActionModifier
+      before={(action) => {
+        // Pre-process action
+        console.log('Before action:', action);
+        return action;
+      }}
+      after={(result) => {
+        // Post-process result
+        console.log('After action:', result);
+        return result;
+      }}
+    >
+      <Action name="exampleAction" handler={() => {}} />
+    </ActionModifier>
+  );
+}
+```
+## Props
+
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+export const actionModifierProps = {
+  before: {
+    description: 'A function that executes before the action is processed.',
+    type: 'Function(action) => action',
+    typeDescription: 'A function that can modify or validate the action and must return the modified action.',
+    typeDescriptionLink: '', // Add a link to further documentation if needed
+    default: 'N/A', // This prop is required, so no default value
+  },
+  after: {
+    description: 'A function that executes after the action completes.',
+    type: 'Function(result) => result',
+    typeDescription: 'A function that can transform the result and must return the final result.',
+    typeDescriptionLink: '', // Add a link to further documentation if needed
+    default: 'N/A', // This prop is required, so no default value
+  },
+};
+
+<TypeTable
+  type={actionModifierProps}
+/>
+
+
+## Best Practices
+
+- Keep modifiers focused on specific concerns
+- Chain multiple modifiers for complex modifications
+- Handle errors appropriately in before/after handlers
+- Avoid heavy computations that might block the main thread
+- Return the modified action/result from handlers
+

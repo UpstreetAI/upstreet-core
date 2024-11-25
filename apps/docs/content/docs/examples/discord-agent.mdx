@@ -1,0 +1,83 @@
+---
+title: Discord Agent
+description: This section describes how to build an Agent which can talk in Discord voice and chat.
+full: false
+authorName: Syed Rabeet
+src: /images/team/syed_rabeet.jpeg
+thumbnailSrc: /images/example-thumbnails/discord-agent.png
+---
+
+In this guide, we build an Agent named "Nimbus" which can talk on [**Discord**](https://discord.com) - It would be able to discuss hot topics in text channels, and even be able to talk in voice channels.
+
+The source code for this example will soon be available on Github.
+
+## Video Tutorial
+
+You can follow along this example by watching the video (coming soon).
+
+## Guide
+
+### Step 1: Setup `usdk`
+
+Follow _[Setup the SDK](/install)_ to set up NodeJS and `usdk`.
+
+### Step 2: Create an Agent using the Interview process
+
+Run `usdk create <your-agent-directory>` to start the interview process.
+
+```
+? What do you want your agent to do?
+I want my agent to act as a discord bot
+```
+
+Now it will ask for a [Discord bot token](https://www.writebots.com/discord-bot-token/) and the [channel](https://docs.statbot.net/docs/faq/general/how-find-id/) you want the bot to join.
+
+```
+? Alright, let's get your agent all set up for Discord! Do you have the bot token ready? If you've also got some specific channels you'd like your bot to join, let me know those too!?
+<Paste the token here and the channel you want the bot to join>
+```
+
+<Callout>
+This tutorial will **not** cover how to obtain Discord tokens. For more information on how to build Discord bots, you can refer to the [Discord Component's documentation](/api/integrations/discord).
+You can also request our agent to guide you through obtaining tokens. Simply use the prompt below, and it will provide a step-by-step process.
+
+```
+How to obtain Discord tokens? Give me step by step process.
+```
+
+</Callout>
+
+
+Once you obtain the tokens, complete the rest of the interview.
+
+### Step 3: Test "Nimbus"
+
+You can run `usdk chat` to test Nimbus out. [Learn more](/test-your-agent)
+
+### Step 4: (optional) Edit the Agent Custom Responses and Personality
+
+After testing, you might want to customize Nimbus for tailored interactions or give her a distinct personality.
+
+Run `usdk edit` to edit Nimbus through the interview process.
+
+```
+? Do you want to give your agent any particular personality traits or a special role?
+Yes, I want Nimbus to be a friendly yet professional assistant with a knack for simplifying tasks.
+- She should exhibit enthusiasm in helping users.
+- Nimbus should also have a bit of wit and humor in her responses to make interactions engaging.
+- Role: A knowledgeable helper for Discord communities, adept at managing tasks like polls, reminders, and daily facts.
+
+
+```
+
+Test Nimbus again. Ask her:
+
+> Hey Nimbus , Introduce yourself in XYZ channel?
+
+Share the response in our [Discord community](https://upstreet.ai/usdk-discord); we'd love to know what she responds to you.
+
+## Further Challenges
+
+- Create a `!poll` command using Nimbus that takes a question and generates a poll with reactions (e.g., ✅ for yes, ❌ for no).
+- Add a `!remind` command where users can set reminders
+- Send a fun fact to a specific channel daily

@@ -1,0 +1,114 @@
+---
+title: Discord
+description: Integrate your Agent with Discord, the popular chatting app.
+full: false
+---
+import Wrapper from 'components/preview/wrapper';
+import Image from 'next/image';
+
+## Import
+
+```tsx
+import { Discord } from 'react-agents';
+```
+
+## Usage
+
+<Callout>
+  We highly recommend reading the [Discord Developers documentation](https://discord.com/developers/docs/intro) for in-depth help, and navigating through Discord's API.
+</Callout>
+
+Add Discord integration to your agent by following these steps:
+
+### Step 1: Create a Discord bot application
+   - Go to https://discord.com/developers/applications
+   - Click **"New Application"** and give it a name
+
+  <Image src="/images/integrations/discord-new-app.png" width={740} height={300} className='rounded-md'/>
+
+
+### Step 2: Configure bot settings
+   - From the sidebar, go to the **Bot** section to get the **Token**.
+   - Click on **Reset Token** to get your Token and save it somewhere securely.
+  <Image src="/images/integrations/bot-section.png" width={740} height={300} className='rounded-md'/>
+ 
+  Make sure to enable all three options here.
+  - **Presence Intent** ✓
+  - **Server Members Intent** ✓
+  - **Message Content Intent** ✓
+
+  <Image src="/images/integrations/bot-perm.png" width={740} height={300} className='rounded-md'/>
+
+### Step 3: Add the bot to your server
+
+  - From the sidebar, go to the **OAuth2** section
+  - At the **OAuth2 URL Generator**, check the `bot` option
+
+  <Image src="/images/integrations/bot-mark.png" width={740} height={300} className='rounded-md'/>
+
+
+
+  - In the **Bot Permissions**, give the relevant permissions to the bot. To enable the bot to talk in the server and respond to messages, you should check **"Send Messages"**. You can check other permissions based on what you want your bot to do.
+  <Image src="/images/integrations/auth-perm.png" width={740} height={300} className='rounded-md'/>
+
+
+  - Scroll down a bit to copy the URL:
+  <Image src="/images/integrations/Copy-url.png" width={740} height={300} className='rounded-md'/>
+
+  - **Paste** this URL in a new tab where you will have to:
+
+   1) Select the server you want to add the bot to
+   2) Authorize the bot
+
+### Step 4: Create and Configure your Agent
+
+Run this command to create an Upstreet Agent:
+```bash
+usdk create
+```
+
+Add the following Component to your Agent:
+```tsx
+import { Discord } from 'react-agents';
+
+// ... 
+return (
+<Agent>
+  {/* ... */}
+  <Discord
+    token="YOUR_BOT_TOKEN" // The bot token from Step 2
+    channels={[
+      "general", // Text channel names the bot should listen to
+      "voice-chat" // Voice channel names the bot should listen to
+    ]}
+    dms={true} // Enable direct messages with the bot
+    userWhitelist={[ // Optional: restrict which users can interact
+      "user1#1234",
+      "user2#5678"
+    ]}
+  />
+  {/* ... */}
+</Agent>
+);
+```
+
+Run the following command to get your Discord Agent up and running.
+
+```bash
+usdk chat
+```
+
+You can now test it in the connected Discord server! Just mention it in one of the channels you specified, and see it talk.
+
+You can see a more detailed guide for this in our [_Discord Agent_](/examples/discord-agent) example.
+
+## Additional Notes
+- The bot will only respond in the specified channels and to whitelisted users (if configured)
+- Voice channel support requires additional Discord permissions (see above)
+- Channel names are case-sensitive and should match exactly
+- For DMs, users must share a server with the bot
+- The bot token should be kept secure and not committed to version control.
+- You can use `.env.txt` and the useEnv() hook to load it at runtime.
+- If you need to reset the token for security reasons, you can do so in the Discord Developer Portal
+- The bot requires a stable internet connection to maintain WebSocket connection with Discord
+- Rate limits apply to bot actions - see Discord's [developer documentation](https://discord.com/developers/docs/topics/rate-limits) for details

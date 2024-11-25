@@ -24,7 +24,7 @@ Agents follow a simple but powerful cycle: they **perceive** inputs, **process**
 
 Read our [*What Are Agents?*](/concepts/what-are-agents) guide to get familiar with Agent basics.
 
-Explore [Upstreet’s Agent Architecture](/concepts/agents-sdk/architecture) to learn more about how Agents operate behind the scenes.
+Explore [Upstreet’s Agent Architecture](/concepts/usdk/architecture) to learn more about how Agents operate behind the scenes.
 
 ## Agent Structure at a Glance
 
@@ -53,6 +53,8 @@ Using the `react-agents` library, Agent customization is broken down into four c
 | `<Perception />` | Allows the Agent to perceive and react to real-world events.    |
 | `<Task />`     | Schedules tasks for the Agent, enabling it to manage asynchronous processes.  |
 
+You can see all Components [here](/api/components).
+
 Import these components from the SDK package:
 
 ```tsx
@@ -68,7 +70,7 @@ An Agent consists of a collection of components implementing these primitives.
 
 Here’s a sample setup that combines these components:
 
-```tsx
+```tsx title="agent.tsx"
 const MyAgent = () => (
   <Agent>
     <Prompt>I'm here to help you with information about our services and products.</Prompt>
@@ -81,13 +83,26 @@ const MyAgent = () => (
 
 This setup provides a well-rounded Agent equipped to respond, perceive, act, and manage scheduled tasks effectively.
 
+### Using environment variables
+
+You may choose to use third-party services when customizing your Agent. These services may have **secrets** or **tokens**.
+
+You can keep them safe by creating a `.env` file in the your Agent directory, and keeping environment variables there.
+
+An example might look like:
+
+```dotenv title=".env"
+GOOGLE_API_KEY=abcdefghijklmonp
+OPEN_WEATHER_KEY=abcdefghijklmonp
+```
+
 ## Custom Logic and Advanced Patterns
 
 With `react-agents`, you can introduce custom logic within components, such as conditional rendering, state management, and data manipulation, using native React hooks and patterns.
 
 To explore advanced customization:
-- Read our [Custom Components guide](/concepts/agents-sdk/agent-structure).
-- Learn more about how [agents are structured](/concepts/agents-sdk/agent-structure).
+- Learn how to make [Custom Components](/concepts/usdk/agent-structure).
+- Learn more about how [agents are structured](/concepts/usdk/agent-structure).
 - Our [Pokédex example](/examples/informative-agent) demonstrates a basic, real-world example of how to create a custom component.
 
 ---

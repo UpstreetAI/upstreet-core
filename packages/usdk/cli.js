@@ -35,7 +35,7 @@ import {
   getWalletFromMnemonic,
   getConnectedWalletsFromMnemonic,
 } from './packages/upstreet-agent/packages/react-agents/util/ethereum-utils.mjs';
-import { ReactAgentsWranglerRuntime } from './packages/upstreet-agent/packages/react-agents-wrangler/wrangler-runtime.mjs';
+// import { ReactAgentsWranglerRuntime } from './packages/upstreet-agent/packages/react-agents-wrangler/wrangler-runtime.mjs';
 import {
   deployEndpointUrl,
   chatEndpointUrl,
@@ -83,9 +83,9 @@ import {
   chat,
   runAgent,
 } from './lib/commands.mjs';
-import {
-  makeRoomName,
-} from './util/connect-utils.mjs';
+// import {
+//   makeRoomName,
+// } from './util/connect-utils.mjs';
 // import {
 //   env,
 // } from './lib/env.mjs';
@@ -94,7 +94,7 @@ import { featureSpecs } from './packages/upstreet-agent/packages/react-agents/ut
 import { AudioDecodeStream } from './packages/upstreet-agent/packages/codecs/audio-decode.mjs';
 import { WebPEncoder } from './packages/upstreet-agent/packages/codecs/webp-codec.mjs';
 import * as codecs from './packages/upstreet-agent/packages/codecs/ws-codec-runtime-fs.mjs';
-import { runJest } from './lib/jest-util.mjs';
+// import { runJest } from './lib/jest-util.mjs';
 import { logUpstreetBanner } from './util/logger/log-utils.mjs';
 import { makeCorsHeaders, getServerOpts } from './util/server-utils.mjs';
 // import {
@@ -588,7 +588,7 @@ const withdraw = async (args) => {
     throw new Error('not logged in');
   }
 }; */
-const test = async (args, opts) => {
+/* const test = async (args, opts) => {
   const agentSpecs = await parseAgentSpecs(args._[0]);
   const debug = !!args.debug;
   if (!agentSpecs.every((agentSpec) => !!agentSpec.directory)) {
@@ -617,7 +617,7 @@ const test = async (args, opts) => {
 
     runtime.terminate();
   }
-};
+}; */
 const ensureWebpEncoder = (() => {
   let webpEncoder = null;
   return () => {
@@ -1628,26 +1628,26 @@ export const main = async () => {
     //       await search(args);
     //     });
     //   });
-    program
-      .command('test')
-      .description('Run agent tests')
-      .argument(`[directories...]`, `Directories containing the agent projects to test`)
-      .option('-g, --debug', 'Enable debug logging')
-      .action(async (directories = [], opts = {}) => {
-        await handleError(async () => {
-          commandExecuted = true;
-          const args = {
-            _: [directories],
-            ...opts,
-          };
+    // program
+    //   .command('test')
+    //   .description('Run agent tests')
+    //   .argument(`[directories...]`, `Directories containing the agent projects to test`)
+    //   .option('-g, --debug', 'Enable debug logging')
+    //   .action(async (directories = [], opts = {}) => {
+    //     await handleError(async () => {
+    //       commandExecuted = true;
+    //       const args = {
+    //         _: [directories],
+    //         ...opts,
+    //       };
 
-          const jwt = await getLoginJwt();
+    //       const jwt = await getLoginJwt();
 
-          await test(args, {
-            jwt,
-          });
-        });
-      });
+    //       await test(args, {
+    //         jwt,
+    //       });
+    //     });
+    //   });
     // program
     //   .command('capture')
     //   .description('Test display functionality; with no arguments, list available devices')

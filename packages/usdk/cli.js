@@ -105,6 +105,8 @@ import { getLatestVersion } from './lib/version.mjs';
 // import {
 //   getDirectoryHash,
 // } from './util/hash-util.mjs';
+import inquirer from 'inquirer';
+import { formatIframe } from './util/embed-formatter.mjs';
 
 //
 
@@ -1986,6 +1988,68 @@ export const main = async () => {
           await withdraw(args);
         });
       });*/
+    program
+      .command('embed')
+      .description('Embed an agent into a webpage or application')
+      .argument('<agentId>', 'ID of the agent to embed')
+      .option('-o, --output <file>', 'Output file for the embed code')
+      .action(async (agentId, opts = {}) => {
+        await handleError(async () => {
+          commandExecuted = true;
+          const args = {
+            _: [agentId],
+            ...opts,
+          };
+
+          const { framework } = await inquirer.prompt([
+            {
+              type: 'list',
+              name: 'framework',
+              message: 'Select the framework for the embed code:',
+              choices: ['HTML', 'React', 'Angular', 'Vue', 'Svelte', 'PHP', 'React Native'],
+            },
+          ]);
+
+          // console.log(`Embedding agent with ID: ${agentId} for ${framework}`);
+
+          let embedCode;
+          switch (framework) {
+            case 'HTML':
+              embedCode = formatIframe("", 'HTML');
+              break;
+            case 'React':
+              embedCode = formatIframe("", 'React');
+              break;
+            case 'Angular':
+              embedCode = formatIframe("", 'Angular');
+              break;
+            case 'Vue':
+              embedCode = formatIframe("", 'Vue');
+              break;
+            case 'Svelte':
+              embedCode = formatIframe("", 'Svelte');
+              break;
+            case 'PHP':
+              embedCode = formatIframe("", 'PHP');
+              break;
+            case 'React Native':
+              embedCode = formatIframe("", 'React Native');
+              break;
+            default:
+              embedCode = 'Embed code not available for the selected framework.';
+          }
+
+          if (opts.output) {
+            console.log(pc.red(`Outputting embed code to file: ${opts.output}`));
+            // Example: fs.writeFileSync(opts.output, embedCode);
+          } else {
+            console.log(pc.yellow(`Embed code:`));
+            console.log(pc.green(`${embedCode}`));
+          }
+        });
+      });
+
+      
     await program.parseAsync();
   } catch (error) {
     console.error(error);

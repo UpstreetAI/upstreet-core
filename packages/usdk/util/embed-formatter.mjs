@@ -15,8 +15,7 @@ export function formatIframe(iframeHtml, framework) {
 
   switch (framework.toLowerCase()) {
     case "html":
-      return `
-<iframe
+      return `<iframe
   src="${iframeAttributes.src}"
   width="${iframeAttributes.width}"
   height="${iframeAttributes.height}"
@@ -27,8 +26,7 @@ export function formatIframe(iframeHtml, framework) {
       `;
 
     case "react":
-      return `
-function IframeComponent() {
+      return `function IframeComponent() {
   return (
     <iframe
       src="${iframeAttributes.src}"
@@ -49,8 +47,7 @@ export default IframeComponent;
       `;
 
     case "angular":
-      return `
-<iframe
+      return `<iframe
   src="${iframeAttributes.src}"
   width="${iframeAttributes.width}"
   height="${iframeAttributes.height}"
@@ -61,8 +58,7 @@ export default IframeComponent;
       `;
 
     case "vue":
-      return `
-<template>
+      return `<template>
   <iframe
     src="${iframeAttributes.src}"
     :style="{
@@ -80,8 +76,7 @@ export default IframeComponent;
       `;
 
     case "svelte":
-      return `
-<script>
+      return `<script>
   let iframeSrc = "${iframeAttributes.src}";
 </script>
 
@@ -96,8 +91,7 @@ export default IframeComponent;
       `;
 
     case "php":
-      return `
-<?php
+      return `<?php
 echo '<iframe
   src="${iframeAttributes.src}"
   width="${iframeAttributes.width}"
@@ -110,8 +104,7 @@ echo '<iframe
       `;
 
     case "react native":
-      return `
-import React from 'react';
+      return `import React from 'react';
 import { WebView } from 'react-native-webview';
 
 const IframeComponent = () => {

@@ -106,7 +106,7 @@ import { getLatestVersion } from './lib/version.mjs';
 //   getDirectoryHash,
 // } from './util/hash-util.mjs';
 import inquirer from 'inquirer';
-import { formatIframe } from './util/embed-formatter.mjs';
+import { generateIframe } from './util/generate-iframe.mjs';
 
 //
 
@@ -2015,25 +2015,25 @@ export const main = async () => {
           let embedCode;
           switch (framework) {
             case 'HTML':
-              embedCode = formatIframe("", 'HTML');
+              embedCode = generateIframe(agentId, 'HTML');
               break;
             case 'React':
-              embedCode = formatIframe("", 'React');
+              embedCode = generateIframe(agentId, 'React');
               break;
             case 'Angular':
-              embedCode = formatIframe("", 'Angular');
+              embedCode = generateIframe(agentId, 'Angular');
               break;
             case 'Vue':
-              embedCode = formatIframe("", 'Vue');
+              embedCode = generateIframe(agentId, 'Vue');
               break;
             case 'Svelte':
-              embedCode = formatIframe("", 'Svelte');
+              embedCode = generateIframe(agentId, 'Svelte');
               break;
             case 'PHP':
-              embedCode = formatIframe("", 'PHP');
+              embedCode = generateIframe(agentId, 'PHP');
               break;
             case 'React Native':
-              embedCode = formatIframe("", 'React Native');
+              embedCode = generateIframe(agentId, 'React Native');
               break;
             default:
               embedCode = 'Embed code not available for the selected framework.';

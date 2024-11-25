@@ -1,4 +1,5 @@
-export function formatIframe(iframeHtml, framework) {
+export function generateIframe(agentId, framework) {
+  
   const iframeAttributes = {
     src: "http://localhost:3000/embed/6b9b0174-aa31-4644-908a-fac17446528f",
     width: "300",

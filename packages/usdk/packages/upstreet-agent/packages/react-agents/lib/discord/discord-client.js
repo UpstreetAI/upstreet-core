@@ -23,6 +23,9 @@ import {
   TranscribedVoiceInput,
 } from '../../devices/audio-transcriber.mjs';
 
+import { AudioBufferManager } from './audio-buffer-manager';
+import { AudioQueueManager } from './audio-queue-manager';
+
 //
 
 // input from the agent to the discord bot
@@ -33,6 +36,10 @@ export class DiscordInput {
     this.ws = ws;
 
     this.streamSpecs = new Map();
+
+    // Add managers
+    this.bufferManager = new AudioBufferManager();
+    this.queueManager = new AudioQueueManager();
   }
 
   setWs(ws) {
@@ -56,98 +63,70 @@ export class DiscordInput {
     this.ws.send(s);
   }
 
-  // async to wait for consumption of the stream by the discord api
   async pushStream(stream) {
     const streamId = makeId(8);
-
-    const startVoiceMessage = {
-      method: 'playVoiceStart',
-      args: {
-        streamId,
-      },
-    };
-    // console.log('start voice message', {
-    //   startVoiceMessage,
-    // });
-    this.ws.send(JSON.stringify(startVoiceMessage));
+    
+    // Create buffer for this stream
+    this.bufferManager.createBuffer(streamId);
 
     const abortController = new AbortController();
     const {signal} = abortController;
-    // const onabort = () => {
-    //   const voiceAbortMessage = {
-    //     method: 'playVoiceEnd',
-    //     args: {
-    //       streamId,
-    //     },
-    //   };
-    //   this.ws.send(JSON.stringify(voiceAbortMessage));
-    // };
-    // signal.addEventListener('abort', onabort);
-    // const cleanup = () => {
-    //   signal.removeEventListener('abort', onabort);
-    // };
 
     this.streamSpecs.set(streamId, {
-      // stream,
       cancel() {
         abortController.abort();
       },
     });
 
-    // signal.addEventListener('abort', () => {
-    //   const voiceAbortMessage = {
-    //     method: 'playVoiceAbort',
-    //     args: {
-    //       streamId,
-    //     },
-    //   };
-    //   // console.log('play voice stream send abort', voiceAbortMessage);
-    //   this.ws.send(JSON.stringify(voiceAbortMessage));
-    // });
+    // Queue the stream
+    await this.queueManager.queueAudio(streamId, async () => {
+      // Send start message
+      const startVoiceMessage = {
+        method: 'playVoiceStart',
+        args: {
+          streamId,
+        },
+      };
+      this.ws.send(JSON.stringify(startVoiceMessage));
 
-    const reader = stream.getReader();
-    for (;;) {
-      const {
-        done,
-        value,
-      // } = await abortableRead(reader, signal);
-      } = await reader.read();
-      if (!done && !signal.aborted) {
-        // console.log('signal read not done', !!signal.aborted);
-        const uint8Array = value;
-        const voiceDataMessage = {
-          method: 'playVoiceData',
-          args: {
-            streamId,
-            uint8Array,
-          },
-        };
-        const encodedData = zbencode(voiceDataMessage);
-        // console.log('play voice stream send data', voiceDataMessage, encodedData);
-        // ensure the websocket is still live
-        if (this.ws.readyState === WebSocket.OPEN) {
-          this.ws.send(encodedData);
+      // Read and send stream
+      const reader = stream.getReader();
+      for (;;) {
+        const { done, value } = await reader.read();
+        
+        if (!done && !signal.aborted) {
+          const uint8Array = value;
+          this.bufferManager.addChunk(streamId, uint8Array);
+
+          const voiceDataMessage = {
+            method: 'playVoiceData',
+            args: {
+              streamId,
+              uint8Array,
+            },
+          };
+          const encodedData = zbencode(voiceDataMessage);
+
+          if (this.ws.readyState === WebSocket.OPEN) {
+            this.ws.send(encodedData);
+          } else {
+            break;
+          }
         } else {
+          this.bufferManager.markComplete(streamId);
+          const voiceEndMessage = {
+            method: 'playVoiceEnd',
+            args: {
+              streamId,
+            },
+          };
+          this.ws.send(JSON.stringify(voiceEndMessage));
           break;
         }
-      } else {
-        // console.log('signal read done', !!signal.aborted);
-        const voiceEndMessage = {
-          method: 'playVoiceEnd',
-          args: {
-            streamId,
-          },
-        };
-        // console.log('play voice stream send end', voiceEndMessage);
-        this.ws.send(JSON.stringify(voiceEndMessage));
-        break;
       }
-    }
-
-    // cleanup();
-
-    this.streamSpecs.delete(streamId);
+    });
   }
+
   cancelStream(args) {
     const {
       streamId,
@@ -175,8 +154,21 @@ export class DiscordInput {
     this.ws.send(s);
   }
 
+  handleVoiceIdle(args) {
+    const { streamId } = args;
+    // Clean up current stream
+    this.bufferManager.deleteBuffer(streamId);
+    this.streamSpecs.delete(streamId);
+    
+    // Complete the stream in queue manager
+    this.queueManager.completeStream(streamId);
+  }
+
   destroy() {
-    // nothing
+    // Clean up any remaining buffers
+    for (const streamId of this.bufferManager.buffers.keys()) {
+      this.bufferManager.deleteBuffer(streamId);
+    }
   }
 }
 
@@ -473,7 +465,7 @@ export class DiscordBotClient extends EventTarget {
           }
           case 'voiceidle': { // feedback that discord is no longer listening
             // console.log('voice idle', args);
-            this.input.cancelStream(args);
+            this.input.handleVoiceIdle(args);
             break;
           }
           default: {

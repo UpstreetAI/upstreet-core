@@ -260,6 +260,13 @@ export class DiscordBot extends EventTarget {
           id: userId,
         } = user;
 
+        // Check if dm conversation already exists for this user.
+        // This occurs when the same user exists in multiple common servers.
+        if (this.dmConversations.has(userId)) {
+          console.log('dm conversation already exists for this user, skipping', userId);
+          return
+        }
+        
         const conversation = new ConversationObject({
           agent,
           getHash: () => {

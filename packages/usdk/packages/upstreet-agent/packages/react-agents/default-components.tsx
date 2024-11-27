@@ -146,6 +146,103 @@ export const DefaultAgentComponents = () => {
   );
 };
 
+
+//
+
+interface ConversationMember {
+  playerSpec: {
+    name: string;
+    id: string;
+  };
+}
+
+const SkipResponseActionPrompt = () => {
+  const conversation = useConversation();
+  const agent = useAgent();
+  const historyLength = 10;
+  const defaultThreshold = 0.6;
+
+  // Get conversation members
+  const conversationMembers = conversation.getAgents();
+  const membersList = (conversationMembers as ConversationMember[]).map(m => m.playerSpec.name).join(", ");
+
+  // Calculate current back-and-forth penalty
+  const messages = conversation.messageCache.getMessages()
+    .slice(-historyLength);
+  const backAndForthCount = messages.reduce((count, msg, i) => {
+    if (i === 0) return count;
+    const prevMsg = messages[i-1];
+    const isBackAndForth = msg.name === agent.name && 
+                          prevMsg.name === messages[messages.length - 1]?.name;
+    return isBackAndForth ? count + 1 : count;
+  }, 0);
+
+  const backAndForthPenalty = conversationMembers.length > 2 ? 
+    Math.min(backAndForthCount * 0.2, 0.8) : 0;
+
+  return (
+    <Action
+      name="skipResponse" 
+      description={dedent`
+        Consider whether you should SKIP responding to the current conversation context.
+        Only use this action if you decide NOT to respond. If you want to respond, use other appropriate actions instead.
+        
+        Current conversation members: ${membersList}
+        Current back-and-forth penalty: ${backAndForthPenalty.toFixed(2)} (reduces confidence by ${(backAndForthPenalty * 100).toFixed()}%)
+        
+        Consider the following guidelines for SKIPPING a response:
+        
+        1. Message Targeting:
+           - If a message is clearly addressed to someone else (via @mention or context), do NOT respond UNLESS:
+             * You have critical, directly relevant information to share
+             * The information is urgent/important enough to justify interrupting
+             * Not sharing could lead to misunderstandings
+        
+        2. Conversation Interruption:
+           - It would be inappropriate to interrupt others' conversations
+           - The message is not directed at you
+        
+        3. Group Discussions:
+           - The group discussion doesn't require your input
+           - Others can handle the conversation better
+           - You have no unique value to add
+        
+        4. Conversation Fatigue:
+           - You've had 4+ back-and-forth exchanges already
+           - The conversation is naturally ending
+           - Others should have a chance to speak
+        
+        Additional Factors:
+        - Direct mentions carry more weight (${defaultThreshold} threshold)
+        - Group-directed messages are high priority
+        - Responses should align with your personality
+        - Consider if your response is necessary or potentially derailing
+        - Ensure you have valuable information when interrupting
+
+        Note: Only use this action to explicitly SKIP responding. For actual responses, use other appropriate actions.
+      `}
+      schema={z.object({
+        reason: z.string(),
+        confidence: z.number(),
+      })}
+      examples={[
+        {
+          reason: "Conversation is between others and I have no crucial information to add",
+          confidence: 0.8
+        },
+        {
+          reason: "Message clearly addressed to another agent via @mention",
+          confidence: 0.9
+        },
+      ]}
+      handler={async (e: PendingActionEvent) => {
+        console.log('self-conscious action: explicitly choosing not to respond');
+        await e.commit();
+      }}
+    />
+  );
+};
+
 // actions
 
 const ChatActions = () => {
@@ -659,6 +756,7 @@ export const DefaultPrompts = () => {
       <StorePrompt />
       <ConversationMessagesPrompt />
       <InstructionsPrompt />
+      <SkipResponseActionPrompt />
     </>
   );
 };

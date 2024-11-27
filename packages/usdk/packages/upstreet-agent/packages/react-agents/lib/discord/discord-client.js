@@ -56,6 +56,13 @@ export class DiscordInput {
     this.ws.send(s);
   }
 
+  abortVoicePlayback() {
+    const voiceAbortMessage = {
+      method: 'abortVoicePlayback',
+      args: {},
+    };
+    this.ws.send(JSON.stringify(voiceAbortMessage));
+  }
   // async to wait for consumption of the stream by the discord api
   async pushStream(stream) {
     const streamId = makeId(8);
@@ -249,7 +256,12 @@ export class DiscordOutput extends EventTarget {
         codecs,
         jwt,
       });
-
+      transcribedVoiceInput.addEventListener('speechstart', e => {
+        this.dispatchEvent(
+          new MessageEvent('speechstart')
+        );
+      });
+      
       transcribedVoiceInput.addEventListener('transcription', e => {
         const text = e.data;
 
@@ -489,6 +501,9 @@ export class DiscordBotClient extends EventTarget {
     };
     this.ws = ws;
     this.input.setWs(ws);
+    this.output.addEventListener('speechstart', e => {
+      this.input.abortVoicePlayback();
+    });
 
     await connectPromise;
     await readyPromise;

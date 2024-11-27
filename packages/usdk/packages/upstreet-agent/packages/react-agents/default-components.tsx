@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useMemo, useContext } from 'react';
 import dedent from 'dedent';
 import { ZodTypeAny, ZodUnion, z } from 'zod';
 import { printNode, zodToTs } from 'zod-to-ts';
-import type { Browser, BrowserContext, Page } from 'playwright-core';
+import type { Browser, BrowserContext, Page } from 'playwright-core-lite';
 import { minimatch } from 'minimatch';
 import { timeAgo } from 'react-agents/util/time-ago.mjs';
 

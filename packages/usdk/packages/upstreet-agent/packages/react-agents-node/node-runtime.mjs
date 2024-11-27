@@ -9,9 +9,11 @@ const localDirectory = getCurrentDirname(import.meta, process);
 
 //
 
+process.addListener('SIGTERM', () => {
+  process.exit(0);
+});
 const bindProcess = (cp) => {
   process.on('exit', () => {
-    // console.log('got exit', cp.pid);
     try {
       process.kill(cp.pid, 'SIGTERM');
     } catch (err) {
@@ -31,6 +33,7 @@ export class ReactAgentsNodeRuntime {
     this.agentSpec = agentSpec;
   }
   async start({
+    init = {},
   } = {}) {
     const {
       directory,
@@ -51,6 +54,7 @@ export class ReactAgentsNodeRuntime {
         '--var', 'WORKER_ENV:development',
         '--ip', '0.0.0.0',
         '--port', devServerPort + portIndex,
+        '--init', JSON.stringify(init),
       ],
       {
         stdio: ['pipe', 'pipe', 'pipe', 'ipc'],

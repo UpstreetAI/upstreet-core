@@ -1,5 +1,5 @@
 {
     "title": "📖 Migration Guides",
-    "pages": ["langchain", "crew-ai", "fetch-ai", "previous-versions"],
+    "pages": ["langchain", "crew-ai", "fetch-ai", "tavern", "previous-versions"],
     "defaultOpen": false
 }

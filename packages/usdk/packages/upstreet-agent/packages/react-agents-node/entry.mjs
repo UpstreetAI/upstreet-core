@@ -63,7 +63,9 @@ const getAuth = async () => {
 
 //
 
-const main = async () => {
+const main = async ({
+  init = {},
+} = {}) => {
   const [
     env,
     auth,
@@ -76,6 +78,7 @@ const main = async () => {
   const state = {
     userRender,
     codecs,
+    init,
     storage: {
       async getAlarm() {
         return alarmTimestamp;

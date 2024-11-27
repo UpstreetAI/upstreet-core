@@ -147,6 +147,7 @@ export type TwitterSpacesArgs = {
   url?: string;
   agent: ActiveAgentObject;
   codecs: any;
+  init: any;
   jwt: string;
 };
 
@@ -778,6 +779,7 @@ export type AppContextValue = {
   useConversationManager: () => ConversationManager;
   useChatsSpecification: () => ChatsSpecification;
   useCodecs: () => any;
+  useInit: () => any;
   useRegistry: () => RenderRegistry;
 
   useKv: (opts?: KvArgs) => Kv;

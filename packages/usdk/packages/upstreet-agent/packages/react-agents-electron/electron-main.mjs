@@ -17,6 +17,9 @@ console.log('electron start script!');
     console.warn(err.stack);
   });
 });
+process.addListener('SIGTERM', () => {
+  process.exit(0);
+});
 
 // electron doesn't provide a native WebSocket
 // this is needed for needed for the multiplayer library
@@ -231,6 +234,7 @@ const main = async () => {
     .option('--var <vars...>', 'Environment variables in format KEY:VALUE')
     .requiredOption('--ip <ip>', 'IP address to bind to')
     .requiredOption('--port <port>', 'Port to bind to')
+    .requiredOption('--init <json>', 'Initialization data')
     .action(async (directory, opts) => {
       commandExecuted = true;
 

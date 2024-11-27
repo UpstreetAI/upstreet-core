@@ -52,10 +52,12 @@ export type GenerativeAgentObject =  {
   embed: (text: string) => Promise<Array<number>>;
   complete: (
     messages: ChatMessages,
+    model?: string,
   ) => Promise<ChatMessage>;
   completeJson: (
     messages: ChatMessages,
     format: ZodTypeAny,
+    model?: string,
   ) => Promise<ChatMessage>;
 
   think: (hint?: string, thinkOpts?: AgentThinkOptions) => Promise<any>;

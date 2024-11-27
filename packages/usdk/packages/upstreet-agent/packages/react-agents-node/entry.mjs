@@ -63,8 +63,10 @@ const getAuth = async () => {
 
 //
 
-const main = async () => {
-  const [
+const main = async ({
+  init = {},
+} = {}) => {
+  let [
     env,
     auth,
   ] = await Promise.all([
@@ -84,6 +86,10 @@ const main = async () => {
         alarmTimestamp = timestamp;
       },
     },
+  };
+  env = {
+    ...env,
+    init,
   };
   const agentMain = new AgentMain(state, env, auth);
   return agentMain;

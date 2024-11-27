@@ -19,6 +19,7 @@ export const chat = async (args, opts) => {
   const runtime = args.runtime ?? 'node';
   const inputStream = args.inputStream;
   const outputStream = args.outputStream;
+  const init = args.init ?? {};
   const debug = !!args.debug;
   // opts
   const jwt = opts.jwt;
@@ -42,6 +43,7 @@ export const chat = async (args, opts) => {
     if (agentSpec.directory) {
       const runtime = new Runtime(agentSpec);
       await runtime.start({
+        init,
         debug,
       });
       return runtime;

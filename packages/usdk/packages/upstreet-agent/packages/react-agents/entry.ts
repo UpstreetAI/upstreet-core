@@ -46,11 +46,15 @@ export class AgentMain extends EventTarget {
       userRender,
       codecs,
     } = state;
+    const {
+      init,
+    } = env;
     this.agentRenderer = new AgentRenderer({
       env,
       auth,
       userRender,
       codecs,
+      init,
       chatsSpecification: this.chatsSpecification,
     });
     const bindAlarm = () => {

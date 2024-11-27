@@ -17,6 +17,9 @@ console.log('electron start script!');
     console.warn(err.stack);
   });
 });
+process.addListener('SIGTERM', () => {
+  process.exit(0);
+});
 
 // electron doesn't provide a native WebSocket
 // this is needed for needed for the multiplayer library
@@ -113,10 +116,17 @@ const startAgentMainServer = async ({
   // console.log(`Agent server listening on http://${ip}:${port}`);
 };
 const runAgent = async (directory, opts) => {
+  const {
+    init: initString,
+  } = opts;
+  const init = initString && JSON.parse(initString);
+
   const p = '/packages/upstreet-agent/packages/react-agents-node/entry.mjs';
   const main = await loadModule(directory, p);
   // console.log('worker loaded module', main);
-  const agentMain = await main();
+  const agentMain = await main({
+    init,
+  });
   // console.log('agentMain', agentMain);
 
   const {
@@ -231,6 +241,7 @@ const main = async () => {
     .option('--var <vars...>', 'Environment variables in format KEY:VALUE')
     .requiredOption('--ip <ip>', 'IP address to bind to')
     .requiredOption('--port <port>', 'Port to bind to')
+    .requiredOption('--init <json>', 'Initialization data')
     .action(async (directory, opts) => {
       commandExecuted = true;
 

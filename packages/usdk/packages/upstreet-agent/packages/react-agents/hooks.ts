@@ -63,6 +63,11 @@ export const useAuthToken: () => string = () => {
   const appContextValue = useContext(AppContext);
   return appContextValue.useAuthToken();
 };
+// get the passed-down agent initialization json
+export const useInit: () => any = () => {
+  const appContextValue = useContext(AppContext);
+  return appContextValue.useInit();
+};
 
 //
 
@@ -86,14 +91,6 @@ export const useConversation = () => {
   }
   return conversation;
 };
-/* export const useScene: () => SceneObject = () => {
-  const agentContextValue = useContext(AgentContext);
-  return agentContextValue.useScene();
-};
-export const useAgents: () => Array<AgentObject> = () => {
-  const agentContextValue = useContext(AgentContext);
-  return agentContextValue.useAgents();
-}; */
 
 export const useActions: () => ActionPropsAux[] = () => {
   const agentRegistryValue = useContext(AgentRegistryContext).agentRegistry;

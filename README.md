@@ -53,6 +53,8 @@ If you want to get started with Upstreet Agents in general, you can simply insta
 npm i -g usdk
 ```
 
+> ⚠️ Please ensure you have Node version 22.9.0 or above, otherwise `usdk` will not work.
+
 Read more about how to use `usdk` in the [documentation](https://docs.upstreet.ai/install).
 
 If you want to dive deeper into `usdk` and Upstreet, you can [set up this repository locally.](#Setting-up-your-development-environment)

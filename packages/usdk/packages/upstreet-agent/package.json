@@ -20,7 +20,7 @@
     "memoize-one": "^6.0.0",
     "minimatch": "^9.0.4",
     "openai": "^4.56.0",
-    "playwright-core": "file:./packages/playwright-core",
+    "playwright-core-lite": "file:./packages/playwright-core-lite",
     "queue-manager": "file:./packages/queue-manager",
     "react": "^19.0.0-rc-df5f2736-20240712",
     "react-agents": "file:./packages/react-agents",

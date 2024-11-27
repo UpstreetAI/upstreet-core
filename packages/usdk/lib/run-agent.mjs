@@ -7,6 +7,7 @@ import { parseAgentSpecs } from './agent-spec-utils.mjs';
 export const runAgent = async (args, opts) => {
   const agentSpecs = await parseAgentSpecs(args._[0]);
   const runtime = args.runtime ?? 'node';
+  const init = args.init ?? {};
   const debug = !!args.debug;
   // opts
   const jwt = opts.jwt;
@@ -34,6 +35,7 @@ export const runAgent = async (args, opts) => {
       const runtime = new Runtime(agentSpec);
       runtimes.push(runtime);
       await runtime.start({
+        init,
         debug,
       });
       console.log(`Agent ${agentSpec.guid} running on URL: http://localhost:${devServerPort + agentSpec.portIndex}`);

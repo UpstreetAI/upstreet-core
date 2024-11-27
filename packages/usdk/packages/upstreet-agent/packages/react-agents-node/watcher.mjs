@@ -9,9 +9,13 @@ import { getCurrentDirname } from '../react-agents/util/path-util.mjs';
 
 const dirname = getCurrentDirname(import.meta, process);
 
+// watch SIGTERM
+process.on('SIGTERM', () => {
+  process.exit(0);
+});
+
 const bindProcess = (cp) => {
   process.on('exit', () => {
-    // console.log('got exit', cp.pid);
     try {
       process.kill(cp.pid, 'SIGTERM');
     } catch (err) {
@@ -63,6 +67,9 @@ const reloadAgentWorker = async (directory, opts) => {
       }
       if (opts.port) {
         args.push('--port', opts.port);
+      }
+      if (opts.init) {
+        args.push('--init', opts.init);
       }
 
       // create the worker
@@ -190,6 +197,7 @@ const main = async () => {
     .option('--var <vars...>', 'Environment variables in format KEY:VALUE')
     .requiredOption('--ip <ip>', 'IP address to bind to')
     .requiredOption('--port <port>', 'Port to bind to')
+    .requiredOption('--init <init>', 'Initialization data')
     .action(async (directory, opts) => {
       commandExecuted = true;
 

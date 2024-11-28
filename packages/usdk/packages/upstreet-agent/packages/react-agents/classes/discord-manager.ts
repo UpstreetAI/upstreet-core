@@ -221,6 +221,13 @@ export class DiscordBot extends EventTarget {
           type === 2 || // voice channel
           type === 13 // stage
         ) {
+          // Check if channel conversation already exists.
+          // XXX: This would occur during a hot reload 
+          if (this.channelConversations.has(channelId)) {
+            console.log('channel conversation already exists, skipping', channelId);
+            return
+          }
+
           const conversation = new ConversationObject({
             agent,
             getHash: () => {
@@ -260,6 +267,13 @@ export class DiscordBot extends EventTarget {
           id: userId,
         } = user;
 
+        // Check if dm conversation already exists for this user.
+        // This occurs when the same user exists in multiple common servers.
+        if (this.dmConversations.has(userId)) {
+          console.log('dm conversation already exists for this user, skipping', userId);
+          return
+        }
+        
         const conversation = new ConversationObject({
           agent,
           getHash: () => {

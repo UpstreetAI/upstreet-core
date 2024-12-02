@@ -1,0 +1,513 @@
+---
+title: Tic-Tac-Toe Game
+description: This tutorial walks you through creating a Tic Tac Toe game using React and the react-agents library. We'll build an interactive CLI-style game where a user can play against a simple AI agent..
+full: false
+---
+
+### Step 1:  Project Set up
+
+- Install the Upstreet SDK using `usdk create`
+
+- Navigate to the `agent.tsx` file.
+
+- You will find a pre-built `MyAgent` component like that. 
+```tsx
+export default function MyAgent() {
+  return (
+    <Agent>
+   
+    </Agent>
+  )
+}
+```
+
+### Step 2: Import dependencies and create `TicTacToeCLI` component 
+
+
+```tsx
+import React, { useState } from "react";
+import { Agent, Prompt, Action } from "react-agents";
+import { z } from "zod";
+```
+
+Let's break down these imports:
+
+- `React` and `useState`: Core React library and state management hook
+- `Agent`, `Prompt`, `Action`: Components from `react-agents` for creating interactive agents
+- `z`: Zod library for schema validation and type checking
+
+
+Now create a component named `TicTacToeCLI` and set your states using `useState`
+
+```tsx
+
+const TicTacToeCLI = () => {
+ const initialBoard = {
+  a: [".", ".", "."],
+  b: [".", ".", "."],
+  c: [".", ".", "."],
+};
+
+const [board, setBoard] = useState(initialBoard);
+const [currentPlayer, setCurrentPlayer] = useState("x");
+
+  return (
+    <>
+      
+    </>
+  );
+};
+```
+
+We define two key states:
+
+- `board`: Represents the game board using a 3x3 grid
+- `currentPlayer`: Tracks whose turn it is ("x" for user, "o" for agent)
+
+
+### Step 3: Functions explanation 
+
+The `renderBoard()` function converts the board state into a CLI-style string representation: 
+
+```tsx
+const renderBoard = () => {
+  const header = "    1   2   3";
+  const rows = Object.entries(board)
+    .map(([row, values]) => `${row}   ${values.join(" | ")}`)
+    .join("\n");
+  return `${header}\n${rows}`;
+};
+```
+The `checkWinner()` implements game-ending condition checks:
+
+```tsx
+
+  const checkWinner = (currentBoard) => {
+    // Check rows
+    for (const row of Object.keys(currentBoard)) {
+      if (
+        currentBoard[row][0] !== "." &&
+        currentBoard[row][0] === currentBoard[row][1] &&
+        currentBoard[row][1] === currentBoard[row][2]
+      ) {
+        return currentBoard[row][0];
+      }
+    }
+
+    // Check columns
+    for (let col = 0; col < 3; col++) {
+      if (
+        currentBoard.a[col] !== "." &&
+        currentBoard.a[col] === currentBoard.b[col] &&
+        currentBoard.b[col] === currentBoard.c[col]
+      ) {
+        return currentBoard.a[col];
+      }
+    }
+
+    // Check diagonals
+    if (
+      currentBoard.a[0] !== "." &&
+      currentBoard.a[0] === currentBoard.b[1] &&
+      currentBoard.b[1] === currentBoard.c[2]
+    ) {
+      return currentBoard.a[0];
+    }
+
+    if (
+      currentBoard.a[2] !== "." &&
+      currentBoard.a[2] === currentBoard.b[1] &&
+      currentBoard.b[1] === currentBoard.c[0]
+    ) {
+      return currentBoard.a[2];
+    }
+
+    // Check for draw
+    const isDraw = Object.values(currentBoard).every(row => 
+      row.every(cell => cell !== ".")
+    );
+
+    return isDraw ? "draw" : null;
+  };
+
+```
+
+
+### Winning Condition Checks
+
+### Row Check:
+
+- Iterates through each row
+- Ensures first cell is not empty
+- Verifies all cells in the row are identical
+
+
+### Column Check:
+
+- Checks each column vertically
+- Similar logic to row check
+- Uses fixed column index across rows
+
+
+### Diagonal Checks:
+
+- Main diagonal (top-left to bottom-right)
+- Anti-diagonal (top-right to bottom-left)
+- Checks for matching symbols across diagonal
+
+
+### Draw Detection:
+
+- Checks if all cells are filled
+- Returns "draw" if no empty cells remain
+
+
+The `makeMove()` handles the overall working of the game like input validation and switching player etc: 
+
+```tsx
+ const makeMove = (row, col, player) => {
+    // Validate input
+    if (!["a", "b", "c"].includes(row) || col < 0 || col > 2) {
+      console.log("Invalid move! Please choose a valid row (a, b, c) and column (1, 2, 3).");
+      return false;
+    }
+  
+    // Check if cell is already occupied
+    if (board[row][col] !== ".") {
+      console.log("Invalid move! Cell already occupied.");
+      return false;
+    }
+  
+    // Create a copy of the board and update it
+    const updatedBoard = { ...board };
+    updatedBoard[row][col] = player;
+  
+    // Check for winner or draw
+    const result = checkWinner(updatedBoard);
+  
+    // Update board and player
+    setBoard(updatedBoard);
+    setCurrentPlayer(player === "x" ? "o" : "x");
+  
+    // Handle game result
+    if (result) {
+      if (result === "draw") {
+        console.log("The game is a draw!");
+      } else {
+        console.log(`Player ${result} wins!`);
+      }
+    }
+  
+    return true;
+  };
+ 
+```
+
+
+### Move Execution Steps
+
+### Input Validation:
+
+- Checks row is valid ("a", "b", "c")
+- Ensures column is within 0-2 range
+
+### Occupancy Validation:
+
+- Prevents overwriting non-empty cells
+
+
+### Board Update:
+
+- Creates a copy of current board
+- Marks cell with current player's symbol
+
+
+### Result Checking:
+
+- Calls checkWinner to detect game-ending conditions
+- Determines win, draw, or ongoing game
+
+
+### State Management:
+
+- Updates board state
+- Switches current player
+- Logs game outcome if applicable
+
+
+### Step 4: Modify the `TicTacToeCLI` component 
+
+Give agent a customized `Prompt` 
+
+
+```tsx
+<Prompt>
+        The user and agent are playing Tic Tac Toe. 
+        The current player is {currentPlayer}. The current board is:
+        {`\n${renderBoard()}`}
+      </Prompt>
+```
+
+Add the `Action` component to define the specific action our agent will be performing
+
+
+```tsx
+ <Action
+  name="makeMove"
+  description="Make a move for the current player."
+  schema={z.object({
+    row: z.string(), // Row must be a string (e.g., "a", "b", "c")
+    col: z.number(), // Column must be a number (1, 2, 3)
+    player: z.string().optional(), // Optional, determines the player ("user" or "agent")
+  })}
+  handler={(event) => {
+    const { message } = event.data;
+    const { args } = message;
+    const { row, col, player } = args;
+
+    if (player === "agent") {
+      // Agent's move logic
+      for (const row of Object.keys(board)) {
+        for (let col = 0; col < 3; col++) {
+          if (board[row][col] === ".") {
+            makeMove(row, col, "o"); // Force "O" for the agent
+            console.log("Agent made its move.");
+            console.log(renderBoard());
+            return;
+          }
+        }
+      }
+      console.log("Game over! No moves left.");
+    }
+     else {
+      // User's move logic
+      const adjustedCol = col - 1; // Adjust column index to 0-based
+      if (makeMove(row, adjustedCol, "x")) { // User always marks with "X"
+        console.log(renderBoard());
+      }
+    }
+    event.commit(); // Mark the action as completed
+  }}
+/>
+```
+### Explanation of `Action` component
+
+#### Zod Schema Validation
+
+- Uses Zod for type and schema validation
+- Ensures type safety for move inputs
+- Allows optional player specification
+
+#### Handler Function Logic
+
+- Differentiates between user and agent moves
+- Agent uses simple first-empty-cell strategy
+- Adjusts column index for 0-based array
+- Commits action after move completion
+
+#### Move Selection Strategies
+
+- Agent: Finds first available cell
+- User: Explicitly specified move
+
+The final state of `TicTacToeCLI` look like this.
+
+
+
+```tsx
+
+import React, { useState } from "react";
+import { Agent, Prompt, Action } from "react-agents";
+import { z } from "zod";
+
+export const TicTacToeCLI = () => {
+  // Board initialization
+  const initialBoard = {
+    a: [".", ".", "."],
+    b: [".", ".", "."],
+    c: [".", ".", "."],
+  };
+
+  const [board, setBoard] = useState(initialBoard);
+  const [currentPlayer, setCurrentPlayer] = useState("x");
+
+  // Function to render the board in CLI
+  const renderBoard = () => {
+    const header = "    1   2   3";
+    const rows = Object.entries(board)
+      .map(([row, values]) => `${row}   ${values.join(" | ")}`)
+      .join("\n");
+    return `${header}\n${rows}`;
+  };
+
+  // Function to check for a winner
+  const checkWinner = (currentBoard) => {
+    // Check rows
+    for (const row of Object.keys(currentBoard)) {
+      if (
+        currentBoard[row][0] !== "." &&
+        currentBoard[row][0] === currentBoard[row][1] &&
+        currentBoard[row][1] === currentBoard[row][2]
+      ) {
+        return currentBoard[row][0];
+      }
+    }
+
+    // Check columns
+    for (let col = 0; col < 3; col++) {
+      if (
+        currentBoard.a[col] !== "." &&
+        currentBoard.a[col] === currentBoard.b[col] &&
+        currentBoard.b[col] === currentBoard.c[col]
+      ) {
+        return currentBoard.a[col];
+      }
+    }
+
+    // Check diagonals
+    if (
+      currentBoard.a[0] !== "." &&
+      currentBoard.a[0] === currentBoard.b[1] &&
+      currentBoard.b[1] === currentBoard.c[2]
+    ) {
+      return currentBoard.a[0];
+    }
+
+    if (
+      currentBoard.a[2] !== "." &&
+      currentBoard.a[2] === currentBoard.b[1] &&
+      currentBoard.b[1] === currentBoard.c[0]
+    ) {
+      return currentBoard.a[2];
+    }
+
+    // Check for draw
+    const isDraw = Object.values(currentBoard).every(row => 
+      row.every(cell => cell !== ".")
+    );
+
+    return isDraw ? "draw" : null;
+  };
+
+  const makeMove = (row, col, player) => {
+    // Validate input
+    if (!["a", "b", "c"].includes(row) || col < 0 || col > 2) {
+      console.log("Invalid move! Please choose a valid row (a, b, c) and column (1, 2, 3).");
+      return false;
+    }
+  
+    // Check if cell is already occupied
+    if (board[row][col] !== ".") {
+      console.log("Invalid move! Cell already occupied.");
+      return false;
+    }
+  
+    // Create a copy of the board and update it
+    const updatedBoard = { ...board };
+    updatedBoard[row][col] = player;
+  
+    // Check for winner or draw
+    const result = checkWinner(updatedBoard);
+  
+    // Update board and player
+    setBoard(updatedBoard);
+    setCurrentPlayer(player === "x" ? "o" : "x");
+  
+    // Handle game result
+    if (result) {
+      if (result === "draw") {
+        console.log("The game is a draw!");
+      } else {
+        console.log(`Player ${result} wins!`);
+      }
+    }
+  
+    return true;
+  };
+  
+
+  return (
+    <>
+      <Prompt>
+        The user and agent are playing Tic Tac Toe. 
+        The current player is {currentPlayer}. The current board is:
+        {`\n${renderBoard()}`}
+      </Prompt>
+
+      <Action
+  name="makeMove"
+  description="Make a move for the current player."
+  schema={z.object({
+    row: z.string(), // Row must be a string (e.g., "a", "b", "c")
+    col: z.number(), // Column must be a number (1, 2, 3)
+    player: z.string().optional(), // Optional, determines the player ("user" or "agent")
+  })}
+  handler={(event) => {
+    const { message } = event.data;
+    const { args } = message;
+    const { row, col, player } = args;
+
+    if (player === "agent") {
+      // Agent's move logic
+      for (const row of Object.keys(board)) {
+        for (let col = 0; col < 3; col++) {
+          if (board[row][col] === ".") {
+            makeMove(row, col, "o"); // Force "O" for the agent
+            console.log("Agent made its move.");
+            console.log(renderBoard());
+            return;
+          }
+        }
+      }
+      console.log("Game over! No moves left.");
+    }
+     else {
+      // User's move logic
+      const adjustedCol = col - 1; // Adjust column index to 0-based
+      if (makeMove(row, adjustedCol, "x")) { // User always marks with "X"
+        console.log(renderBoard());
+      }
+    }
+    event.commit(); // Mark the action as completed
+  }}
+/>
+
+    </>
+  );
+};
+```
+
+### Step 5: Import `TicTacToeCLI` in the `Agent` Components
+
+```tsx
+export default function MyAgent() {
+  return (
+    <Agent>
+   <TicTacToeCLI/>
+    </Agent>
+  )
+}
+```
+
+### Step 5: Test the agent
+
+Run `usdk chat` in the terminal to test the agent.
+
+Give the below prompt
+
+> I want to play Tic Tac Toe game?
+
+It will give a response like this 
+
+> Alright [Your Name], Let's have some fun! You're X, and it's your turn to start. Pick your spot by specifying the position like 'a1', 'b2', etc. The grid is ready for your move:
+
+The game will be presented like this: 
+
+```tsx
+
+  1 | 2 | 3
+a . | . | .
+b . | . | .
+c . | . | .
+
+```

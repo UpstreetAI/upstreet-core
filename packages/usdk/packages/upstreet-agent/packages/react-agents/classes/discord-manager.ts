@@ -167,6 +167,11 @@ export class DiscordBot extends EventTarget {
     const _connect = async () => {
       console.log('discord connect 1');
       const status = await discordBotClient.status();
+
+      if (status.error) {
+        throw new Error('discord status error: ' + status.error);
+      }
+
       if (signal.aborted) return;
 
       console.log('discord connect 2');

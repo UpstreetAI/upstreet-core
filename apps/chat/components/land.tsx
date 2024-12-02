@@ -7,7 +7,7 @@ import { Physics, RapierRigidBody, RigidBody } from "@react-three/rapier";
 import { OrbitControls, KeyboardControls, Text, GradientTexture } from '@react-three/drei';
 import Ecctrl from 'ecctrl';
 import dedent from 'dedent';
-import { zbencode, zbdecode } from 'zjs/encoding.mjs';
+import { zbencode, zbdecode } from 'zjs';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {
   Vector2,

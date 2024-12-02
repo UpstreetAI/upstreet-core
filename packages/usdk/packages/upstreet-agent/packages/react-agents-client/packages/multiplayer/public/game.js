@@ -1,5 +1,4 @@
 import {makeId, zstringify} from './util.mjs';
-// import {zstringify} from './encoding.mjs';
 import {frameSize, realmSize} from './constants.js';
 
 import {RemotePlayerCursorHtmlRenderer, AppsHtmlRenderer, GameRealmsCanvases, GamePlayerCanvas} from "./renderers/html-renderer.js";

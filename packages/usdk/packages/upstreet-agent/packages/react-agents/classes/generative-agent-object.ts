@@ -86,7 +86,10 @@ export class GenerativeAgentObject {
     await this.generativeQueueManager.waitForTurn(async () => {
       await this.conversation.typing(async () => {
         try {
-          const step = await generateAgentActionStep(this, hint, thinkOpts);
+          const debugOpts = {
+            debug: this.agent.appContextValue.useDebug(),
+          };
+          const step = await generateAgentActionStep(this, hint, thinkOpts, debugOpts);
           await executeAgentActionStep(this, step);
 
           this.thinkCache.push(step);
@@ -149,13 +152,18 @@ export class GenerativeAgentObject {
   }
   async monologue(text: string) {
     await this.conversation.typing(async () => {
+      const thinkOpts = {
+        forceAction: 'say',
+      };
+      const debugOpts = {
+        debug: this.agent.appContextValue.useDebug(),
+      };
       const step = await generateAgentActionStep(
         this,
         'Comment on the following:' + '\n' +
           text,
-        {
-          forceAction: 'say',
-        },
+        thinkOpts,
+        debugOpts,
       );
       await executeAgentActionStep(this, step);
     });

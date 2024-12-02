@@ -1,0 +1,153 @@
+---
+title: Custom Components with useEffect
+description: Learn to build custom React components in Upstreet Agents, leveraging the useEffect hook for AI-driven interactions.
+full: false
+---
+
+[`useEffect`](https://react.dev/reference/react/useEffect) is a React Hook that lets you synchronize a component with an external system.
+```tsx
+useEffect(setup, dependencies?)
+```
+
+### Explanation
+
+- Manages side effects in functional components.
+- Executes after the component renders and re-runs when dependencies change.
+
+### Usecase
+
+- Connecting to an external system
+- Wrapping Effects in custom Hooks
+- Controlling a non-React widget
+- Fetching data with Effects
+- Specifying reactive dependencies
+- Updating state based on previous state from an Effect
+
+
+### Step 1:  Integrate useEffect with Upstreet agents to build a component that generate random names
+
+- Install the Upstreet SDK using `usdk create`
+
+- Navigate to the `agent.tsx` file.
+
+- You will find a pre-built `MyAgent` component like that. 
+```tsx
+export default function MyAgent() {
+  return (
+    <Agent>
+   
+    </Agent>
+  )
+}
+```
+
+<Callout>
+In this example `useState` and `useEffect` both are being utilized.
+</Callout>
+
+### Step 2: Import dependencies and create `SimpleAgentEffect` component 
+
+```tsx
+import React, { useState, useEffect } from "react";
+import { Prompt } from "react-agents";
+```
+
+Now create a component named `SimpleAgentEffect` and set your states using `useState`
+
+```tsx
+
+const SimpleAgentEffect = () => {
+ const [message, setMessage] = useState("Fetching message...");
+
+  return (
+    <>
+      
+    </>
+  );
+};
+```
+
+After defining the useState, the useEffect is being used to display a greeting from the agent and update the message state
+
+```tsx
+ useEffect(() => {
+    const greet = async () => {
+      const simulatedAgentResponse = "Hello! I'm here to assist you.";
+      setMessage(simulatedAgentResponse);
+    };
+
+    greet(); 
+  }, []);
+
+```
+This code runs after the component renders, triggering the agent to say "Hello! I'm here to assist you," 
+and updates the `message` state to indicate the greeting was sent, with the effect re-running whenever the `agent` changes.
+
+### Step 3: Modify the `SimpleAgentEffect` component 
+
+Give agent a customized `Prompt` 
+
+
+```tsx
+  <Prompt>
+        Engage the user by discussing their generated name, "{name}". Offer insights or lore about their name and suggest if they want to generate a new one.
+      </Prompt>
+```
+
+Display the message here 
+
+```tsx
+  {message && <p>{message}</p>}
+```
+
+The final state of `SimpleAgentEffect` look like this.
+
+```tsx
+
+import React, { useState, useEffect } from "react";
+import { Prompt } from "@upstreet/agents";
+
+const SimpleGreetingAgent = () => {
+  const [message, setMessage] = useState("Initializing...");
+
+   useEffect(() => {
+    const greet = async () => {
+      const simulatedAgentResponse = "Hello! I'm here to assist you.";
+      setMessage(simulatedAgentResponse);
+    };
+
+    greet(); // Call the simulated greeting
+  }, []);
+
+  return (
+    <>
+      <Prompt>
+        The agent greets the user with: "{message}".
+      </Prompt>
+      {message && <p>{message}</p>}
+    </>
+  );
+};
+
+export default SimpleGreetingAgent;
+
+```
+
+
+### Step 4: Import `SimpleAgentEffect` in the `Agent` Components
+
+```tsx
+export default function MyAgent() {
+  return (
+    <Agent>
+   <SimpleAgentEffect/>
+    </Agent>
+  )
+}
+```
+
+### Step 5: Test the agent
+
+Run `usdk chat` in the terminal to test the agent.
+
+**As soon as the agent render it will greet you.**

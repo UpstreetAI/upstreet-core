@@ -1,7 +1,7 @@
 import {
   zbencode,
   zbdecode,
-} from 'zjs/encoding.mjs';
+} from 'zjs';
 // import {
 //   transcribe,
 // } from '../../util/audio-perception.mjs';

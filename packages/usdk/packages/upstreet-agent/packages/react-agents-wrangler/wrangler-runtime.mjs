@@ -4,6 +4,9 @@ import { devServerPort } from './util/ports.mjs';
 
 //
 
+process.addListener('SIGTERM', () => {
+  process.exit(0);
+});
 const bindProcess = (cp) => {
   process.on('exit', () => {
     // console.log('got exit', cp.pid);
@@ -88,6 +91,7 @@ export class ReactAgentsWranglerRuntime {
     this.agentSpec = agentSpec;
   }
   async start({
+    init = {},
     debug = false,
   } = {}) {
     const {
@@ -103,7 +107,12 @@ export class ReactAgentsWranglerRuntime {
         '--var', 'WORKER_ENV:development',
         '--ip', '0.0.0.0',
         '--port', devServerPort + portIndex,
-      ],
+      ].concat(init ? [
+        '--var', `init:${JSON.stringify(init)}`,
+      ]: [])
+      .concat(debug ? [
+        '--var', `debug:${!!debug}`,
+      ]: []),
       {
         stdio: 'pipe',
         // stdio: 'inherit',

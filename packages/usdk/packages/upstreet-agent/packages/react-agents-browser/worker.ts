@@ -24,7 +24,7 @@ globalThis.onmessage = (event: any) => {
       if (!agentMainPromise) {
         agentMainPromise = (async () => {
           const { args } = event.data;
-          const { env, agentSrc } = args;
+          const { env, auth, agentSrc } = args;
           if (typeof agentSrc !== 'string') {
             throw new Error('agent worker: missing agentSrc');
           }
@@ -50,7 +50,7 @@ globalThis.onmessage = (event: any) => {
           //   state,
           //   env,
           // });
-          const agentMain = new AgentMain(state, env);
+          const agentMain = new AgentMain(state, env, auth);
           // console.log('worker init 2', {
           //   agentMain,
           // });

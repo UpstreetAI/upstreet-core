@@ -32,7 +32,7 @@
   "scripts": {
     "dev": "rollup -c --watch",
     "prebuild": "rimraf ./src/icons && rimraf ./dist && rimraf ./assets/tempIcons && node ./helpers/formatAndSaveSvgFiles.js",
-    "build": "yarn svgr && rollup -c",
+    "build": "pnpm run svgr && rollup -c",
     "test": "jest --watchAll --verbose",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",

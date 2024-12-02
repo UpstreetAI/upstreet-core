@@ -18,10 +18,5 @@ function walkUpToNodeModules(modulePath) {
 
 //
 
-const electronModulePath = require.resolve('electron');
-const electronNodeModulesPath = walkUpToNodeModules(electronModulePath);
-export const electronBinPath = path.join(electronNodeModulesPath, '.bin', 'electron');
-
-const reactAgentsElectronPath = require.resolve('react-agents-electron');
-const reactAgentsElectronDir = path.dirname(reactAgentsElectronPath);
-export const electronStartScriptPath = path.join(reactAgentsElectronDir, 'electron-main.mjs');
+export const electronBinPath = require.resolve('electron/cli.js');
+export const electronStartScriptPath = require.resolve('react-agents-electron/electron-main.mjs');

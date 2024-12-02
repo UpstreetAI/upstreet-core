@@ -35,6 +35,7 @@ import {
 import {
   TranscribedVoiceInput,
 } from 'react-agents/devices/audio-transcriber.mjs';
+import { formatConversationMessage } from '../util/message-utils';
 
 //
 
@@ -201,52 +202,72 @@ export class ChatsManager {
         multiplayerConnection.addEventListener('audiostart', async (e: any) => {
           // console.log('got audio start', e.data);
           const { playerId, streamId, type, disposition } = e.data;
-          if (disposition === 'text') {
-            if (type === 'audio/pcm-f32-48000') {
-              const audioInput = new EventEmitter();
-              const sampleRate = 48000;
-              const codecs = agent.appContextValue.useCodecs();
-              const jwt = agent.useAuthToken();
-              const transcribedVoiceInput = new TranscribedVoiceInput({
-                audioInput,
-                sampleRate,
-                codecs,
-                jwt,
-              });
-              transcribedVoiceInput.addEventListener('speechstart', e => {
-                // console.log('chats manager speech start', e.data);
-                conversation.dispatchEvent(new MessageEvent('speechstart', {
-                  data: e.data,
-                }));
-              });
-              transcribedVoiceInput.addEventListener('speechstop', e => {
-                // console.log('chats manager speech stop', e.data);
-                conversation.dispatchEvent(new MessageEvent('speechstop', {
-                  data: e.data,
-                }));
-              });
-              transcribedVoiceInput.addEventListener('speechcancel', e => {
-                // console.log('chats manager speech cancel', e.data);
-                conversation.dispatchEvent(new MessageEvent('speechcancel', {
-                  data: e.data,
-                }));
-              });
-              transcribedVoiceInput.addEventListener('transcription', e => {
-                // console.log('chats manager transcription', e.data);
-                conversation.dispatchEvent(new MessageEvent('transcription', {
-                  data: e.data,
-                }));
-              });
-              const transcriptionStream = {
-                audioInput,
-                transcribedVoiceInput,
-              };
-              transcriptionStreams.set(streamId, transcriptionStream);
-            } else {
-              console.warn('unhandled audio text disposition type', type);
+          const player = conversation.agentsMap.get(playerId);
+          if (player) {
+            const playerSpec = player.getPlayerSpec();
+            if (disposition === 'text') {
+              if (type === 'audio/pcm-f32-48000') {
+                const audioInput = new EventEmitter();
+                const sampleRate = 48000;
+                const codecs = agent.appContextValue.useCodecs();
+                const jwt = agent.useAuthToken();
+                const transcribedVoiceInput = new TranscribedVoiceInput({
+                  audioInput,
+                  sampleRate,
+                  codecs,
+                  jwt,
+                });
+                transcribedVoiceInput.addEventListener('speechstart', e => {
+                  // console.log('chats manager speech start', e.data);
+                  conversation.dispatchEvent(new MessageEvent('speechstart', {
+                    data: e.data,
+                  }));
+                });
+                transcribedVoiceInput.addEventListener('speechstop', e => {
+                  // console.log('chats manager speech stop', e.data);
+                  conversation.dispatchEvent(new MessageEvent('speechstop', {
+                    data: e.data,
+                  }));
+                });
+                transcribedVoiceInput.addEventListener('speechcancel', e => {
+                  // console.log('chats manager speech cancel', e.data);
+                  conversation.dispatchEvent(new MessageEvent('speechcancel', {
+                    data: e.data,
+                  }));
+                });
+                transcribedVoiceInput.addEventListener('transcription', async e => {
+                  // console.log('chats manager transcription', e.data);
+                  const text = e.data.transcript;
+
+                  // add the transcription to the conversation
+                  const rawMessage = {
+                    method: 'say',
+                    args: {
+                      text,
+                    },
+                  };
+                  const agent = {
+                    id: playerId,
+                    name: playerSpec.name,
+                  };
+                  const newMessage = formatConversationMessage(rawMessage, {
+                    agent,
+                  });
+                  await conversation.addLocalMessage(newMessage);
+                });
+                const transcriptionStream = {
+                  audioInput,
+                  transcribedVoiceInput,
+                };
+                transcriptionStreams.set(streamId, transcriptionStream);
+              } else {
+                console.warn('unhandled audio text disposition type', type);
+              }
+            // } else {
+            //   // nothing
             }
-          // } else {
-          //   // nothing
+          } else {
+            console.warn('audio start: no such player', playerId);
           }
         });
         multiplayerConnection.addEventListener('audio', async (e: any) => {

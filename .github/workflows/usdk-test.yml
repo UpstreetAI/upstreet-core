@@ -9,19 +9,22 @@ on:
 
 jobs:
   test-usdk:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        node-version: [20]
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '22' # Specify the Node.js version you are using
-
-    - name: Install dependencies
-      run: cd packages/usdk && npm install --no-optional
-
-    - name: Run USDK command
-      run: cd packages/usdk && ./usdk.js --version
+      - name: Install dependencies
+        run: cd packages/usdk && pnpm install --no-optional --no-frozen-lockfile
+      - name: Run USDK command
+        run: cd packages/usdk && ./usdk.js --version

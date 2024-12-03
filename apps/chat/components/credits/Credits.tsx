@@ -32,8 +32,8 @@ export function Credits({ user }: AccountButtonProps) {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (supabase) fetchData();
+  }, [supabase]);
 
   return (
     <div className='mr-2 md:mr-6 flex items-center font-bold text-2xl'>

@@ -287,14 +287,6 @@ export function PromptForm({
         {typing && (
           <div className="absolute -top-12 text-slate-900 left-0 text-muted-foreground text-sm">{typing}</div>
         )}
-        {canContinue && (
-          <div
-            className="absolute -top-12 right-7 text-sm cursor-pointer animate-[blink_1s_steps(1)_infinite]"
-            onClick={nudgeContinue}
-          >
-            <IconTriangleSmallDown />
-          </div>
-        )}
         <div className="mt-2 px-2 w-full">
           <Textarea
             ref={inputRef}
@@ -315,12 +307,12 @@ export function PromptForm({
         <div className="absolute right-0 top-[2px] sm:right-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button type="submit" size="icon" className='shadow-none text-xl bg-transparent' disabled={input === ''}>
-                <Icon icon="Send" />
-                <span className="sr-only">Send message</span>
+              <Button size="icon" className='shadow-none text-xl bg-transparent cursor-pointer' onClick={input !== '' ? submitMessage : nudgeContinue}>
+                <Icon icon={ input !== '' ? "Send" : "Nudge" } />
+                <span className="sr-only">{ input !== '' ? "Send Message" : "Nudge to Continue" }</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Send message</TooltipContent>
+            <TooltipContent>{ input !== '' ? "Send Message" : "Nudge to Continue" }</TooltipContent>
           </Tooltip>
         </div>
       </div>

@@ -1,7 +1,7 @@
 {
   "name": "@upstreet/zjs",
   "version": "0.6.0",
-  "main": "z.mjs",
+  "main": "encoding.mjs",
   "scripts": {
     "test": "mocha --timeout 60000"
   },

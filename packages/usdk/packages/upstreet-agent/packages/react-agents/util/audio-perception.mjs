@@ -71,7 +71,7 @@ const encodeMp3 = async (f32, {
       }
       chunks.push(value);
     }
-    console.log('read 3');
+    // console.log('read 3');
 
     // console.log('got chunks 1', chunks);
     const uint8Array = mergeUint8Arrays(chunks);
@@ -248,7 +248,7 @@ export const transcribeRealtime = ({
             const text = await transcribe(mp3Buffer, {
               jwt,
             });
-            console.log('transcribed', text);
+            // console.log('transcribed', text);
 
             transcription.dispatchEvent(new MessageEvent('transcription', {
               data: {

@@ -17,6 +17,9 @@ console.log('electron start script!');
     console.warn(err.stack);
   });
 });
+process.addListener('SIGTERM', () => {
+  process.exit(0);
+});
 
 // electron doesn't provide a native WebSocket
 // this is needed for needed for the multiplayer library
@@ -50,12 +53,16 @@ const startAgentMainServer = async ({
         const j = await req.json();
         const {
           room,
+          width,
+          height,
           jwt,
           debug,
         } = j;
 
         await openFrontend({
           room,
+          width,
+          height,
           jwt,
           debug,
         });
@@ -113,10 +120,19 @@ const startAgentMainServer = async ({
   // console.log(`Agent server listening on http://${ip}:${port}`);
 };
 const runAgent = async (directory, opts) => {
+  const {
+    init: initString,
+  } = opts;
+  const init = initString && JSON.parse(initString);
+  const debug = !!opts.debug;
+
   const p = '/packages/upstreet-agent/packages/react-agents-node/entry.mjs';
   const main = await loadModule(directory, p);
   // console.log('worker loaded module', main);
-  const agentMain = await main();
+  const agentMain = await main({
+    init,
+    debug,
+  });
   // console.log('agentMain', agentMain);
 
   const {
@@ -149,7 +165,8 @@ const makeViteServer = (directory) => {
 
 // frontend code
 
-const host = 'https://chat.upstreet.ai';
+// const host = 'https://chat.upstreet.ai';
+const host = 'http://127.0.0.1:3000';
 
 const createOTP = async (jwt) => {
   const res = await fetch(
@@ -168,8 +185,10 @@ const createOTP = async (jwt) => {
 
 const openFrontend = async ({
   room,
-  jwt,
   debug,
+  width,
+  height,
+  jwt,
 }) => {
   // wait for the electron app to be ready
   await app.whenReady();
@@ -177,10 +196,20 @@ const openFrontend = async ({
   // create the window
   {
     const primaryDisplay = screen.getPrimaryDisplay();
-    const { width: displayWidth, height: displayHeight } = primaryDisplay.workAreaSize;
+    // console.log('primary display', primaryDisplay, primaryDisplay.workAreaSize);
+    const { width: displayWidth, height: displayHeight } = primaryDisplay.workAreaSize; // primaryDisplay.bounds;
 
-    const localWidth = 300;
-    const localHeight = 400;
+    if (!debug) {
+      if (width === undefined) {
+        width = 300;
+      }
+      if (height === undefined) {
+        height = 400;
+      }
+    } else {
+      width = displayWidth;
+      height = displayHeight;
+    }
 
     // trade the jwt for an otp auth token
     const authToken = await createOTP(jwt);
@@ -196,11 +225,12 @@ const openFrontend = async ({
     const win = new BrowserWindow({
       // width,
       // height,
-      width: localWidth,
-      height: localHeight,
-      x: displayWidth - localWidth, // Position at right edge
-      y: displayHeight - localHeight, // Position at bottom edge
+      width: width,
+      height: height,
+      x: displayWidth - width, // Position at right edge
+      y: displayHeight - height, // Position at bottom edge
       transparent: true,
+      backgroundColor: '#00000000',
       frame: false,
       hasShadow: false,
       alwaysOnTop: true,
@@ -231,6 +261,8 @@ const main = async () => {
     .option('--var <vars...>', 'Environment variables in format KEY:VALUE')
     .requiredOption('--ip <ip>', 'IP address to bind to')
     .requiredOption('--port <port>', 'Port to bind to')
+    .requiredOption('--init <json>', 'Initialization data')
+    .option('--debug', 'Enable debug mode')
     .action(async (directory, opts) => {
       commandExecuted = true;
 

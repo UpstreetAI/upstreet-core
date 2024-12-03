@@ -32,7 +32,7 @@ export function AccountProfile({ account }: AccountProps) {
   const randomAgentImage = account.agents[Math.floor(Math.random() * account.agents.length)]?.images[0].url;
 
   return (
-    <div className="w-full mx-auto">
+    <div className="w-full mx-auto min-h-screen">
       <HeaderMaskFrame background={randomAgentImage} wrapperClass="bg-blue-500" backgroundOpacity={0.2}>
         <div className="w-full max-w-6xl mx-auto h-60 pt-28 relative px-4">
           <div className="flex">

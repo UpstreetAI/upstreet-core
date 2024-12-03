@@ -1,6 +1,6 @@
 import {UPDATE_METHODS} from '../update-types.mjs';
 import {parseUpdateObject, makeId} from '../util.mjs';
-import {zbencode} from 'zjs/encoding.mjs';
+import {zbencode} from 'zjs';
 import {handlesMethod} from './networked-audio-client-utils.mjs';
 
 export class NetworkedAudioClient extends EventTarget {

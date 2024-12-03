@@ -17,7 +17,7 @@ export function CreditsUsageHistory({ creditsUsageHistory, agents }: AgentsProps
 
   const getPageNumbers = () => {
     const totalPages = Math.ceil(creditsUsageHistory.length / itemsPerPage);
-    const pageNumbers = [];
+    const pageNumbers: number[] = [];
     pageNumbers.push(1);
     for (let i = currentPage; i <= currentPage + 2 && i <= totalPages; i++) {
       if (i !== 1) {

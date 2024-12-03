@@ -87,14 +87,16 @@ This setup provides a well-rounded Agent equipped to respond, perceive, act, and
 
 You may choose to use third-party services when customizing your Agent. These services may have **secrets** or **tokens**.
 
-You can keep them safe by creating a `.env` file in the your Agent directory, and keeping environment variables there.
+You can keep them safe by creating a `.env.txt` file in the your Agent directory, and keeping environment variables there.
 
 An example might look like:
 
-```dotenv title=".env"
+```dotenv title=".env.txt"
 GOOGLE_API_KEY=abcdefghijklmonp
 OPEN_WEATHER_KEY=abcdefghijklmonp
 ```
+
+You can access these environment variables by using the [`useEnv`](/api/hooks/use-env) hook.
 
 ## Custom Logic and Advanced Patterns
 

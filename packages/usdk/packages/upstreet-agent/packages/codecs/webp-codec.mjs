@@ -1,4 +1,4 @@
-import { zbencode, zbdecode } from 'zjs/encoding.mjs';
+import { zbencode, zbdecode } from 'zjs';
 
 export class WebPEncoder {
   constructor() {

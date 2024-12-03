@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useMemo, useContext } from 'react';
 import dedent from 'dedent';
 import { ZodTypeAny, ZodUnion, z } from 'zod';
 import { printNode, zodToTs } from 'zod-to-ts';
-import type { Browser, BrowserContext, Page } from 'playwright-core';
+import type { Browser, BrowserContext, Page } from 'playwright-core-lite';
 import { minimatch } from 'minimatch';
 import { timeAgo } from 'react-agents/util/time-ago.mjs';
 
@@ -659,6 +659,7 @@ export const DefaultPrompts = () => {
       <StorePrompt />
       <ConversationMessagesPrompt />
       <InstructionsPrompt />
+      <DefaultCommunicationGuidelinesPrompt />
     </>
   );
 };
@@ -891,6 +892,38 @@ export const InstructionsPrompt = () => {
         # Instructions
         Respond with the next action taken by your character: ${agent.name}
         The method/args of your response must match one of the allowed actions.
+
+        Before choosing an action, decide if you should respond at all:
+        - Return null (no action) if:
+          * Message is clearly meant for others (unless you have crucial information)
+          * Your input wouldn't add value to the conversation
+          * The conversation is naturally concluding
+          * You've already responded frequently in the last few messages (2-3 messages max)
+          * Multiple other agents are already actively participating
+      `}
+    </Prompt>
+  );
+};
+export const DefaultCommunicationGuidelinesPrompt = () => {
+  return (
+    <Prompt>
+      {dedent`
+        Prioritize responding when:
+          - You're directly mentioned or addressed
+          - It's a group discussion where you can contribute meaningfully
+          - Your personality traits are relevant to the topic
+
+        Communication guidelines:
+          - Avoid using names in every message - only use them when:
+            * Directly responding to someone for the first time
+            * Clarifying who you're addressing in a group
+            * There's potential confusion about who you're talking to
+          - If you've been very active in the last few messages, wrap up your participation naturally
+            * Use phrases like "I'll let you all discuss" or simply stop responding
+            * Don't feel obligated to respond to every message
+          - Keep responses concise and natural
+          - Let conversations breathe - not every message needs a response
+          - If multiple agents are responding to the same person, step back and let others take the lead
       `}
     </Prompt>
   );
@@ -925,11 +958,12 @@ export const JsonFormatter = () => {
           const actionSchemas: ZodTypeAny[] = getFilteredActions(actions, conversation, thinkOpts)
             .map(action => makeActionSchema(action.name, action.schema));
           if (actionSchemas.length >= 2) {
-            return z.union(
-              actionSchemas as [ZodTypeAny, ZodTypeAny, ...ZodTypeAny[]]
-            );
+            return z.union([
+              z.null(),
+              ...actionSchemas as [ZodTypeAny, ZodTypeAny, ...ZodTypeAny[]]
+            ]);
           } else if (actionSchemas.length === 1) {
-            return actionSchemas[0];
+            return z.union([z.null(), actionSchemas[0]]);
           } else {
             return null;
           }

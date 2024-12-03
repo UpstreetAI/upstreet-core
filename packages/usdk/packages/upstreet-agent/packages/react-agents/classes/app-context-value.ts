@@ -37,6 +37,8 @@ export class AppContextValue {
   conversationManager: ConversationManager;
   chatsSpecification: ChatsSpecification;
   codecs: any;
+  init: any;
+  debug: boolean;
   registry: RenderRegistry;
 
   constructor({
@@ -50,6 +52,8 @@ export class AppContextValue {
     conversationManager,
     chatsSpecification,
     codecs,
+    init,
+    debug,
     registry,
   }: {
     subtleAi: SubtleAi;
@@ -62,6 +66,8 @@ export class AppContextValue {
     conversationManager: ConversationManager;
     chatsSpecification: ChatsSpecification;
     codecs: any;
+    init: any;
+    debug: boolean;
     registry: RenderRegistry;
   }) {
     this.subtleAi = subtleAi;
@@ -74,6 +80,8 @@ export class AppContextValue {
     this.conversationManager = conversationManager;
     this.chatsSpecification = chatsSpecification;
     this.codecs = codecs;
+    this.init = init;
+    this.debug = debug;
     this.registry = registry;
   }
 
@@ -105,6 +113,12 @@ export class AppContextValue {
   }
   useCodecs() {
     return this.codecs;
+  }
+  useInit() {
+    return this.init;
+  }
+  useDebug() {
+    return this.debug;
   }
   useRegistry() {
     return this.registry;

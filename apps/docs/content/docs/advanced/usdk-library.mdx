@@ -1,0 +1,115 @@
+---
+title: Using USDK programmatically
+description: Use the Upstreet Agents SDK as a library in your code.
+---
+
+While the Upstreet Agents SDK (USDK) is designed as a [command-line interface](/concepts/usdk/overview) (CLI) for building, managing, and deploying Upstreet AI Agents, you can also import USDK as a module in your code to access its powerful functionalities programmatically.
+
+Using USDK programmatically gives you more control over the deployment and management of your agents. You can integrate it into your own workflows, automate tasks, or build more complex applications on top of Upstreet's platform. It also eliminates the need for shell execution, providing a clean and efficient way to interact with USDK features directly from your code.
+
+## Installation
+
+To use it as a module in your Node.js application, install USDK locally in your project:
+
+```bash
+npm install usdk
+```
+
+## Import
+
+You can then import USDK into your Node.js scripts:
+
+```tsx
+const usdk = require('usdk');
+```
+
+## Usage
+
+Once imported, you can interact with USDK's commands as JavaScript functions. Here's a basic example of how you can use USDK programmatically:
+
+### Example: Log In
+
+```javascript
+const usdk = require('usdk');
+
+async function login() {
+  try {
+    await usdk.login();
+    console.log('Logged in successfully!');
+  } catch (error) {
+    console.error('Login failed:', error);
+  }
+}
+
+login();
+```
+
+### Example: Create an Agent
+
+```javascript
+const usdk = require('usdk');
+
+async function createAgent() {
+  try {
+    const agent = await usdk.create({
+      prompt: "Create a new agent",
+      feature: ['chat'],
+      force: true,
+      json: '{"name":"MyAgent","type":"assistant"}'
+    });
+    console.log('Agent created:', agent);
+  } catch (error) {
+    console.error('Error creating agent:', error);
+  }
+}
+
+createAgent();
+```
+
+### Example: Deploy an Agent
+
+```javascript
+const usdk = require('usdk');
+
+async function deployAgent(agentId) {
+  try {
+    await usdk.deploy([agentId]);
+    console.log('Agent deployed successfully!');
+  } catch (error) {
+    console.error('Error deploying agent:', error);
+  }
+}
+
+deployAgent('my-agent-id');
+```
+
+## Key Functions Available
+
+Here's a quick overview of the core functions you can use programmatically with USDK:
+
+- `usdk.login()`: Logs in to the USDK.
+- `usdk.logout()`: Logs out from USDK.
+- `usdk.create(options)`: Creates a new agent.
+- `usdk.edit(directory, options)`: Edits an existing agent.
+- `usdk.deploy(agentIds)`: Deploys an agent to the network.
+- `usdk.rm(agentIds)`: Removes a deployed agent.
+- `usdk.pull(agentId, options)`: Pulls the source code of a deployed agent.
+- `usdk.status()`: Retrieves the current login status and account details.
+- `usdk.chat(agentIds, options)`: Starts a multi-agent chat session.
+
+### Example: Check Status
+
+```javascript
+const usdk = require('usdk');
+
+async function checkStatus() {
+  try {
+    const status = await usdk.status();
+    console.log('Current status:', status);
+  } catch (error) {
+    console.error('Error retrieving status:', error);
+  }
+}
+
+checkStatus();
+```

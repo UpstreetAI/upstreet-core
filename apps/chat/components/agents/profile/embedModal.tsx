@@ -45,7 +45,7 @@ export default function EmbedModal({agent, close}: {agent: any, close: () => voi
   const generateEmbedCode = () => {
     const defaultWidth = 300;
     const defaultHeight = 400;
-    const embedCode = `<iframe src="${window.location.origin}/embed/${agent.id}" width="${defaultWidth}" height="${defaultHeight}" style={{ position: 'fixed', bottom: 0, right: 0, zIndex: 9999, background: 'transparent' }}></iframe>`;
+    const embedCode = `<iframe allowtransparency="true" src="${window.location.origin}/embed/${agent.id}" width="${defaultWidth}" height="${defaultHeight}" style={{ position: 'fixed', bottom: 0, right: 0, zIndex: 9999, background: 'transparent', border: 0, }}></iframe>`;
     setEmbedCode(embedCode);
   };
 

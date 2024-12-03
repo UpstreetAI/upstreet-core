@@ -63,7 +63,6 @@ import HTML from "./chat.html";
 import { getAssetFromKV, mapRequestToAsset } from '@cloudflare/kv-asset-handler'
 import manifestJSON from '__STATIC_CONTENT_MANIFEST'
 const assetManifest = JSON.parse(manifestJSON);
-// import {zbencode, zbdecode} from "../public/encoding.mjs";
 import {DataClient, NetworkedDataClient/*, DCMap, DCArray*/} from "../public/data-client.mjs";
 import {NetworkedIrcClient} from "../public/irc-client.mjs";
 import {NetworkedCrdtClient} from "../public/crdt-client.mjs";

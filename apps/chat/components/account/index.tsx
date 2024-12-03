@@ -16,10 +16,10 @@ export async function AccountForm({
 }: {
   id: string
 }) {
-  let user = null
-  let userPrivate = null
+  let user: any = null
+  let userPrivate: any = null
   let credits = 0
-  let creditsUsageHistory = null;
+  let creditsUsageHistory: any = null;
   let userIsCurrentUser = false
 
   const currentUser = await waitForUser();

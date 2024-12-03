@@ -1,5 +1,5 @@
 {
     "title": "📚 API Reference",
-    "pages": ["overview", "components", "hooks", "integrations", "command-reference"],
+    "pages": ["overview", "components", "hooks", "generators", "contexts", "evaluators", "integrations", "command-reference"],
     "defaultOpen": false
 }

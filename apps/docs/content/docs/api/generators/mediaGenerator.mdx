@@ -1,0 +1,81 @@
+---
+title: <MediaGenerator>
+description: Add media generation support to your agent.
+full: false
+---
+import Wrapper from 'components/preview/wrapper';
+import Image from 'next/image';
+
+## Import
+
+```tsx
+import { WebBrowser } from 'react-agents';
+```
+
+## MediaGenerator
+
+The MediaGenerator component enables your agent to generate various types of media content through a unified interface.
+
+1. Add the component to your agent:
+   ```json
+   import { MediaGenerator } from 'react-agents';
+
+   return (
+     <Agent>
+       {/* ... */}
+       <MediaGenerator />
+       {/* ... */}
+     </Agent>
+   );
+   ```
+
+   **Additional Notes:**
+   - The agent can generate different types of media using the `type` parameter:
+     - Images: `'image/jpeg+image'`
+     - Sound effects: `'audio/mpeg+sound-effect'`
+     - 3D models: `'model/gltf-binary+3d-model'`
+     - Videos: `'model/video/mp4+video'`
+   - Each media type has its own generation options and parameters
+   - Generated media is automatically uploaded and shared in the chat
+   - Media generation requires valid authentication via JWT token
+   - Generation may take some time depending on the media type
+   - Note: if you haven't created the agent yet, please follow this [Create an Agent](/create-an-agent) first.
+
+### Available Media Types
+
+The MediaGenerator supports several media types with different capabilities:
+
+- **Images (`'image/jpeg+image'`)**
+  - Format: JPEG
+  - Configurable image sizes via `options.image_size`
+  - Text-to-image generation from prompts
+  - Outputs .jpg files
+  
+- **Sound Effects (`'audio/mpeg+sound-effect'`)**
+  - Format: MP3
+  - Text-to-audio generation from prompts
+  - Suitable for short sound clips
+  - Outputs .mp3 files
+
+- **3D Models (`'model/gltf-binary+3d-model'`)**
+  - Format: GLB
+  - Image-to-3D generation (generates image from prompt first)
+  - Compatible with standard 3D viewers
+  - Outputs .glb files
+
+- **Videos (`'model/video/mp4+video'`)**
+  - Format: MP4
+  - Image-to-video generation (generates image from prompt first)
+  - Automated video synthesis
+  - Outputs .mp4 files
+
+Each media type includes error handling for common scenarios like:
+- Generation failures
+- Upload errors 
+- Invalid prompts
+- Authentication issues
+- Network timeouts
+
+The agent will automatically handle errors and can retry generation when appropriate. All generated media is uploaded to secure storage and shared in the chat with proper MIME types and extensions.
+
+### Usage Example

@@ -1020,6 +1020,7 @@ export const DefaultCommunicationGuidelinesPrompt = () => {
 };
 
 // formatters
+// XXX can get rid of this
 export const DefaultFormatters = () => {
   return <JsonFormatter />;
 };

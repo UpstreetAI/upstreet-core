@@ -91,9 +91,9 @@ export const useConversations = () => {
 export const useConversation = () => {
   const conversationContextValue = useContext(ConversationContext);
   const { conversation } = conversationContextValue;
-  if (conversation === null) {
-    throw new Error('useConversation() can only be used within a conversation context');
-  }
+  // if (conversation === null) {
+  //   throw new Error('useConversation() can only be used within a conversation context');
+  // }
   return conversation;
 };
 

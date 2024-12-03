@@ -170,6 +170,12 @@ export type TelnyxBotArgs = {
   agent: ActiveAgentObject;
 };
 
+// video perception
+
+export type VideoPerceptionProps = {
+  hint?: string;
+};
+
 // actions
 
 export type FormattedAttachment = {

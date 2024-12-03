@@ -1,5 +1,5 @@
 {
-    "title": "API Reference",
+    "title": "📚 API Reference",
     "pages": ["overview", "components", "hooks", "integrations", "command-reference"],
     "defaultOpen": false
 }

@@ -67,6 +67,9 @@ export type GenerativeAgentObject =  {
   addMessage: (m: PendingActionMessage) => Promise<void>;
   addAudioStream: (stream: PlayableAudioStream) => void;
 };
+export type DebugOptions = {
+  debug?: false;
+};
 export type AgentThinkOptions = {
   forceAction?: string;
   excludeActions?: string[];
@@ -147,6 +150,7 @@ export type TwitterSpacesArgs = {
   url?: string;
   agent: ActiveAgentObject;
   codecs: any;
+  init: any;
   jwt: string;
 };
 
@@ -770,7 +774,7 @@ export type AppContextValue = {
   subtleAi: SubtleAi;
 
   useAgentJson: () => object;
-  useEnv: () => string;
+  useEnv: () => object;
   useEnvironment: () => string;
   useWallets: () => object[];
   useAuthToken: () => string;
@@ -778,6 +782,8 @@ export type AppContextValue = {
   useConversationManager: () => ConversationManager;
   useChatsSpecification: () => ChatsSpecification;
   useCodecs: () => any;
+  useInit: () => any;
+  useDebug: () => boolean;
   useRegistry: () => RenderRegistry;
 
   useKv: (opts?: KvArgs) => Kv;

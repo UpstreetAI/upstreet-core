@@ -1,6 +1,6 @@
 import {
   multiplayerEndpointUrl,
-} from '../react-agents/util/endpoints.mjs';
+} from 'react-agents/util/endpoints.mjs';
 import { NetworkRealms } from './packages/multiplayer/public/network-realms.mjs'; // XXX should be a deduplicated import, in a separate npm module
 // import { webbrowserActionsToText } from './packages/upstreet-agent/packages/react-agents/util/browser-action-utils.mjs';
 import {

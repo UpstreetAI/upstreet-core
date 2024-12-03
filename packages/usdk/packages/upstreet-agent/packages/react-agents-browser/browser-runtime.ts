@@ -39,17 +39,20 @@ export class ReactAgentsWorker {
 
     const env = {
       AGENT_JSON: JSON.stringify(agentJson),
+      // SUPABASE_URL,
+      // SUPABASE_PUBLIC_API_KEY,
+      WORKER_ENV: 'development', // 'production',
+    };
+    const auth = {
       AGENT_TOKEN: apiKey,
       WALLET_MNEMONIC: mnemonic,
-      SUPABASE_URL,
-      SUPABASE_PUBLIC_API_KEY,
-      WORKER_ENV: 'development', // 'production',
     };
     console.log('starting worker with env:', env);
     this.worker.postMessage({
       method: 'init',
       args: {
         env,
+        auth,
         agentSrc,
       },
     });

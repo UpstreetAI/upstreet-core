@@ -154,7 +154,7 @@ export function ChatInfo() {
           }} disabled={!crdt} />
         </div>
         <div className="text-sm whitespace-pre">{(() => {
-          const result = [];
+          const result: string[] = [];
           for (let i = 1; i < maxIdleMessages; i++) {
             const n = getTimeOfNthMessage(i, temperature, decay);
             if (isFinite(n)) {

@@ -1,5 +1,5 @@
 // import {MULTIPLAYER_PORT} from './constants.mjs';
-import {zbencode, zbdecode} from './encoding.mjs';
+import {zbencode, zbdecode} from 'zjs';
 import {UPDATE_METHODS} from './update-types.mjs';
 
 const alignN = n => index => {

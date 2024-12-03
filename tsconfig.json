@@ -14,6 +14,8 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "strictNullChecks": true,
+    "noImplicitAny": false,
+    "allowImportingTsExtensions": true,
     "target": "esnext"
   },
   "include": [

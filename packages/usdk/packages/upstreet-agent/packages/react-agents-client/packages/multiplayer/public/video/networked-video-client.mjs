@@ -1,7 +1,7 @@
 import {UPDATE_METHODS} from '../update-types.mjs';
 import {handlesMethod} from './networked-video-client-utils.mjs';
 import {parseUpdateObject, makeId} from '../util.mjs';
-import {zbencode} from 'zjs/encoding.mjs';
+import {zbencode} from 'zjs';
 
 export class NetworkedVideoClient extends EventTarget {
   constructor({

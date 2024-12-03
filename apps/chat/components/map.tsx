@@ -1136,8 +1136,8 @@ const MapScene = ({
     setTileSpecs(tileSpecs);
 
     // ensure all tiles are generated
-    const newTileLoads = [];
-    const tileLoadPromises = [];
+    const newTileLoads: any[] = [];
+    const tileLoadPromises: Promise<any>[] = [];
     for (const tileSpec of tileSpecs) {
       if (!isTileGenerated(tileSpec)) {
         const tileLoad = {

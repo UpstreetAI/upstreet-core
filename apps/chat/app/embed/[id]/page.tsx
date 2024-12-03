@@ -41,12 +41,10 @@ async function getAgentData(supabase: any, identifier: string) {
 
 export default async function EmbedPage({ params }: Params) {
   // try {
-    const id = decodeURIComponent(params.id);
-
     const supabase = makeAnonymousClient(env);
-    const identifier = decodeURIComponent(id);
-
-    const result = await getAgentData(supabase, identifier);
+    
+    const id = decodeURIComponent(params.id);
+    const result = await getAgentData(supabase, id);
     const agentData = result.data as AgentData;
 
     // console.log(id, agentData);

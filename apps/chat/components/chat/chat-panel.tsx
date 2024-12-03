@@ -3,6 +3,7 @@ import { PromptForm } from '@/components/prompt-form';
 import { DirectMessages } from '@/components/direct-message-form';
 import { ButtonScrollToBottom } from '@/components/button-scroll-to-bottom';
 import { useSidebar } from '@/lib/client/hooks/use-sidebar';
+import { cn } from '@/lib/utils';
 
 export interface ChatPanelProps {
   // id?: string
@@ -13,7 +14,9 @@ export interface ChatPanelProps {
   scrollToBottom: () => void
   room?: string
   desktop?: boolean
-  messages: Array<{ id: string; display: React.ReactNode }>
+  mode?: "web" | "desktop" | "embed"
+  messages?: Array<{ id: string; display: React.ReactNode }>
+  // messages: Array<{ id: string; display: React.ReactNode }>
   // sendChatMessage: (message: string) => void
 }
 
@@ -26,8 +29,8 @@ export function ChatPanel({
   scrollToBottom,
   room,
   desktop,
-  messages,
-  // sendChatMessage,
+  // messages,
+  mode
 }: ChatPanelProps) {
 
   const { isLeftSidebarOpen, isRightSidebarOpen } = useSidebar();
@@ -40,17 +43,16 @@ export function ChatPanel({
         scrollToBottom={scrollToBottom}
       />
 
-      <div className="relative mx-auto border-t bg-gray-300 sm:px-4">
+      <div className={`relative mx-auto sm:px-4 ${mode === "web" ? "border-t" : ""}`}>
         {room && (<>
-
-          <div className="space-y-4 px-4 py-2 sm:max-w-2xl mx-auto md:py-3 relative">
+          <div className={cn("space-y-4 px-4 py-2 sm:max-w-2xl mx-auto md:py-3 relative", mode === "desktop" ? "py-0" : "")}>
             <PromptForm
               input={input}
               setInput={setInput}
               desktop={desktop}
+              mode={mode}
             />
           </div>
-
           <DirectMessages />
         </>)}
       </div>

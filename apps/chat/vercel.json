@@ -1,0 +1,3 @@
+{
+  "installCommand": "sed -i.bak '/\"speaker\"/d' ../../packages/usdk/package.json && pnpm install --no-frozen-lockfile"
+}

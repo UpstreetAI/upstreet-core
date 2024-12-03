@@ -7,6 +7,9 @@ import { env } from '@/lib/env'
 import { AgentNotFound } from '@/components/agents/profile/AgentNotFound';
 import { getJWT } from '@/lib/jwt';
 
+import Footer from '@/components/ui/Footer';
+import Header from '@/components/ui/Header';
+
 type Params = {
   params: {
     id: string;
@@ -105,6 +108,9 @@ export default async function AgentProfilePage({ params }: Params) {
   const isOwner = agentData.author.id === user?.id;
 
   return (
-    <AgentProfile agent={agentData} isOwner={isOwner} />
+    <>
+      <Header />
+      <AgentProfile agent={agentData} isOwner={isOwner} />
+    </>
   );
 }

@@ -1,0 +1,179 @@
+---
+title: Custom Components with useState
+description: Learn to build custom React components in Upstreet Agents, leveraging the useState hook for state management.
+full: false
+---
+
+[`useState`](https://react.dev/reference/react/useState) is a React Hook that lets you add a state variable to your component.
+
+```tsx
+const [state, setState] = useState(initialState)
+```
+
+### Explanation
+
+- Enables state management in functional components.
+- Updates the component's state and triggers a re-render.
+
+### Usecase
+
+- Introducing state to a component
+- Modifying state using the previous state as a reference
+- Updating objects and arrays within the state
+- Preventing the recreation of the initial state
+- Resetting state by utilizing a unique key
+- Preserving data from earlier renders
+
+
+### Step 1:  Integrate useState with Upstreet agents to build a component that generate random names
+
+- Install the Upstreet SDK using `usdk create`
+
+- Navigate to the `agent.tsx` file.
+
+- You will find a pre-built `MyAgent` component like that. 
+```tsx
+export default function MyAgent() {
+  return (
+    <Agent>
+   
+    </Agent>
+  )
+}
+```
+
+### Step 2: Import dependencies and create `NameRandomizer` component 
+
+
+Call `useState`, `Prompt` and `Action` at the top level of your component to declare a state variable.
+
+```tsx
+import { useState } from "react";
+import { Prompt, Action } from "@upstreet/agents";
+```
+Now create a component named `NameRandomizer` and set your states using `useState`
+
+```tsx
+
+const NameRandomizer = () => {
+  const [name, setName] = useState(generateRandomName);
+
+  return (
+    <>
+      
+    </>
+  );
+};
+```
+
+### Step 3: Modify the `NameRandomizer` component 
+
+
+Create a `generateRandomName`  function below the states in which an array of names is present and the function loops through this array to select a random using 
+`MATH.floor` and `MATH.random()`.
+
+```tsx
+ const generateRandomName = () => {
+    const names = ["Brave Falcon", "Silver Fox", "Mystic Owl", "Golden Hawk"];
+    return names[Math.floor(Math.random() * names.length)];
+  };
+```
+
+Give agent a customized `Prompt` 
+
+```tsx
+  <Prompt>
+        Engage the user by discussing their generated name, "{name}". Offer insights or lore about their name and suggest if they want to generate a new one.
+      </Prompt>
+```
+
+Render the current name and provide a button to generate new name. This button will render the new state
+
+```tsx
+    <div>
+        <p>Your current name is: <strong>{name}</strong></p>
+        <button onClick={() => setName(generateRandomName)}>Generate New Name</button>
+      </div>
+```
+
+Define the `Action` of the agent
+```tsx
+ <Action
+        name="newNameGenerated"
+        description="React to the new name being generated."
+        schema={{ name: "string" }}
+        handler={({ agent, data }) => {
+          agent.say(`The new name, "${data.name}", has a great backstory!`);
+        }}
+      />
+```
+
+The final state of `NameRandomizer` look like this.
+
+```tsx
+import React, { useState } from "react";
+import { Prompt, Action } from "react-agents";
+import { z } from 'zod';
+
+const NameRandomizer = () => {
+  const generateRandomName = () => {
+    const names = ["Brave Falcon", "Silver Fox", "Mystic Owl", "Golden Hawk"];
+    return names[Math.floor(Math.random() * names.length)];
+  };
+
+  const [name, setName] = useState(generateRandomName);
+
+ return (
+    <Agent>
+      <Prompt>
+        Discuss the generated name, "{name}". Share lore or background about
+        it. If the user wants a new name, prompt them to generate one. Be
+        engaging and creative with the responses!
+      </Prompt>
+      <Action
+        name="generateNewName"
+        description="Generate a new random name for the user."
+        schema={z.object({
+          feedbackMessage: z.string(),
+        })}
+        examples={[
+          {
+            feedbackMessage: "Here’s a fresh and unique name for you!",
+          },
+        ]}
+        handler={({ agent }) => {
+          const newName = generateRandomName();
+          agent.say(
+            `Your new name is "${newName}". It has an intriguing history!`
+          );
+          setName(newName);
+        }}
+      />
+    </Agent>
+  );
+
+};
+
+
+```
+### Step 4: Import `NameRandomizer` in the `Agent` Components
+
+```tsx
+export default function MyAgent() {
+  return (
+    <Agent>
+   <NameRandomizer/>
+    </Agent>
+  )
+}
+```
+
+### Step 5: Test the agent
+
+Run `usdk chat` in the terminal to test the agent.
+
+You can ask agent
+
+> I want to guess random names!
+
+

@@ -145,7 +145,6 @@ export function Chat({ className, /* user, missingKeys, */ room, desktop, onConn
     <div
       className={`relative group w-full duration-300 text-gray-900 ease-in-out animate-in ${isLeftSidebarOpen ? "lg:pl-[250px] xl:pl-[300px]" : ""} ${isRightSidebarOpen ? "lg:pr-[250px] xl:pr-[300px]" : ""} `}
     >
-
       {room && (
         <>
           <ChatMenu players={players} roomName={roomName} />
@@ -177,7 +176,7 @@ export function Chat({ className, /* user, missingKeys, */ room, desktop, onConn
             scrollToBottom={scrollToBottom}
             room={room}
             desktop={desktop}
-            messages={messages}
+            mode="web"
           />
 
         </>
@@ -207,12 +206,12 @@ function getMessageComponent(room: string, message: Message, id: string, players
 
     // fake client side messages
     case 'join': return (
-      <div className="opacity-60 text-center text-white bg-gray-400 border-gray-600 border mt-2 p-1 mx-14">
+      <div className="text-center text-white bg-gray-400 border-gray-600 border mt-2 p-1 mx-14">
         <span className='font-bold'>{message.name}</span> joined the room.
       </div>
     )
     case 'leave': return (
-      <div className="opacity-60 text-center text-white bg-gray-400 border-gray-600 border mt-2 p-1 mx-14">
+      <div className="text-center text-white bg-gray-400 border-gray-600 border mt-2 p-1 mx-14">
         <span className='font-bold'>{message.name}</span> left the room.
       </div>
     )

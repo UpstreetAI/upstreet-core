@@ -1,0 +1,41 @@
+---
+title: <VideoPerception>
+description: Allow your agent to perceive images and video.
+full: false
+---
+import Wrapper from 'components/preview/wrapper';
+import Image from 'next/image';
+
+## Import
+
+```tsx
+import { WebBrowser } from 'react-agents';
+```
+
+## Usage
+
+## Video Perception Support
+
+The VideoPerception component enables your agent to perceive and analyze images and videos in the conversation.
+
+1. Add the component to your agent:
+   ```json
+   import { VideoPerception } from 'react-agents';
+
+   return (
+     <Agent>
+       {/* ... */}
+       <VideoPerception
+         hint="Optional guidance for the agent's video perception behavior"
+       />
+       {/* ... */}
+     </Agent>
+   );
+   ```
+
+The passed-in `hint` will be used during inference to determine what aspects of the video the agent should focus on.
+
+The supported media types are:
+  - `image/jpeg`
+  - `image/png`
+  - `image/webp`

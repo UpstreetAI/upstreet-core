@@ -1,0 +1,68 @@
+---
+title: <WebBrowser>
+description: Add web browsing support to your agent.
+full: false
+---
+import Wrapper from 'components/preview/wrapper';
+import Image from 'next/image';
+
+## Import
+
+```tsx
+import { WebBrowser } from 'react-agents';
+```
+
+## Web Browsing Support
+
+The WebBrowser component enables your agent to browse and interact with web pages.
+
+1. Add the component to your agent:
+   ```json
+   import { WebBrowser } from 'react-agents';
+
+   return (
+     <Agent>
+       {/* ... */}
+       <WebBrowser
+         hint="Optional guidance for the agent's browsing behavior"
+       />
+       {/* ... */}
+     </Agent>
+   );
+   ```
+
+   **Additional Notes:**
+   - The `hint` prop is optional and can be used to guide the agent's browsing behavior
+   - For example, you could set `hint="Focus on news articles"` or `hint="Only browse product pages"`
+   - If no hint is provided, the agent will browse based on its own judgment
+   - The bot can:
+     - Navigate to URLs
+     - Click elements
+     - Fill forms
+     - Extract text content
+     - Take screenshots
+     - And more
+   - Web browsing requires a stable internet connection
+   - Standard rate limiting and robot policies of websites apply
+   - Note: if you haven't created the agent yet, please follow this [Create an Agent](/create-an-agent) first.
+
+### Available Actions
+
+The WebBrowser internally uses several actions for interacting with web pages:
+
+- `goto`: Navigate to a URL
+- `click`: Click an element on the page
+- `type`: Enter text into a form field  
+- `extract`: Get text content from the page
+- `screenshot`: Capture an image of the page
+- `evaluate`: Run custom JavaScript code
+- `waitForSelector`: Wait for an element to appear
+- `waitForNavigation`: Wait for page navigation to complete
+
+Each action follows standard web automation patterns and includes error handling for common scenarios like:
+- Page load failures
+- Missing elements
+- Navigation timeouts
+- Network errors
+
+The agent will automatically retry failed actions when appropriate and can adapt its browsing strategy based on the results.

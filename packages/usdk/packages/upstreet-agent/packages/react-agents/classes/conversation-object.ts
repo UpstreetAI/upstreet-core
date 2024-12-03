@@ -18,7 +18,7 @@ import { loadMessagesFromDatabase } from '../util/loadMessagesFromDatabase';
 //
 
 export class ConversationObject extends EventTarget {
-  agent: ActiveAgentObject;
+  agent: ActiveAgentObject; // the current agent
   agentsMap: Map<string, Player>; // note: agents does not include the current agent
   scene: SceneObject | null;
   getHash: GetHashFn; // XXX this can be a string, since conversation hashes do not change (?)

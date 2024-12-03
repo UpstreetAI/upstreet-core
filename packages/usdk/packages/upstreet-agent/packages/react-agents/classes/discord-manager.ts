@@ -169,6 +169,10 @@ export class DiscordBot extends EventTarget {
       const status = await discordBotClient.status();
       if (signal.aborted) return;
 
+      if (status.error) {
+        throw new Error(`Discord connection error: ${status.error}`);
+      }
+
       console.log('discord connect 2');
       let connectableChannels = status.channels
         .filter((channel: any) => [0, 2].includes(channel.type));

@@ -46,6 +46,8 @@ const testRoomNameMatch = (channelName: string, channelSpec: DiscordRoomSpec) =>
     return false;
   }
 };
+
+// bind sending messages from agent -> discord
 const bindOutgoing = ({
   conversation,
   discordBotClient,
@@ -206,6 +208,8 @@ export class DiscordBot extends EventTarget {
       console.log('discord connect 4');
       if (signal.aborted) return;
       console.log('discord connect 5');
+
+      discordBotClient.initSyncBotAndAgentData();
     };
     const _bindChannels = () => {
       discordBotClient.addEventListener('channelconnect', (e: MessageEvent<{channel: any}>) => {
@@ -368,12 +372,25 @@ export class DiscordBot extends EventTarget {
         }
       });
     };
+    const _bindProfileData = () => {
+      discordBotClient.addEventListener('profileData', (e: MessageEvent) => {
+        const {
+          username,
+          avatarUrl,
+        } = e.data;
+        discordBotClient.syncBotProfileWithAgent(this.agent, {
+          username,
+          avatarUrl,
+        });
+      });
+    };
 
     (async () => {
       _bindChannels();
       _bindGuildMemberAdd();
       _bindGuildMemberRemove();
       _bindIncoming();
+      _bindProfileData();
       await _connect();
     })().catch(err => {
       console.warn('discord bot error', err);

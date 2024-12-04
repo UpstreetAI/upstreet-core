@@ -175,6 +175,16 @@ export class DiscordInput {
     this.ws.send(s);
   }
 
+  getBotProfile() {
+    const m = {
+      method: 'profileData',
+      args: {},
+    };
+    const s = JSON.stringify(m);
+    this.ws.send(s);
+  }
+
+
   destroy() {
     // nothing
   }
@@ -428,6 +438,12 @@ export class DiscordBotClient extends EventTarget {
           args,
         } = j;
         switch (method) {
+          case 'profileData': {
+            this.dispatchEvent(new MessageEvent('profileData', {
+              data: args,
+            }));
+            break;
+          }
           case 'ready': {
             readyPromise.resolve();
             break;
@@ -492,6 +508,52 @@ export class DiscordBotClient extends EventTarget {
 
     await connectPromise;
     await readyPromise;
+  }
+
+  updateUsername(name) {
+    const m = {
+      method: 'setUsername',
+      args: {
+        name,
+      },
+    };
+    const s = JSON.stringify(m);
+    this.ws.send(s);
+  }
+
+  updateAvatar(avatarUrl) {
+    console.log('update avatar', avatarUrl);
+  }
+  initSyncBotAndAgentData() {
+    this.input.getBotProfile();
+  }
+
+  syncBotProfileWithAgent(agent, botProfile) {
+    const {
+      name,
+      previewUrl,
+    } = agent;
+
+    const {
+      username,
+      avatarUrl,
+    } = botProfile;
+    
+    console.log('syncBotProfileWithAgent', {
+      name,
+      username,
+      previewUrl,
+      avatarUrl,
+    });
+
+    if (name && name !== username) {
+      console.log('update username', name);
+      this.updateUsername(name);
+    }
+    // if (previewUrl && previewUrl !== avatarUrl) {
+    //   console.log('update avatar', previewUrl);
+    //   this.updateAvatar(previewUrl);
+    // }
   }
 
   destroy() {

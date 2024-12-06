@@ -1,0 +1,4 @@
+{
+  "name": "[Shared] Build Node app",
+  "command": "npx pnpm build"
+}

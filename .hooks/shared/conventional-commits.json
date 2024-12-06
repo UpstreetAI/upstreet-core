@@ -1,0 +1,4 @@
+{
+  "name": "[Shared] Conventional Commits",
+  "command": "cd `git rev-parse --show-toplevel` && (cat {args} | npx commitlint)"
+}

@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "postinstall": "echo -e '\\033[31mPlease run npx mookme init --only-hook to enable commit hooks.\\033[0m'",
     "chat": "npm run -w @upstreet/chat --",
     "docs": "npm run -w @upstreet/docs --"
   },
@@ -13,9 +14,16 @@
     "packages/usdk/packages/*",
     "packages/usdk/packages/upstreet-agent/packages/*"
   ],
+  "dependencies": {
+    "@escape.tech/mookme": "^2.5.1",
+    "commitlint": "^17.7.2"
+  },
   "devDependencies": {
     "@eslint/js": "^9.4.0",
-    "@stylistic/eslint-plugin": "^2.1.0"
+    "@stylistic/eslint-plugin": "^2.1.0",
+    "conventional-changelog-conventionalcommits": "^7.0.2",
+    "lint-staged": "^14.0.1",
+    "prettier": "^3.2.5"
   },
   "packageManager": "pnpm@9.14.2+sha512.6e2baf77d06b9362294152c851c4f278ede37ab1eba3a55fda317a4a17b209f4dbb973fb250a77abc463a341fcb1f17f17cfa24091c4eb319cda0d9b84278387"
 }

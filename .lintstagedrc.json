@@ -1,0 +1,18 @@
+{
+  "**/*.ts": [
+    "prettier --write",
+    "eslint --max-warnings 0 ."
+  ],
+  "**/*.tsx": [
+    "prettier --write",
+    "eslint --max-warnings 0 ."
+  ],
+  "**/*.js": [
+    "prettier --write",
+    "eslint --max-warnings 0 ."
+  ],
+  "**/*.jsx": [
+    "prettier --write",
+    "eslint --max-warnings 0 ."
+  ]
+}

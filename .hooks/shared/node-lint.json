@@ -1,0 +1,4 @@
+{
+  "name": "[Shared] Linting Node app 🧹",
+  "command": "npx lint-staged"
+}

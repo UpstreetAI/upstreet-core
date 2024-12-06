@@ -1,33 +1,33 @@
-"use client";
-import { cn } from "../lib/utils";
-import Image from "next/image";
+'use client'
+import { cn } from '../lib/utils'
+import Image from 'next/image'
 
 export default function AuthorCard({
-    title,
-    description,
-    src,
-    thumbnailSrc,
-    authorName,
-    authorSubtitle,
-    variant="community",
+  title,
+  description,
+  src,
+  thumbnailSrc,
+  authorName,
+  authorSubtitle,
+  variant = 'community'
 }: {
-    title: string;
-    description: string;
-    src?: string;
-    thumbnailSrc: string;
-    authorName: string;
-    authorSubtitle: string;
-    variant?: "official" | "community",
+  title: string
+  description: string
+  src?: string
+  thumbnailSrc: string
+  authorName: string
+  authorSubtitle: string
+  variant?: 'official' | 'community'
 }) {
   return (
     <div className="md:max-w-xs w-full flex flex-grow group/card">
       <div
         className={cn(
-          "w-full cursor-pointer overflow-hidden relative card h-96 rounded-md shadow-xl mx-auto backgroundImage flex flex-col justify-between p-4",
+          'w-full cursor-pointer overflow-hidden relative card h-96 rounded-md shadow-xl mx-auto backgroundImage flex flex-col justify-between p-4',
           `bg-cover`
         )}
         style={{
-          backgroundImage: `url(${thumbnailSrc})`,
+          backgroundImage: `url(${thumbnailSrc})`
         }}
       >
         {/* Dark overlay for initial background */}
@@ -38,7 +38,7 @@ export default function AuthorCard({
           <Image
             height="100"
             width="100"
-            alt={authorName + " Avatar"}
+            alt={authorName + ' Avatar'}
             src={src ?? '/images/general/default_profile_picture.webp'}
             className="h-10 w-10 rounded-full border-2 object-cover"
           />
@@ -53,14 +53,16 @@ export default function AuthorCard({
           <h1 className="font-bold text-xl md:text-2xl text-gray-50 relative z-10">
             {title}
           </h1>
-          <p className={cn(
-            "font-normal text-sm text-gray-50 relative z-10 my-4",
-            variant === "official" ? "line-clamp-2" : "line-clamp-4"
-          )}>
+          <p
+            className={cn(
+              'font-normal text-sm text-gray-50 relative z-10 my-4',
+              variant === 'official' ? 'line-clamp-2' : 'line-clamp-4'
+            )}
+          >
             {description}
           </p>
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -1,0 +1,4 @@
+{
+  "name": "[Shared] Typescript compilation ♳",
+  "command": "pnpm exec tsc --noEmit"
+}

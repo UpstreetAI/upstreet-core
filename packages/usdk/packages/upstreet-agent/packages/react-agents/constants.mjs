@@ -10,6 +10,12 @@ export const defaultModels = [
   'lambdalabs:hermes-3-llama-3.1-405b-fp8',
   // 'lambdalabs:hermes-3-llama-3.1-405b-fp8-128k',
 ];
+export const defaultSmallModels = [
+  'openai:gpt-4o-mini',
+];
+export const defaultLargeModels = [
+  'openai:o1-preview',
+];
 
 export const defaultVisionModels = [
   'openai:gpt-4o-2024-08-06',

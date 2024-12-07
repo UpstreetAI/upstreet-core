@@ -1,7 +1,7 @@
 {
   "name": "usdk",
   "description": "AI Agents SDK in TypeScript and React.",
-  "version": "0.0.95",
+  "version": "0.0.96",
   "homepage": "https://upstreet.ai/",
   "author": "Upstreet <hello@upstreet.ai> (https://github.com/UpstreetAI)",
   "contributors": [
@@ -109,6 +109,7 @@
     "simple-yenc": "^1.0.4",
     "together-ai": "^0.6.0-alpha.4",
     "unique-names-generator": "^4.7.1",
+    "update-notifier": "file:./packages/update-notifier",
     "vercel": "^34.2.6",
     "vite": "^5.4.11",
     "web-worker": "1.2.0",

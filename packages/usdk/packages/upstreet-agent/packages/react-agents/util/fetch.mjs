@@ -327,7 +327,6 @@ export const fetchJsonCompletion = async ({
 
   const match = model.match(/^(.+?):/);
   if (match) {
-    // XXX support different model types; for now openai is assumed
     // const modelType = match[1];
     const modelName = model.slice(match[0].length);
     const res = await fetch(`https://${aiProxyHost}/api/ai/chat/completions`, {

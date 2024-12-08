@@ -115,9 +115,6 @@ export const featureSpecs = [
     imports: () => [
       'RateLimit',
     ],
-    // agentProps: (props) => [
-    //   `rateLimit={${JSON.stringify(props)}}`,
-    // ],
     components: ({
       maxUserMessages,
       maxUserMessagesTime,

@@ -16,7 +16,7 @@ import {
 } from '../../context';
 import {
   storeItemType,
-} from '../../util/agent-features.mjs';
+} from '../../util/agent-features-spec.mjs';
 import {
   currencies,
   intervals,

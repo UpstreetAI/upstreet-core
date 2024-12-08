@@ -46,30 +46,34 @@ import { ExtendableMessageEvent } from '../../util/extendable-message-event';
  * ```
  */
 export const Agent = forwardRef(({
-  raw,
+  config,
   children,
 }: AgentProps, ref: Ref<ActiveAgentObject>) => {
   // hooks
   const appContextValue = useContext(AppContext);
-  const agentJson = appContextValue.useAgentJson() as any;
   const conversationManger = appContextValue.useConversationManager();
   const [conversations, setConversations] = useState<ConversationObject[]>([]);
   const agentRegistry = useMemo(() => new AgentRegistry(), []);
-  const agent = useMemo<ActiveAgentObject>(() => new ActiveAgentObject(agentJson, {
+  const agent = useMemo<ActiveAgentObject>(() => new ActiveAgentObject(config, {
     appContextValue,
     registry: agentRegistry,
   }), []);
   const [registryEpoch, setRegistryEpoch] = useState(0);
 
-  // cleanup binding
+  // bind live/destroy
   useEffect(() => {
     agent.live();
-
     return () => {
       agent.destroy();
     };
   }, [agent]);
 
+  // sync config
+  useEffect(() => {
+    agent.setConfig(config);
+  }, [agent, config]);
+
+  // wait for re-render on conversations change
   useEffect(() => {
     const updateConversations = (e: ExtendableMessageEvent<ConversationEventData>) => {
       setConversations(() => conversationManger.getConversations());
@@ -100,16 +104,17 @@ export const Agent = forwardRef(({
     };
   }, [agent]);
 
-  // ref
+  // bind exported ref
   useImperativeHandle(ref, () => agent, [agent]);
 
+  // render
   return (
     <agent value={agent}>
       <AgentContext.Provider value={agent}>
         <ConversationsContext.Provider value={{conversations}}>
           <ConversationProvider>
             <AgentRegistryContext.Provider value={{agentRegistry}}>
-              {!raw && <DefaultAgentComponents />}
+              <DefaultAgentComponents config={config}/>
               {children}
             </AgentRegistryContext.Provider>
           </ConversationProvider>

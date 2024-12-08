@@ -26,7 +26,7 @@ export type ExtendableMessageEvent<T> = MessageEvent<T> & {
 
 // agents
 
-export type AgentObject = EventTarget & {
+export type AgentObjectData = {
   id: string;
   ownerId: string;
   name: string;
@@ -36,8 +36,12 @@ export type AgentObject = EventTarget & {
   model: string;
   smallModel: string;
   largeModel: string;
+  features: string[];
   address: string;
   stripeConnectAccountId: string;
+};
+export type AgentObject = EventTarget & AgentObjectData & {
+  setConfig(config: AgentObjectData): void;
 };
 export type AgentSpec = {
   id: string;
@@ -46,8 +50,6 @@ export type AgentSpec = {
 export type GenerativeAgentObject =  {
   agent: ActiveAgentObject;
   conversation: ConversationObject;
-  // generativeQueueManager: QueueManager;
-  // thinkCache: Array<ActionStep>;
   
   get location(): URL;
 
@@ -66,8 +68,6 @@ export type GenerativeAgentObject =  {
   evaluate: (evaluator: Evaluator, opts?: {
     signal: AbortSignal,
   }) => Promise<any>;
-  // generate: (hint: string, schema?: ZodTypeAny) => Promise<any>;
-  // generateImage: (prompt: string, opts?: SubtleAiImageOpts) => Promise<Blob>;
   say: (text: string) => Promise<any>;
   monologue: (text: string) => Promise<any>;
 
@@ -565,6 +565,7 @@ export type AgentAppProps = {
 
 export type AgentProps = {
   raw?: boolean;
+  config?: AgentObject;
   children?: ReactNode;
   ref?: Ref<any>;
 };
@@ -764,7 +765,7 @@ export type RenderRegistry = EventTarget & {
 export type AppContextValue = {
   subtleAi: SubtleAi;
 
-  useAgentJson: () => object;
+  useConfig: () => any;
   useEnv: () => object;
   useEnvironment: () => string;
   useWallets: () => object[];

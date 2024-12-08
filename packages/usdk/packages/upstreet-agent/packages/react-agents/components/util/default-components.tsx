@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useMemo, useContext } from 'react';
 import dedent from 'dedent';
 import type {
+  AgentObject,
   Attachment,
   FormattedAttachment,
 } from '../../types';
@@ -26,11 +27,15 @@ import { timeAgo } from '../../util/time-ago.mjs';
 
 // defaults
 
+type DefaultAgentComponentProps = {
+  config?: AgentObject;
+}
+
 /**
  * Renders the default agent components.
  * @returns The JSX elements representing the default agent components.
  */
-export const DefaultAgentComponents = () => {
+export const DefaultAgentComponents = (props: DefaultAgentComponentProps) => {
   return (
     <>
       <DefaultActions />

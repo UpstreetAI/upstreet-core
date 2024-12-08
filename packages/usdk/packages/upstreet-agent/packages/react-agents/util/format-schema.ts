@@ -96,7 +96,7 @@ export const formatBasicSchema = ({
 }) => {
   const makeUnionSchema = (actions: ActionPropsAux[]) => {
     const actionSchemas: ZodTypeAny[] = getFilteredActions(actions, conversation, actOpts)
-      .map(action => makeActionSchema(action.name, action.schema));
+      .map(action => makeActionSchema(action.type, action.schema));
     if (actionSchemas.length >= 2) {
       return z.union([
         z.null(),
@@ -113,7 +113,7 @@ export const formatBasicSchema = ({
     if (filteredUniforms.length > 0) {
       const o = {};
       for (const uniform of filteredUniforms) {
-        o[uniform.name] = uniform.schema;
+        o[uniform.type] = uniform.schema;
         // console.log('set uniform', uniform.name, printNode(zodToTs(uniform.schema).node));
       }
       return z.object(o);
@@ -144,7 +144,46 @@ export const formatReactSchema = ({
   conversation?: ConversationObject,
   actOpts?: ActOpts,
 }) => {
-  throw new Error('formatReactSchema not implemented');
+  const makeUnionSchema = (actions: ActionPropsAux[]) => {
+    const actionSchemas: ZodTypeAny[] = getFilteredActions(actions, conversation, actOpts)
+      .map(action => makeActionSchema(action.type, action.schema));
+    if (actionSchemas.length >= 2) {
+      return z.union([
+        z.null(),
+        ...actionSchemas as [ZodTypeAny, ZodTypeAny, ...ZodTypeAny[]]
+      ]);
+    } else if (actionSchemas.length === 1) {
+      return z.union([z.null(), actionSchemas[0]]);
+    } else {
+      return null;
+    }
+  };
+  const makeObjectSchema = (uniforms: ActionPropsAux[]) => {
+    const filteredUniforms = getFilteredActions(uniforms, conversation, actOpts);
+    if (filteredUniforms.length > 0) {
+      const o = {};
+      for (const uniform of filteredUniforms) {
+        o[uniform.type] = uniform.schema;
+        // console.log('set uniform', uniform.name, printNode(zodToTs(uniform.schema).node));
+      }
+      return z.object(o);
+    } else {
+      return null;
+    }
+  };
+  const actionSchema = makeUnionSchema(actions);
+  const uniformsSchema = makeObjectSchema(uniforms);
+  const o = {};
+  o['observation'] = z.string();
+  o['thought'] = z.string();
+  if (actionSchema) {
+    o['action'] = actionSchema;
+  }
+  if (uniformsSchema) {
+    o['uniforms'] = uniformsSchema;
+  }
+  return z.object(o);
+  // throw new Error('formatReactSchema not implemented');
 };
 
 export const formatActionsPrompt = (actions: ActionPropsAux[], uniforms: UniformPropsAux[], conversation?: ConversationObject, actOpts?: ActOpts) => {

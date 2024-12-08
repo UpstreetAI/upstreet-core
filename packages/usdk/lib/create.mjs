@@ -12,19 +12,12 @@ import ora from 'ora';
 import { cleanDir } from '../lib/directory-util.mjs';
 import { hasNpm, npmInstall } from '../lib/npm-util.mjs';
 import { hasGit, gitInit } from '../lib/git-util.mjs';
-// import {
-//   makeTempDir,
-// } from './file.mjs';
 import {
   BASE_DIRNAME,
-  // templatesDirectory,
 } from './locations.mjs';
 import {
   ImageRenderer,
 } from '../packages/upstreet-agent/packages/react-agents/devices/video-input.mjs';
-// import {
-//   getUserIdForJwt,
-// } from '../packages/upstreet-agent/packages/react-agents/util/supabase-client.mjs';
 import { AgentInterview } from '../packages/upstreet-agent/packages/react-agents/util/agent-interview.mjs';
 import {
   getAgentName,
@@ -39,9 +32,6 @@ import {
   updateAgentJsonAuth,
   ensureAgentJsonDefaults,
 } from '../packages/upstreet-agent/packages/react-agents/util/agent-json-util.mjs';
-// import {
-//   aiProxyHost,
-// } from '../packages/upstreet-agent/packages/react-agents/util/endpoints.mjs';
 import { defaultAgentSourceCode } from '../packages/upstreet-agent/packages/react-agents/util/agent-source-code-formatter.mjs';
 import { consoleImagePreviewWidth } from '../packages/upstreet-agent/packages/react-agents/constants.mjs';
 import InterviewLogger from '../util/logger/interview-logger.mjs';

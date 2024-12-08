@@ -102,13 +102,10 @@ const copyWithStringTransform = async (src, dst, transformFn) => {
 
 const buildWranglerToml = (
   t,
-  { name, agentJson, /* mnemonic, agentToken */ } = {},
+  { name } = {},
 ) => {
   if (name !== undefined) {
     t.name = name;
-  }
-  if (agentJson !== undefined) {
-    t.vars.AGENT_JSON = JSON.stringify(agentJson);
   }
   return t;
 };
@@ -511,6 +508,7 @@ export const create = async (args, opts) => {
     const srcGitignorePath = path.join(upstreetAgentSrcDir, 'gitignore.template');
     const dstGitignorePath = path.join(dstDir, '.gitignore');
 
+    const dstConfigTxt = path.join(dstDir, 'config.txt');
     const dstEnvTxt = path.join(dstDir, '.env.txt');
 
     // const srcJestPath = path.join(upstreetAgentSrcDir, 'jest');
@@ -548,12 +546,11 @@ export const create = async (args, opts) => {
         let t = toml.parse(s);
         t = buildWranglerToml(t, {
           name: getAgentName(guid),
-          agentJson,
-          // agentToken,
-          // mnemonic,
         });
         return toml.stringify(t);
       }),
+      // config.txt
+      writeFile(dstConfigTxt, JSON.stringify(agentJson, null, 2)),
       // env.txt
       writeFile(dstEnvTxt, dotenvFormat({
         AGENT_TOKEN: agentToken,
@@ -718,16 +715,16 @@ export const edit = async (args, opts) => {
   const _updateFiles = async () => {
     await Promise.all([
       // wrangler.toml
-      (async () => {
-        const wranglerTomlPath = path.join(dstDir, 'wrangler.toml');
-        await copyWithStringTransform(wranglerTomlPath, wranglerTomlPath, (s) => {
-          let t = toml.parse(s);
-          t = buildWranglerToml(t, {
-            agentJson,
-          });
-          return toml.stringify(t);
-        });
-      })(),
+      // (async () => {
+      //   const wranglerTomlPath = path.join(dstDir, 'wrangler.toml');
+      //   await copyWithStringTransform(wranglerTomlPath, wranglerTomlPath, (s) => {
+      //     let t = toml.parse(s);
+      //     t = buildWranglerToml(t, {
+      //       agentJson,
+      //     });
+      //     return toml.stringify(t);
+      //   });
+      // })(),
       // agent.tsx
       (async () => {
         const agentJSXPath = path.join(dstDir, 'agent.tsx');

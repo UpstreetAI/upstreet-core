@@ -42,7 +42,7 @@ import {
 // import {
 //   aiProxyHost,
 // } from '../packages/upstreet-agent/packages/react-agents/util/endpoints.mjs';
-import { makeAgentSourceCode } from '../packages/upstreet-agent/packages/react-agents/util/agent-source-code-formatter.mjs';
+import { defaultAgentSourceCode } from '../packages/upstreet-agent/packages/react-agents/util/agent-source-code-formatter.mjs';
 import { consoleImagePreviewWidth } from '../packages/upstreet-agent/packages/react-agents/constants.mjs';
 import InterviewLogger from '../util/logger/interview-logger.mjs';
 import ReadlineStrategy from '../util/logger/readline.mjs';
@@ -478,16 +478,16 @@ export const create = async (args, opts) => {
     : '*none*'
   );
 
-  const agentJSX = await (async () => {
-    if (sourceFile !== null) {
-      return sourceFile;
-    } else {
-      console.log(pc.italic('Building agent...'));
-      const sourceCode = makeAgentSourceCode(agentJson.features ?? []);
-      console.log(pc.italic('Agent built.'));
-      return sourceCode;
-    }
-  })();
+  // const agentJSX = await (async () => {
+  //   if (sourceFile !== null) {
+  //     return sourceFile;
+  //   } else {
+  //     console.log(pc.italic('Building agent...'));
+  //     const sourceCode = makeAgentSourceCode(agentJson.features ?? []);
+  //     console.log(pc.italic('Agent built.'));
+  //     return sourceCode;
+  //   }
+  // })();
 
   // copy over files
   const _copyFiles = async () => {
@@ -518,7 +518,7 @@ export const create = async (args, opts) => {
     console.log(pc.italic('Copying files...'));
     await Promise.all([
       // agent.tsx
-      writeFile(dstAgentTsxPath, agentJSX),
+      writeFile(dstAgentTsxPath, defaultAgentSourceCode),
       // package.json
       writeFile(dstPackageJsonPath, JSON.stringify({
         name: 'my-agent',
@@ -712,26 +712,26 @@ export const edit = async (args, opts) => {
     });
   }
 
-  const _updateFiles = async () => {
-    await Promise.all([
-      // wrangler.toml
-      // (async () => {
-      //   const wranglerTomlPath = path.join(dstDir, 'wrangler.toml');
-      //   await copyWithStringTransform(wranglerTomlPath, wranglerTomlPath, (s) => {
-      //     let t = toml.parse(s);
-      //     t = buildWranglerToml(t, {
-      //       agentJson,
-      //     });
-      //     return toml.stringify(t);
-      //   });
-      // })(),
-      // agent.tsx
-      (async () => {
-        const agentJSXPath = path.join(dstDir, 'agent.tsx');
-        const agentJSX = makeAgentSourceCode(agentJson.features ?? []);
-        await fs.promises.writeFile(agentJSXPath, agentJSX);
-      })(),
-    ]);
-  };
-  await _updateFiles();
+  // const _updateFiles = async () => {
+  //   await Promise.all([
+  //     // wrangler.toml
+  //     // (async () => {
+  //     //   const wranglerTomlPath = path.join(dstDir, 'wrangler.toml');
+  //     //   await copyWithStringTransform(wranglerTomlPath, wranglerTomlPath, (s) => {
+  //     //     let t = toml.parse(s);
+  //     //     t = buildWranglerToml(t, {
+  //     //       agentJson,
+  //     //     });
+  //     //     return toml.stringify(t);
+  //     //   });
+  //     // })(),
+  //     // agent.tsx
+  //     (async () => {
+  //       const agentJSXPath = path.join(dstDir, 'agent.tsx');
+  //       const agentJSX = makeAgentSourceCode(agentJson.features ?? []);
+  //       await fs.promises.writeFile(agentJSXPath, agentJSX);
+  //     })(),
+  //   ]);
+  // };
+  // await _updateFiles();
 };

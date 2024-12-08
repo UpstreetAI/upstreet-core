@@ -1,26 +1,21 @@
 import { featureSpecs } from './agent-features.mjs';
 
-const agentPropsPlaceholder = ` /* */ `;
-const importPlaceholder = `  // ...`;
-const featurePlaceholder = `      {/* ... */}`;
-const defaultSourceCode = `\
+// const agentPropsPlaceholder = ` /* */ `;
+// const importPlaceholder = `  // ...`;
+// const featurePlaceholder = `      {/* ... */}`;
+export const defaultAgentSourceCode = `\
 import React from 'react';
-import {
-  Agent,
-${importPlaceholder}
-} from 'react-agents';
-
-//
+import { Agent } from 'react-agents';
 
 export default function MyAgent() {
   return (
-    <Agent${agentPropsPlaceholder}>
-${featurePlaceholder}
+    <Agent config={config}>
+      {/* ... */}
     </Agent>
   );
 }
 `;
-const agentPropsIndentString = Array(3 * 2 + 1).join(' ');
+/* const agentPropsIndentString = Array(3 * 2 + 1).join(' ');
 const agentPropsEndIndentString = Array(2 * 2 + 1).join(' ');
 const importIndentString = Array(2 + 1).join(' ');
 const featureIndentString = Array(3 * 2 + 1).join(' ');
@@ -69,4 +64,4 @@ export const makeAgentSourceCode = (featuresObject) => {
     sourceCode = sourceCode.replace(featurePlaceholder, featureComponents);
   }
   return sourceCode;
-};
+}; */

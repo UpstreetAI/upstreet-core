@@ -17,6 +17,7 @@ export const ActionLoop = (props: LoopProps) => {
     </DeferConversation>
   );
 };
+// XXX make this per-conversation, with nukll conversation by default
 const ActionLoopInner = (props: LoopProps) => {
   if (props.evaluator && (props.hint || props.actOpts)) {
     throw new Error('Cannot provide both evaluator and hint/actOpts');

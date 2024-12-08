@@ -10,6 +10,7 @@ export class AgentObject extends EventTarget {
   model: string;
   smallModel: string;
   largeModel: string;
+  features: string[];
   address: string;
   stripeConnectAccountId: string;
 
@@ -27,6 +28,7 @@ export class AgentObject extends EventTarget {
     model,
     smallModel,
     largeModel,
+    features,
     address,
     stripeConnectAccountId,
   }: AgentObjectData) {
@@ -39,6 +41,7 @@ export class AgentObject extends EventTarget {
     this.model = model;
     this.smallModel = smallModel;
     this.largeModel = largeModel;
+    this.features = features;
     this.address = address;
     this.stripeConnectAccountId = stripeConnectAccountId;
   }

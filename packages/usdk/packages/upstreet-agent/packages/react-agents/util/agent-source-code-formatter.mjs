@@ -1,4 +1,4 @@
-import { featureSpecs } from './agent-features.mjs';
+// import { featureSpecs } from './agent-features-spec.mjs';
 
 // const agentPropsPlaceholder = ` /* */ `;
 // const importPlaceholder = `  // ...`;

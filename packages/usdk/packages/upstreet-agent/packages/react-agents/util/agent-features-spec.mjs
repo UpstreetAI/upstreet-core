@@ -64,9 +64,9 @@ export const defaultVoices = [
   },
 ];
 
-const formatDiscordBotChannels = (channels = []) => {
-  return channels.map(c => c.trim()).filter(Boolean);
-};
+// const formatDiscordBotChannels = (channels = []) => {
+//   return channels.map(c => c.trim()).filter(Boolean);
+// };
 
 export const featureSpecs = [
   {

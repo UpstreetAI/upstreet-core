@@ -1,7 +1,11 @@
 import React from 'react';
-import { z } from 'zod';
-import dedent from 'dedent';
+// import { z } from 'zod';
+// import dedent from 'dedent';
 import { TTS } from '../components/plugins/tts';
+import { RateLimit } from '../components/plugins/rate-limit';
+import { Discord } from '../components/plugins/discord';
+import { Twitter } from '../components/plugins/twitter';
+import { Telnyx } from '../components/plugins/telnyx';
 // import { currencies, intervals } from '../constants.mjs';
 
 // export const paymentPropsType = z.object({
@@ -33,11 +37,7 @@ import { TTS } from '../components/plugins/tts';
 
 //
 
-const formatDiscordBotChannels = (channels = []) => {
-  return channels.map(c => c.trim()).filter(Boolean);
-};
-
-export const featureSpecs = [
+/* export const featureSpecs = [
   {
     name: 'tts',
     description: dedent`\
@@ -275,11 +275,44 @@ export const featureSpecs = [
       });
     },
   },
-];
+]; */
 export const featureRenderers = {
   tts: ({voiceEndpoint}) => {
     return (
       <TTS voiceEndpoint={JSON.stringify(voiceEndpoint)} />
     );
+  },
+  rateLimit: ({maxUserMessages, maxUserMessagesTime, message}) => {
+    return (
+      <RateLimit maxUserMessages={maxUserMessages} maxUserMessagesTime={maxUserMessagesTime} message={message} />
+    );
+  },
+  discord: ({token, channels}) => {
+    if (token) {
+      channels = channels && channels.map((c: string) => c.trim()).filter(Boolean);
+      return (
+        <Discord token={token} channels={channels} />
+      );
+    } else {
+      return null;
+    }
+  },
+  twitterBot: ({token}) => {
+    if (token) {
+      return (
+        <Twitter token={token} />
+      );
+    } else {
+      return null;
+    }
+  },
+  telnyx: ({apiKey, phoneNumber, message, voice}) => {
+    if (apiKey) {
+      return (
+        <Telnyx apiKey={apiKey} phoneNumber={phoneNumber} message={message} voice={voice} />
+      );
+    } else {
+      return null;
+    }
   },
 }

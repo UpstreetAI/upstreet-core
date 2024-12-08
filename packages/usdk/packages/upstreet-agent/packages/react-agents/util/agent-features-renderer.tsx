@@ -1,74 +1,43 @@
-import { z } from 'zod';
-import dedent from 'dedent';
-import { currencies, intervals } from '../constants.mjs';
+import React from 'react';
+// import { z } from 'zod';
+// import dedent from 'dedent';
+import { TTS } from '../components/plugins/tts';
+import { RateLimit } from '../components/plugins/rate-limit';
+import { Discord } from '../components/plugins/discord';
+import { Twitter } from '../components/plugins/twitter';
+import { Telnyx } from '../components/plugins/telnyx';
+// import { currencies, intervals } from '../constants.mjs';
 
-export const paymentPropsType = z.object({
-  name: z.string(),
-  description: z.string().optional(),
-  amount: z.number().int(),
-  currency: z.enum(currencies),
-});
-export const paymentItemType = z.object({
-  type: z.literal('payment'),
-  props: paymentPropsType,
-});
-export const subscriptionPropsType = z.object({
-  name: z.string(),
-  description: z.string().optional(),
-  amount: z.number().int(),
-  currency: z.enum(currencies),
-  interval: z.enum(intervals),
-  intervalCount: z.number(),
-});
-export const subscriptionItemType = z.object({
-  type: z.literal('subscription'),
-  props: subscriptionPropsType,
-});
-export const storeItemType = z.union([
-  paymentItemType,
-  subscriptionItemType,
-]);
+// export const paymentPropsType = z.object({
+//   name: z.string(),
+//   description: z.string().optional(),
+//   amount: z.number().int(),
+//   currency: z.enum(currencies),
+// });
+// export const paymentItemType = z.object({
+//   type: z.literal('payment'),
+//   props: paymentPropsType,
+// });
+// export const subscriptionPropsType = z.object({
+//   name: z.string(),
+//   description: z.string().optional(),
+//   amount: z.number().int(),
+//   currency: z.enum(currencies),
+//   interval: z.enum(intervals),
+//   intervalCount: z.number(),
+// });
+// export const subscriptionItemType = z.object({
+//   type: z.literal('subscription'),
+//   props: subscriptionPropsType,
+// });
+// export const storeItemType = z.union([
+//   paymentItemType,
+//   subscriptionItemType,
+// ]);
 
 //
 
-export const defaultVoices = [
-  {
-    voiceEndpoint: 'elevenlabs:kadio:YkP683vAWY3rTjcuq2hX',
-    name: 'Kaido',
-    description: 'Teenage anime boy',
-  },
-  {
-    voiceEndpoint: 'elevenlabs:drake:1thOSihlbbWeiCGuN5Nw',
-    name: 'Drake',
-    description: 'Anime male',
-  },
-  {
-    voiceEndpoint: 'elevenlabs:terrorblade:lblRnHLq4YZ8wRRUe8ld',
-    name: 'Terrorblade',
-    description: 'Monstrous male',
-  },
-  {
-    voiceEndpoint: 'elevenlabs:scillia:kNBPK9DILaezWWUSHpF9',
-    name: 'Scillia',
-    description: 'Teenage anime girl',
-  },
-  {
-    voiceEndpoint: 'elevenlabs:mommy:jSd2IJ6Fdd2bD4TaIeUj',
-    name: 'Mommy',
-    description: 'Anime female',
-  },
-  {
-    voiceEndpoint: 'elevenlabs:uni:PSAakCTPE63lB4tP9iNQ',
-    name: 'Uni',
-    description: 'Waifu girl',
-  },
-];
-
-const formatDiscordBotChannels = (channels = []) => {
-  return channels.map(c => c.trim()).filter(Boolean);
-};
-
-export const featureSpecs = [
+/* export const featureSpecs = [
   {
     name: 'tts',
     description: dedent`\
@@ -115,9 +84,6 @@ export const featureSpecs = [
     imports: () => [
       'RateLimit',
     ],
-    // agentProps: (props) => [
-    //   `rateLimit={${JSON.stringify(props)}}`,
-    // ],
     components: ({
       maxUserMessages,
       maxUserMessagesTime,
@@ -309,4 +275,44 @@ export const featureSpecs = [
       });
     },
   },
-];
+]; */
+export const featureRenderers = {
+  tts: ({voiceEndpoint}) => {
+    return (
+      <TTS voiceEndpoint={JSON.stringify(voiceEndpoint)} />
+    );
+  },
+  rateLimit: ({maxUserMessages, maxUserMessagesTime, message}) => {
+    return (
+      <RateLimit maxUserMessages={maxUserMessages} maxUserMessagesTime={maxUserMessagesTime} message={message} />
+    );
+  },
+  discord: ({token, channels}) => {
+    if (token) {
+      channels = channels && channels.map((c: string) => c.trim()).filter(Boolean);
+      return (
+        <Discord token={token} channels={channels} />
+      );
+    } else {
+      return null;
+    }
+  },
+  twitterBot: ({token}) => {
+    if (token) {
+      return (
+        <Twitter token={token} />
+      );
+    } else {
+      return null;
+    }
+  },
+  telnyx: ({apiKey, phoneNumber, message, voice}) => {
+    if (apiKey) {
+      return (
+        <Telnyx apiKey={apiKey} phoneNumber={phoneNumber} message={message} voice={voice} />
+      );
+    } else {
+      return null;
+    }
+  },
+}

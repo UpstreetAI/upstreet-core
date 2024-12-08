@@ -44,12 +44,14 @@ export class AgentMain extends EventTarget {
     });
     const {
       userRender,
+      config,
       codecs,
     } = state;
     this.agentRenderer = new AgentRenderer({
       env,
       auth,
       userRender,
+      config,
       codecs,
       chatsSpecification: this.chatsSpecification,
     });
@@ -77,9 +79,6 @@ export class AgentMain extends EventTarget {
 
   #getId = cachedGet(function() {
     return this.#getAgentJson().id;
-  })
-  #getOwnerId = cachedGet(function() {
-    return this.#getAgentJson().ownerId;
   })
   #getAgentJson = cachedGet(function() {
     const agentJsonString = this.env.AGENT_JSON;

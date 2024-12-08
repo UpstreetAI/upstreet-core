@@ -517,7 +517,7 @@ export const create = async (args, opts) => {
           'react-agents': 'file:./packages/upstreet-agent/packages/react-agents'
         },
       }, null, 2)),
-      // package.json
+      // pnpm-workspace.yaml
       writeFile(pnpmYamlPath, dedent`\
         packages:
           - 'packages/*'

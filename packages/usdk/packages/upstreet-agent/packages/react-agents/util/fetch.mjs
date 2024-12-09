@@ -1,20 +1,72 @@
 import { zodResponseFormat } from 'openai/helpers/zod';
-import Together from 'together-ai';
+import dedent from 'dedent';
+// import Together from 'together-ai';
 import { aiProxyHost } from './endpoints.mjs';
-import { getAiFetch } from './ai-util.mjs';
+// import { getAiFetch } from './ai-util.mjs';
 import { defaultModel } from '../defaults.mjs';
 import { NotEnoughCreditsError } from './error-utils.mjs';
+import zodToJsonSchemaImpl from 'zod-to-json-schema';
+
+const jsonParse = (s) => {
+  try {
+    return JSON.parse(s);
+  } catch (e) {
+    return null;
+  }
+};
+const jsonSchemaToTools = (jsonSchema) => {
+  return jsonSchema.properties.action.anyOf.map(schema => {
+    const { type } = schema;
+    if (type === 'object') {
+      const name = schema.properties.method.const;
+      const description = schema.description || `Execute the ${name} action`;
+      const parameters = schema.properties.args;
+      let result = {
+        name,
+        description,
+        parameters,
+      };
+      return result;
+    } else {
+      return null;
+    }
+  }).filter(Boolean);
+};
+const toolsToOpenai = (tools) => {
+  return tools.map(tool => {
+    return {
+      type: 'function',
+      function: tools,
+    };
+  });
+};
+const toolsToAnthropic = (tools) => {
+  return tools.map(tool => {
+    const {
+      name,
+      description,
+      parameters,
+    } = tool;
+    return {
+      name,
+      description,
+      input_schema: parameters,
+    };
+  });
+};
 
 const fetchChatCompletionFns = {
-  openai: async ({ model, messages, stream, signal }, {
+  openai: async ({ model, messages, format, stream, signal }, {
     jwt,
   }) => {
     if (!jwt) {
       throw new Error('no jwt');
     }
 
-    const aiFetch = getAiFetch();
-    const res = await aiFetch(`https://${aiProxyHost}/api/ai/chat/completions`, {
+    const response_format = format && zodResponseFormat(format, 'result');
+
+    // const aiFetch = getAiFetch();
+    const res = await fetch(`https://${aiProxyHost}/api/ai/chat/completions`, {
       method: 'POST',
 
       headers: {
@@ -26,12 +78,7 @@ const fetchChatCompletionFns = {
       body: JSON.stringify({
         model,
         messages,
-
-        // stop: ['\n'],
-
-        // response_format: {
-        //   type: 'json_object',
-        // },
+        response_format,
         stream,
       }),
       signal,
@@ -45,14 +92,94 @@ const fetchChatCompletionFns = {
       throw new Error('error response in fetch completion: ' + res.status + ': ' + text);
     }
   },
-  anthropic: async ({ model, max_tokens, messages, stream, signal }, {
+  anthropic: async ({ model, max_tokens, messages, format, stream, signal }, {
     jwt,
   }) => {
     if (!jwt) {
       throw new Error('no jwt');
     }
 
-    const res = await aiFetch(`https://${aiProxyHost}/api/claude/messages`, {
+    const o = {
+      model,
+      max_tokens,
+      messages,
+      // response_format,
+      stream,
+      // max_tokens: 8192, // maximum allowed for claude
+      max_tokens: 2000,
+    };
+
+    const jsonSchema = zodToJsonSchemaImpl(format);
+    // console.log('got json schema', JSON.stringify(jsonSchema, null, 2));
+    let tools = jsonSchemaToTools(jsonSchema);
+    tools = toolsToAnthropic(tools);
+    tools = tools.concat([
+      {
+        name: 'nothing',
+        description: 'Do nothing',
+        input_schema: {
+          type: 'object',
+          properties: {},
+        },
+      },
+    ]);
+    o.tools = tools;
+    o.tool_choice = {
+      type: 'any',
+    };
+
+    const res = await fetch(`https://${aiProxyHost}/api/anthropic/messages`, {
+      method: 'POST',
+
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+
+      body: JSON.stringify(o),
+      signal,
+    });
+    if (res.ok) {
+      const j = await res.json();
+      // console.log('got anthropic response', JSON.stringify(j, null, 2));
+      const toolJson = j.content[0];
+      // extract the content
+      const method = toolJson.name;
+      const args = toolJson.input;
+      let content;
+      // handle null action
+      if (method !== 'nothing') {
+        content = {
+          action: {
+            method,
+            args,
+          },
+        };
+      } else {
+        content = null;
+      }
+      // console.log('got content', JSON.stringify(content, null, 2));
+      // check the parse
+      if (content !== null) {
+        content = format.parse(content);
+      }
+      return content;
+    } else {
+      const text = await res.text();
+      throw new Error('error response in fetch completion: ' + res.status + ': ' + text);
+    }
+  },
+  /* together: async ({ model, messages, format, stream, signal }, {
+    jwt,
+  }) => {
+    if (!jwt) {
+      throw new Error('no jwt');
+    }
+
+    const response_format = format && zodResponseFormat(format, 'result');
+
+    const togetherEndpointUrl = `https://${aiProxyHost}/api/together`;
+    const res = await fetch(`${togetherEndpointUrl}/chat/completions`, {
       method: 'POST',
 
       headers: {
@@ -62,199 +189,32 @@ const fetchChatCompletionFns = {
 
       body: JSON.stringify({
         model,
-        max_tokens,
         messages,
+        response_format,
         stream,
       }),
       signal,
     });
     if (res.ok) {
       const j = await res.json();
-      const text = j.content[0].text;
-      return text;
+      const content = j.choices[0].message.content;
+      return content;
     } else {
       const text = await res.text();
       throw new Error('error response in fetch completion: ' + res.status + ': ' + text);
     }
   },
-  together: async ({ model, messages, stream, signal }, {
+  lambdalabs: async ({ model, messages, format, stream, signal }, {
     jwt,
   }) => {
     if (!jwt) {
       throw new Error('no jwt');
     }
 
-    const together = new Together({
-      baseURL: `https://api.together.xyz/v1`,
-      apiKey: jwt,
-    });
-    throw new Error('not implemented');
-    // XXX
-    // const systemMessages = messages.filter(m => m.role === 'system');
-    // const userMessages = messages.filter(m => m.role === 'user');
-    // const assistantMessages = messages.filter(m => m.role === 'assistant');
-    const prMessages = [];
-    for (let i = 0; i < messages.length; i++) {
-      let prompt = '';
-      while (
-        i < messages.length &&
-        ['system', 'user'].includes(messages[i].role)
-      ) {
-        if (prompt) {
-          prompt += '\n';
-        }
-        prompt += messages[i].content;
-        i++;
-      }
+    const response_format = format && zodResponseFormat(format, 'result');
 
-      const nextMessage = messages[i];
-      if (nextMessage?.role === 'assistant') {
-        const response = nextMessage.content;
-        prMessages.push({
-          prompt,
-          response,
-        });
-      } else {
-        prMessages.push({
-          prompt,
-          response: null,
-        });
-      }
-    }
-    // console.log('pr messages', {messages, prMessages});
-
-    const promptSpec = (() => {
-      // 'mistralai/Mistral-7B-Instruct-v0.1',
-      // 'NousResearch/Nous-Hermes-Llama2-13b',
-      // 'Open-Orca/Mistral-7B-OpenOrca',
-      // 'teknium/OpenHermes-2-Mistral-7B',
-      // 'Gryphe/MythoMax-L2-13b',
-
-      const formatMessagesInst = (messages) =>
-        messages
-          .filter((m) => m.prompt && m.response)
-          .map(
-            (message) =>
-              `<s>[INST] ${message.prompt} [/INST] ${message.response}`
-          )
-          .join('') +
-        messages
-          .filter((m) => m.prompt && !m.response)
-          .map((message) => `<s>[INST] ${message.prompt} [/INST] `)
-          .join('');
-      const formatMessagesInstruction = (messages) =>
-        messages
-          .filter((m) => m.prompt && m.response)
-          .map(
-            (message) =>
-              `### Instruction:
-${message.prompt}
-
-### Response:
-${message.response}
-`
-          )
-          .join('') +
-        messages
-          .filter((m) => m.prompt && !m.response)
-          .map(
-            (message) =>
-              `### Instruction:
-${message.prompt}
-
-### Response:
-`
-          )
-          .join('');
-      const formatMessagesIm = (messages) =>
-        messages
-          .filter((m) => m.prompt && m.response)
-          .map(
-            (message) =>
-              `<|im_start|>user
-${message.prompt}
-<|im_end|>
-<|im_start|>assistant
-${message.response}
-`
-          )
-          .join('') +
-        messages
-          .filter((m) => m.prompt && !m.response)
-          .map(
-            (message) =>
-              `<|im_start|>user
-${message.prompt}
-<|im_end|>
-<|im_start|>assistant
-`
-          )
-          .join('');
-
-      let prompt2;
-      let stop;
-      switch (model) {
-        case 'meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo': {
-          prompt2 = formatMessagesInst(prMessages);
-          stop = ['[/INST]', '</s>'];
-          break;
-        }
-        case 'mistralai/Mixtral-8x7B-Instruct-v0.1': {
-          prompt2 = formatMessagesInst(prMessages);
-          stop = ['[/INST]', '</s>'];
-          break;
-        }
-        case 'mistralai/Mistral-7B-Instruct-v0.1': {
-          prompt2 = formatMessagesInst(prMessages);
-          stop = ['[/INST]', '</s>'];
-          break;
-        }
-        case 'mistralai/Mistral-7B-Instruct-v0.2': {
-          prompt2 = formatMessagesInst(prMessages);
-          stop = ['[/INST]', '</s>'];
-          break;
-        }
-        case 'NousResearch/Nous-Hermes-Llama2-13b': {
-          prompt2 = formatMessagesInstruction(prMessages);
-          stop = ['###', '</s>'];
-          break;
-        }
-        case 'Open-Orca/Mistral-7B-OpenOrca': {
-          prompt2 = formatMessagesIm(prMessages);
-          stop = ['<|im_end|>'];
-          // stop = ['<|im_end|>', '<|im_start|>'];
-          break;
-        }
-        case 'teknium/OpenHermes-2p5-Mistral-7B': {
-          prompt2 = formatMessagesIm(prMessages);
-          stop = ['<|im_end|>', '<|im_start|>'];
-          break;
-        }
-        case 'Gryphe/MythoMax-L2-13b': {
-          prompt2 = formatMessagesInstruction(prMessages);
-          stop = ['</s>'];
-          break;
-        }
-        case 'NousResearch/Nous-Hermes-2-Yi-34B': {
-          prompt2 = formatMessagesInstruction(prMessages);
-          stop = ['###', '</s>'];
-          break;
-        }
-        default: {
-          throw new Error('unknown model: ' + JSON.stringify(model));
-        }
-      }
-
-      return {
-        prompt2,
-        stop,
-      };
-    })();
-
-    const togetherAiTemperature = 0.7;
-    const togetherAiMaxTokens = 1024;
-    const aiFetch = getAiFetch();
-    const res = await aiFetch(`https://${aiProxyHost}/api/togetherAi/inference`, {
+    const lambdaEndpointUrl = `https://${aiProxyHost}/api/lambdalabs`;
+    const res = await fetch(`${lambdaEndpointUrl}/chat/completions`, {
       method: 'POST',
 
       headers: {
@@ -264,21 +224,142 @@ ${message.prompt}
 
       body: JSON.stringify({
         model,
-        prompt: promptSpec.prompt2,
-        max_tokens: togetherAiMaxTokens,
-        stop: promptSpec.stop,
-        temperature: togetherAiTemperature,
-        // "temperature":0.7,
-        // "top_p":0.7,
-        // "top_k":50,
-        // "repetition_penalty": 1,
-        stream_tokens: stream,
+        messages,
+        response_format,
+        stream,
       }),
       signal,
     });
-    return res;
+    if (res.ok) {
+      const j = await res.json();
+      const content = j.choices[0].message.content;
+      return content;
+    } else {
+      const text = await res.text();
+      throw new Error('error response in fetch completion: ' + res.status + ': ' + text);
+    }
+  }, */
+  openrouter: async ({ model, messages, format, stream, signal }, {
+    jwt,
+  }) => {
+    if (!jwt) {
+      throw new Error('no jwt');
+    }
+
+    const o = {
+      model,
+      messages,
+      stream,
+    };
+    const mode = (() => {
+      if (format) {
+        if (/hermes-3/.test(model)) {
+          return 'prompt';
+        } else {
+          return 'structuredOutput';
+        }
+      } else {
+        return 'none';
+      }
+    })();
+    switch (mode) {
+      case 'prompt': {
+        // const omit = (o, keys) => {
+        //   const r = {};
+        //   for (const k in o) {
+        //     if (!keys.includes(k)) {
+        //       r[k] = o[k];
+        //     }
+        //   }
+        //   return r;
+        // };
+        // const zodToJsonSchema = (schema) => {
+        //   return omit(
+        //     zodToJsonSchemaImpl(schema, { $refStrategy: 'none' }),
+        //     [
+        //       '$ref',
+        //       '$schema',
+        //       'default',
+        //       'definitions',
+        //       'description',
+        //       'markdownDescription',
+        //     ],
+        //   );
+        // };
+
+        const jsonSchema = zodToJsonSchemaImpl(format);
+        // console.log('got json schema', JSON.stringify(jsonSchema, null, 2));
+        o.messages = messages.slice().concat([
+          {
+            role: 'user',
+            content: dedent`\
+              Your output must match the following JSON schema:
+              \`\`\`
+            ` + '\n' + JSON.stringify(jsonSchema, null, 2) + '\n' + dedent`\
+              \`\`\`
+            `,
+          },
+        ]);
+        o.response_format = 'json';
+        // process.exit(1);
+        break;
+      }
+      case 'tool': {
+        const jsonSchema = zodToJsonSchemaImpl(format);
+        let tools = jsonSchemaToTools(jsonSchema);
+        tools = toolsToOpenai(tools);
+        // console.log('got json schema', tools);
+        o.tools = tools;
+        o.tool_choice = 'required';
+        break;
+      }
+      case 'structuredOutput': {
+        const response_format = format && zodResponseFormat(format, 'result');
+        o.response_format = response_format;
+        break;
+      }
+    }
+
+    const openrouterEndpointUrl = `https://${aiProxyHost}/api/openrouter`;
+    const u = `${openrouterEndpointUrl}/chat/completions`;
+    const res = await fetch(u, {
+      method: 'POST',
+
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+
+      body: JSON.stringify(o),
+      signal,
+    });
+    if (res.ok) {
+      const j = await res.json();
+      // console.log('got response content', JSON.stringify(j, null, 2));
+      const contentString = j.choices[0].message.content;
+      if (mode === 'prompt') {
+        let content = jsonParse(contentString);
+        // try to parse with the zod schema, format
+        // try {
+        if (content !== null) {
+          content = format.parse(content);
+        }
+        // } catch (e) {
+        //   console.error('error parsing content with zod schema', e);
+        // }
+        return content;
+      } else {
+        return contentString;
+      }
+    } else {
+      const text = await res.text();
+      throw new Error('error response in fetch completion: ' + res.status + ': ' + text);
+    }
   },
 };
+
+//
+
 export const fetchChatCompletion = async ({
   model = defaultModel,
   messages,
@@ -291,13 +372,13 @@ export const fetchChatCompletion = async ({
     throw new Error('no jwt');
   }
 
-  const match = model.match(/^(.+?):/);
+  const match = model.match(/^([^:]+?):/);
   if (match) {
     const modelType = match[1];
-    const modelName = model.slice(match[0].length);
+    const modelName = model.slice(modelType.length + 1);
     const fn = fetchChatCompletionFns[modelType];
     if (fn) {
-      const res = await fn({
+      const result = await fn({
         model: modelName,
         messages,
         stream,
@@ -305,12 +386,16 @@ export const fetchChatCompletion = async ({
       }, {
         jwt,
       });
-      return res;
+      return result;
     } else {
       throw new Error('invalid model type: ' + JSON.stringify(modelType));
     }
   } else {
-    throw new Error('invalid model: ' + JSON.stringify(model));
+    if (res.status === 402) {
+      throw new NotEnoughCreditsError();
+    }
+    const text = await res.text();
+    throw new Error('invalid status code: ' + res.status + ': ' + text);
   }
 };
 export const fetchJsonCompletion = async ({
@@ -325,43 +410,31 @@ export const fetchJsonCompletion = async ({
     throw new Error('no jwt');
   }
 
-  const match = model.match(/^(.+?):/);
+  const match = model.match(/^([^:]+?):/);
   if (match) {
-    // XXX support different model types; for now openai is assumed
-    // const modelType = match[1];
-    const modelName = model.slice(match[0].length);
-    const res = await fetch(`https://${aiProxyHost}/api/ai/chat/completions`, {
-      method: 'POST',
-
-      headers: {
-        'Content-Type': 'application/json',
-        // 'OpenAI-Beta': 'assistants=v1',
-        Authorization: `Bearer ${jwt}`,
-      },
-
-      body: JSON.stringify({
+    const modelType = match[1];
+    const modelName = model.slice(modelType.length + 1);
+    const fn = fetchChatCompletionFns[modelType];
+    if (fn) {
+      const result = await fn({
         model: modelName,
         messages,
-
-        response_format: zodResponseFormat(format, 'result'),
-
+        format,
         stream,
-      }),
-      signal,
-    });
-    if (res.ok) {
-      const j = await res.json();
-      const s = j.choices[0].message.content;
-      const o = JSON.parse(s);
-      return o;
+        signal,
+      }, {
+        jwt,
+      });
+      const response = JSON.parse(result);
+      return response;
     } else {
-      if (res.status === 402) {
-        throw new NotEnoughCreditsError();
-      }
-      const text = await res.text();
-      throw new Error('invalid status code: ' + res.status + ': ' + text);
+      throw new Error('invalid model type: ' + JSON.stringify(modelType));
     }
   } else {
-    throw new Error('invalid model: ' + JSON.stringify(model));
+    if (res.status === 402) {
+      throw new NotEnoughCreditsError();
+    }
+    const text = await res.text();
+    throw new Error('invalid status code: ' + res.status + ': ' + text);
   }
 };

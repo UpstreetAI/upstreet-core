@@ -168,7 +168,7 @@ const makeViteServer = (directory) => {
 // const host = 'https://chat.upstreet.ai';
 const host = 'http://127.0.0.1:3000';
 
-const createOTP = async (jwt) => {
+/* const createOTP = async (jwt) => {
   const res = await fetch(
     `https://ai.upstreet.ai/api/register-otp?token=${jwt}`,
     {
@@ -181,7 +181,7 @@ const createOTP = async (jwt) => {
   } else {
     throw new Error('Failed to create a one-time password.');
   }
-};
+}; */
 
 // Convert import.meta.url to a file path
 const __filename = fileURLToPath(import.meta.url);
@@ -216,14 +216,14 @@ const openFrontend = async ({
     }
 
     // trade the jwt for an otp auth token
-    const authToken = await createOTP(jwt);
+    // const authToken = await createOTP(jwt);
     // construct the destination url
     const dstUrl = new URL(`${host}/desktop/${room}`);
     dstUrl.searchParams.set('desktop', 1 + '');
-    // construct the final url
-    const u = new URL(`${host}/login`);
-    u.searchParams.set('auth_token', authToken);
-    u.searchParams.set('referrer_url', dstUrl.href);
+    // // construct the final url
+    // const u = new URL(`${host}/login`);
+    // u.searchParams.set('auth_token', authToken);
+    // u.searchParams.set('referrer_url', dstUrl.href);
 
     // main window
     const win = new BrowserWindow({
@@ -243,12 +243,22 @@ const openFrontend = async ({
         session: session.fromPartition('login'),
         // nodeIntegration: true,
         preload: path.join(__dirname, 'preload.mjs'),
+        contextIsolation: true,
+        enableRemoteModule: false,
       },
     });
     if (debug >= debugLevels.SILLY) {
       win.webContents.openDevTools();
     }
-    win.loadURL(u.href);
+
+    // set the cookie on the page
+    await win.webContents.session.cookies.set({
+      url: host,
+      name: 'auth-jwt',
+      value: jwt,
+    });
+
+    await win.loadURL(dstUrl.href);
   }
 };
 

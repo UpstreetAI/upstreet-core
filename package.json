@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "chat": "npm run -w @upstreet/chat --",
-    "docs": "npm run -w @upstreet/docs --"
+    "chat": "pnpm run -w @upstreet/chat --",
+    "docs": "pnpm run -w @upstreet/docs --"
   },
   "workspaces": [
     "apps/*",

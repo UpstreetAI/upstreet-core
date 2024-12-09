@@ -123,37 +123,39 @@ export const useCachedMessages = (opts?: ActionHistoryQuery) => {
   const conversation = useConversation();
   const [cachedMessagesEpoch, setCachedMessagesEpoch] = useState(0);
 
-  if (!conversation) {
-    throw new Error('useCachedMessages() can only be used within a conversation context');
-  }
-
   // trigger the load
   useEffect(() => {
-    (async () => {
-      await conversation.messageCache.waitForLoad();
-    })().catch((err) => {
-      console.warn('message cache wait for load error', err);
-    });
+    if (conversation) {
+      (async () => {
+        await conversation.messageCache.waitForLoad();
+      })().catch((err) => {
+        console.warn('message cache wait for load error', err);
+      });
+    }
   }, [conversation]);
 
-  // listen for messasge cache updates
-  const update = (e: ExtendableMessageEvent<MessageCacheUpdateArgs>) => {
-    setCachedMessagesEpoch(cachedMessagesEpoch => cachedMessagesEpoch + 1);
-
-    // wait for re-render before returning from the handler
-    e.waitUntil((async () => {
-      const renderRegistry = agent.appContextValue.useRegistry();
-      await renderRegistry.waitForUpdate();
-    })());
-  };
   useEffect(() => {
-    conversation.messageCache.addEventListener('update', update);
-    return () => {
-      conversation.messageCache.removeEventListener('update', update);
-    };
+    if (conversation) {
+      const update = (e: ExtendableMessageEvent<MessageCacheUpdateArgs>) => {
+        setCachedMessagesEpoch(cachedMessagesEpoch => cachedMessagesEpoch + 1);
+    
+        // wait for re-render before returning from the handler
+        e.waitUntil((async () => {
+          const renderRegistry = agent.appContextValue.useRegistry();
+          await renderRegistry.waitForUpdate();
+        })());
+      };
+      conversation.messageCache.addEventListener('update', update);
+      return () => {
+        conversation.messageCache.removeEventListener('update', update);
+      };
+    }
   }, [conversation]);
 
-  const messages = conversation.getCachedMessages(opts?.filter);
+  const messages = conversation ?
+    conversation.getCachedMessages(opts?.filter)
+  :
+    [];
   return messages;
 };
 export const useNumMessages = () => {

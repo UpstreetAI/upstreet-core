@@ -3,5 +3,8 @@
   "main": "wrangler-runtime.mjs",
   "dependencies": {
     "wrangler": "^3.60.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }

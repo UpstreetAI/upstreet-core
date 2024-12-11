@@ -101,6 +101,7 @@ export class AgentRenderer {
   env: any;
   auth: any;
   userRender: UserHandler;
+  config: any;
   chatsSpecification: ChatsSpecification;
   codecs: any;
 
@@ -120,12 +121,14 @@ export class AgentRenderer {
     env,
     auth,
     userRender,
+    config,
     chatsSpecification,
     codecs,
   }: {
     env: any;
     auth: any;
     userRender: UserHandler;
+    config: any;
     chatsSpecification: ChatsSpecification;
     codecs: any;
   }) {
@@ -133,6 +136,7 @@ export class AgentRenderer {
     this.env = env;
     this.auth = auth;
     this.userRender = userRender;
+    this.config = config;
     this.chatsSpecification = chatsSpecification;
     this.codecs = codecs;
 
@@ -142,10 +146,8 @@ export class AgentRenderer {
       registry: this.registry,
     });
     const subtleAi = new SubtleAi();
-    const useAgentJson = () => {
-      const agentJsonString = this.env.AGENT_JSON as string;
-      const agentJson = JSON.parse(agentJsonString);
-      return agentJson;
+    const useConfig = () => {
+      return this.config;
     };
     const useEnv = () => {
       return this.auth;
@@ -186,7 +188,7 @@ export class AgentRenderer {
     };
     this.appContextValue = new AppContextValue({
       subtleAi,
-      agentJson: useAgentJson(),
+      config: useConfig(),
       env: useEnv(),
       environment: useEnvironment(),
       wallets: useWallets(),

@@ -36,10 +36,6 @@ export const update = async (args, opts) => {
     throw new Error('all agent specs must have directories');
   }
   // opts
-  /* const jwt = opts.jwt;
-  if (!jwt) {
-    throw new Error('You must be logged in to update.');
-  } */
   const force = !!args.force;
 
   // update the agents
@@ -48,14 +44,14 @@ export const update = async (args, opts) => {
 
     console.log(pc.italic(`Updating agent ${directory}...`));
 
-    const wranglerTomlPath = path.join(directory, 'wrangler.toml');
+    const agentJsonPath = path.join(directory, 'agent.json');
     const packagesPathSrc = path.join(BASE_DIRNAME, 'packages');
     const packagesPathDst = path.join(directory, 'packages');
 
     // read the agent json
-    const wranglerTomlString = await fs.promises.readFile(wranglerTomlPath, 'utf8');
-    const wranglerToml = toml.parse(wranglerTomlString);
-    const agentJsonString = wranglerToml.vars.AGENT_JSON;
+    // const wranglerTomlString = await fs.promises.readFile(wranglerTomlPath, 'utf8');
+    // const wranglerToml = toml.parse(wranglerTomlString);
+    const agentJsonString = await fs.promises.readFile(agentJsonPath, 'utf8');
     let agentJson = JSON.parse(agentJsonString);
 
     // hash the packages directories
@@ -108,8 +104,9 @@ export const update = async (args, opts) => {
           version,
         };
         // write the agent json
-        wranglerToml.vars.AGENT_JSON = JSON.stringify(agentJson);
-        await fs.promises.writeFile(wranglerTomlPath, toml.stringify(wranglerToml));
+        // wranglerToml.vars.AGENT_JSON = JSON.stringify(agentJson);
+        // await fs.promises.writeFile(agentJsonPath, toml.stringify(wranglerToml));
+        await fs.promises.writeFile(agentJsonPath, JSON.stringify(agentJson, null, 2));
       }
 
       const has = await hasNpm();

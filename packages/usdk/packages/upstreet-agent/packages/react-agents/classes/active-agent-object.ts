@@ -8,6 +8,7 @@ import type {
   Memory,
   ActionMessageEventData,
   // LiveTriggerEvent,
+  AgentObjectData,
 } from '../types';
 import {
   ConversationObject,
@@ -43,7 +44,7 @@ import { AgentRegistry } from './render-registry';
 
 export class ActiveAgentObject extends AgentObject {
   // arguments
-  agentJson: AgentObject;
+  config: AgentObjectData;
   appContextValue: AppContextValue;
   registry: AgentRegistry;
   // state
@@ -60,7 +61,7 @@ export class ActiveAgentObject extends AgentObject {
   //
   
   constructor(
-    agentJson: AgentObject,
+    config: AgentObjectData,
     {
       appContextValue,
       registry,
@@ -69,11 +70,11 @@ export class ActiveAgentObject extends AgentObject {
       registry: AgentRegistry;
     }
   ) {
-    super(agentJson);
+    super(config);
 
     //
 
-    this.agentJson = agentJson;
+    this.config = config;
     this.appContextValue = appContextValue;
     this.registry = registry;
 
@@ -120,6 +121,9 @@ export class ActiveAgentObject extends AgentObject {
 
   // static hooks
 
+  useConfig() {
+    return this.config;
+  }
   useAuthToken() {
     return this.appContextValue.useAuthToken();
   }

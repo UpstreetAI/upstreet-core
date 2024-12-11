@@ -9,18 +9,6 @@ import { multiplayerEndpointUrl } from './util/endpoints.mjs';
 
 //
 
-const cachedGet = (fn: () => any) => {
-  let value = null;
-  let ran = false;
-  return function() {
-    if (!ran) {
-      value = fn.call(this);
-      ran = true;
-    }
-    return value;
-  };
-};
-
 export class AgentMain extends EventTarget {
   state: any;
   env: any;
@@ -36,20 +24,23 @@ export class AgentMain extends EventTarget {
     this.state = state;
     this.env = env;
     this.auth = auth;
-    this.supabase = makeAnonymousClient(auth.AGENT_TOKEN);
+    const jwt = auth.AGENT_TOKEN;
+    this.supabase = makeAnonymousClient(jwt);
 
-    this.chatsSpecification = new ChatsSpecification({
-      userId: this.#getId(),
-      supabase: this.supabase,
-    });
     const {
       userRender,
+      config,
       codecs,
     } = state;
+    this.chatsSpecification = new ChatsSpecification({
+      supabase: this.supabase,
+      jwt,
+    });
     this.agentRenderer = new AgentRenderer({
       env,
       auth,
       userRender,
+      config,
       codecs,
       chatsSpecification: this.chatsSpecification,
     });
@@ -75,20 +66,6 @@ export class AgentMain extends EventTarget {
 
   //
 
-  #getId = cachedGet(function() {
-    return this.#getAgentJson().id;
-  })
-  #getOwnerId = cachedGet(function() {
-    return this.#getAgentJson().ownerId;
-  })
-  #getAgentJson = cachedGet(function() {
-    const agentJsonString = this.env.AGENT_JSON;
-    const agentJson = JSON.parse(agentJsonString);
-    return agentJson;
-  })
-
-  //
-
   // Handle HTTP requests from clients.
   async fetch(request: Request) {
     try {
@@ -101,7 +78,7 @@ export class AgentMain extends EventTarget {
       let match;
       if ((match = u.pathname.match(/^\/([^/]*)/))) {
         const subpath = match[1];
-        const guid = this.#getId();
+        // const guid = this.#getId();
 
         /* const handleAgentJson = async () => {
           const agentJson = this.#getAgentJson();

@@ -135,11 +135,14 @@ const runAgent = async (directory, opts) => {
   const p = '/packages/upstreet-agent/packages/react-agents-node/entry.mjs';
   const main = await loadModule(directory, p);
   // console.log('worker loaded module', main);
-  const agentMain = await main({
+  const agentMain = main({
     init,
     debug,
   });
   // console.log('agentMain', agentMain);
+
+  // wait for first render
+  // await agentMain.waitForLoad();
 
   await startAgentMainServer({
     agentMain,

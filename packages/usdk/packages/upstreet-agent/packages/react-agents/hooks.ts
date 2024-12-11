@@ -62,6 +62,10 @@ export const useAuthToken: () => string = () => {
   const appContextValue = useContext(AppContext);
   return appContextValue.useAuthToken();
 };
+export const useConfig: () => any = () => {
+  const appContextValue = useContext(AppContext);
+  return appContextValue.useConfig();
+};
 // get the passed-down agent initialization json
 export const useInit: () => any = () => {
   const appContextValue = useContext(AppContext);

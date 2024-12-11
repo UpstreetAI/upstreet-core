@@ -13,7 +13,7 @@ import {
 import { makePromise, uploadBlob } from './util.mjs';
 import {
   featureSpecs,
-} from './agent-features.mjs';
+} from './agent-features-spec.mjs';
 
 const processFeatures = (agentJson) => {
   const userSpecifiedFeatures = new Set(Object.keys(agentJson.features || {}));

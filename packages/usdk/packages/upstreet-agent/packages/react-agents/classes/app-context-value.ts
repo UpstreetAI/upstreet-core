@@ -28,7 +28,7 @@ import { useAgent } from '../hooks';
 
 export class AppContextValue {
   subtleAi: SubtleAi;
-  agentJson: object;
+  config: any;
   env: object;
   environment: string;
   wallets: any;
@@ -43,7 +43,7 @@ export class AppContextValue {
 
   constructor({
     subtleAi,
-    agentJson,
+    config,
     env,
     environment,
     wallets,
@@ -57,7 +57,7 @@ export class AppContextValue {
     registry,
   }: {
     subtleAi: SubtleAi;
-    agentJson: object;
+    config: any;
     environment: string;
     env: object;
     wallets: any;
@@ -71,7 +71,7 @@ export class AppContextValue {
     registry: RenderRegistry;
   }) {
     this.subtleAi = subtleAi;
-    this.agentJson = agentJson;
+    this.config = config;
     this.env = env;
     this.environment = environment;
     this.wallets = wallets;
@@ -87,8 +87,8 @@ export class AppContextValue {
 
   // hooks
 
-  useAgentJson() {
-    return this.agentJson;
+  useConfig() {
+    return this.config;
   }
   useEnv() {
     return this.env;

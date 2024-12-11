@@ -5,6 +5,7 @@ import { QueueManager } from 'queue-manager';
 import {
   ExtendableMessageEvent,
 } from '../util/extendable-message-event';
+import { getUserIdForJwt } from '../util/supabase-client.mjs';
 
 //
 
@@ -26,28 +27,29 @@ const getRoomsSpecificationKey = (roomSpecification: RoomSpecification) => {
 // tracks the chats that the currently active agents should connect to
 export class ChatsSpecification extends EventTarget {
   // members
-  userId: string;
   supabase: any;
+  userId: string;
   // state
   roomSpecifications: RoomSpecification[];
   roomsQueueManager: QueueManager;
   loadPromise: Promise<void>;
 
   constructor({
-    userId,
     supabase,
+    jwt,
   }: {
-    userId: string,
     supabase: any,
+    jwt: string,
   }) {
     super();
 
-    this.userId = userId;
     this.supabase = supabase;
 
     this.roomSpecifications = [];
     this.roomsQueueManager = new QueueManager();
     this.loadPromise = (async () => {
+      this.userId = await getUserIdForJwt(jwt);
+
       const result = await this.supabase.from('chat_specifications')
         .select('*')
         .eq('user_id', this.userId);

@@ -1,8 +1,8 @@
 import { FetchOpts } from './types';
-import {
-  SUPABASE_URL,
-  SUPABASE_PUBLIC_API_KEY,
-} from './secrets.mjs';
+// import {
+//   SUPABASE_URL,
+//   SUPABASE_PUBLIC_API_KEY,
+// } from './secrets.mjs';
 
 //
 
@@ -38,7 +38,7 @@ export class ReactAgentsWorker {
     this.worker = new Worker(new URL('./worker.ts', import.meta.url));
 
     const env = {
-      AGENT_JSON: JSON.stringify(agentJson),
+      // AGENT_JSON: JSON.stringify(agentJson),
       // SUPABASE_URL,
       // SUPABASE_PUBLIC_API_KEY,
       WORKER_ENV: 'development', // 'production',
@@ -53,6 +53,7 @@ export class ReactAgentsWorker {
       args: {
         env,
         auth,
+        config: agentJson,
         agentSrc,
       },
     });

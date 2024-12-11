@@ -1,17 +1,15 @@
 import path from 'path';
 import fs from 'fs';
-import toml from '@iarna/toml';
+// import toml from '@iarna/toml';
 import { cwd } from '../util/directory-utils.mjs';
 import { isGuid } from '../packages/upstreet-agent/packages/react-agents/util/guid-util.mjs';
 
 const getGuidFromPath = async (p) => {
   const makeEnoent = () => new Error('not an agent directory: ' + p);
 
-  const wranglerTomlPath = path.join(p, 'wrangler.toml');
+  const agentJsonPath = path.join(p, 'agent.json');
   try {
-    const wranglerTomString = await fs.promises.readFile(wranglerTomlPath, 'utf8');
-    const wranglerToml = toml.parse(wranglerTomString);
-    const agentJsonString = wranglerToml.vars.AGENT_JSON;
+    const agentJsonString = await fs.promises.readFile(agentJsonPath, 'utf8');
     const agentJson = agentJsonString && JSON.parse(agentJsonString);
     const id = agentJson?.id;
     if (id) {

@@ -24,7 +24,7 @@ globalThis.onmessage = (event: any) => {
       if (!agentMainPromise) {
         agentMainPromise = (async () => {
           const { args } = event.data;
-          const { env, auth, agentSrc } = args;
+          const { env, auth, config, agentSrc } = args;
           if (typeof agentSrc !== 'string') {
             throw new Error('agent worker: missing agentSrc');
           }
@@ -35,6 +35,7 @@ globalThis.onmessage = (event: any) => {
 
           let alarmTimestamp: number | null = null;
           const state = {
+            config,
             userRender,
             codecs,
             storage: {
@@ -54,6 +55,10 @@ globalThis.onmessage = (event: any) => {
           // console.log('worker init 2', {
           //   agentMain,
           // });
+
+          // wait for first render
+          // await agentMain.waitForLoad();
+
           return agentMain;
         })();
       } else {

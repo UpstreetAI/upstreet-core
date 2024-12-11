@@ -59,7 +59,7 @@ const DocsIndexPage = () => {
             backgroundOverlay={false}
             src={'/images/general/learn.webp'}
             title={'Learn'}
-            description="What are agents? Learn from our research-backend knowledge base."
+            description="What are Agents? Learn from our research-backed knowledge base."
           />
         </Link>
       </div>

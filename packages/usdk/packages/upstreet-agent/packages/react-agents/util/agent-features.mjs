@@ -145,11 +145,12 @@ export const featureSpecs = [
     schema: z.union([
       z.object({
         token: z.string(),
+        clientId: z.string(),
         channels: z.array(z.string()),
       }),
       z.null(),
     ]),
-    examples: [{ token: 'YOUR_DISCORD_BOT_TOKEN', channels: ['general', 'voice'], }],
+    examples: [{ token: 'YOUR_DISCORD_BOT_TOKEN', clientId: 'YOUR_DISCORD_CLIENT_ID', channels: ['general', 'voice'], }],
     imports: (discord) => {
       if (discord.token) {
         return ['Discord'];
@@ -164,6 +165,7 @@ export const featureSpecs = [
           dedent`
             <Discord
               token=${JSON.stringify(discord.token)}
+              clientId=${JSON.stringify(discord.clientId)}
               ${discord.channels ? `channels={${JSON.stringify(channels)}}` : ''}
             />
           `,

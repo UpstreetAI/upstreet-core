@@ -121,6 +121,7 @@ const CharactersPrompt = () => {
       id: agent.id,
       name,
       bio,
+      socialSpecs: agent.getSocialSpecs(),
     };
     const agentSpecs = agents.map((agent) => agent.getPlayerSpec());
 
@@ -129,6 +130,7 @@ const CharactersPrompt = () => {
         `Name: ${agent.name}`,
         `UserId: ${agent.id}`,
         `Bio: ${agent.bio}`,
+        `${agent.socialSpecs ? `Social Specifications: ${JSON.stringify(agent.socialSpecs, null, 2)}` : ''}`,
       ].join('\n');
     };
 

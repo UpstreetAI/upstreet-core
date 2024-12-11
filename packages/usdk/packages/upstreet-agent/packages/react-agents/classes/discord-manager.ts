@@ -24,7 +24,7 @@ import {
 //
 
 const getIdFromUserId = (userId: string) => uuidByString(userId);
-const makePlayerFromMember = (member: any) => {
+const makePlayerFromDiscordMember = (member: any) => {
   const {
     userId,
     displayName,
@@ -34,6 +34,11 @@ const makePlayerFromMember = (member: any) => {
   const player = new Player(id, {
     name: displayName,
     previewUrl: displayAvatarURL,
+    socialSpecs: {
+      discord: {
+        userId,
+      },
+    },
   });
   return player;
 };
@@ -119,6 +124,7 @@ const bindOutgoing = ({
 
 export class DiscordBot extends EventTarget {
   token: string;
+  clientId: string;
   channels: DiscordRoomSpec[];
   dms: DiscordRoomSpec[];
   userWhitelist: string[];
@@ -132,6 +138,7 @@ export class DiscordBot extends EventTarget {
     // arguments
     const {
       token,
+      clientId,
       channels,
       dms,
       userWhitelist,
@@ -140,6 +147,7 @@ export class DiscordBot extends EventTarget {
       jwt,
     } = args;
     this.token = token;
+    this.clientId = clientId;
     this.channels = channels;
     this.dms = dms;
     this.userWhitelist = userWhitelist;
@@ -149,6 +157,13 @@ export class DiscordBot extends EventTarget {
     this.abortController = new AbortController();
     const { signal } = this.abortController;
 
+    // add relevent discord information to the agent's social specs variable
+    agent.updateSocialSpecs({
+      discord: {
+        userId: clientId,
+      },
+    });
+    
     // initialize discord bot client
     const discordBotClient = new DiscordBotClient({
       token,
@@ -314,7 +329,7 @@ export class DiscordBot extends EventTarget {
         // console.log('got guild member add', {
         //   member,
         // });
-        const player = makePlayerFromMember(member);
+        const player = makePlayerFromDiscordMember(member);
         for (const conversation of this.channelConversations.values()) {
           conversation.addAgent(player.playerId, player);
         }

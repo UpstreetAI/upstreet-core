@@ -11,6 +11,7 @@ import {
 export const Discord: React.FC<DiscordProps> = (props: DiscordProps) => {
   const {
     token,
+    clientId,
     channels,
     dms,
     userWhitelist,
@@ -25,6 +26,7 @@ export const Discord: React.FC<DiscordProps> = (props: DiscordProps) => {
     if (!conversation) {
       const args: DiscordArgs = {
         token,
+        clientId,
         channels: channels ? (Array.isArray(channels) ? channels : [channels]) : [],
         dms: dms ? (Array.isArray(dms) ? dms : [dms]) : [],
         userWhitelist,

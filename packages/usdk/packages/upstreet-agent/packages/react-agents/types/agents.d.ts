@@ -121,12 +121,14 @@ export type DiscordRoomSpec = RegExp | string;
 export type DiscordRoomSpecs = DiscordRoomSpec | DiscordRoomSpec[];
 export type DiscordProps = {
   token: string;
+  clientId: string;
   channels?: DiscordRoomSpecs;
   dms?: DiscordRoomSpecs;
   userWhitelist?: string[];
 };
 export type DiscordArgs = {
   token: string;
+  clientId: string;
   channels: DiscordRoomSpec[];
   dms: DiscordRoomSpec[];
   userWhitelist: string[];
@@ -457,6 +459,7 @@ export type ActiveAgentObject = AgentObject & {
   pingManager: PingManager;
   liveManager: LiveManager;
   generativeAgentsMap: WeakMap<ConversationObject, GenerativeAgentObject>;
+  socialSpecs: object;
 
   //
 
@@ -481,6 +484,8 @@ export type ActiveAgentObject = AgentObject & {
     text: string,
     content?: any,
   ) => Promise<Memory>;
+  updateSocialSpecs: (socialSpecs: object) => void;
+  getSocialSpecs: () => object;
 
   live: () => void;
   destroy: () => void;

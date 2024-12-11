@@ -56,6 +56,7 @@ export class ActiveAgentObject extends AgentObject {
   liveManager: LiveManager;
   pingManager: PingManager;
   generativeAgentsMap = new WeakMap<ConversationObject, GenerativeAgentObject>();
+  socialSpecs: object;
 
   //
   
@@ -116,6 +117,7 @@ export class ActiveAgentObject extends AgentObject {
       userId: this.id,
       supabase: this.useSupabase(),
     });
+    this.socialSpecs = {};
   }
 
   // static hooks
@@ -236,6 +238,15 @@ export class ActiveAgentObject extends AgentObject {
     } else {
       throw new Error(error2);
     }
+  }
+  updateSocialSpecs(socialSpecs: object) {
+    this.socialSpecs = {
+      ...this.socialSpecs,
+      ...socialSpecs,
+    };
+  }
+  getSocialSpecs() {
+    return this.socialSpecs;
   }
   live() {
     this.chatsManager.live();

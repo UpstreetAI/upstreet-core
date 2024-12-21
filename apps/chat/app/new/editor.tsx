@@ -42,7 +42,7 @@ import { currencies, intervals } from 'react-agents/constants.mjs';
 import { buildAgentSrc } from 'react-agents-builder';
 import { ReactAgentsWorker } from 'react-agents-browser';
 import type { FetchableWorker } from 'react-agents-browser/types';
-import { IconButton } from 'ucom';
+// import { IconButton } from 'ucom';
 import { BackButton } from '@/components/back';
 
 //
@@ -271,10 +271,6 @@ export default function AgentEditor({
     const jwt = await getJWT();
     try {
       if (jwt) {
-        console.log('building agent src...', { monaco, sourceCode });
-        const agentSrc = await buildAgentSrc(sourceCode);
-        console.log('built agent src:', { agentSrc });
-
         const [
           userPrivate,
           {
@@ -325,14 +321,35 @@ export default function AgentEditor({
           stripeConnectAccountId,
         };
         ensureAgentJsonDefaults(agentJson);
+        const agentJsonString = JSON.stringify(agentJson);
 
-        // initialize the agent worker
         const mnemonic = generateMnemonic();
+        const auth = {
+          AGENT_TOKEN: agentToken,
+          WALLET_MNEMONIC: mnemonic,
+        };
+        const envTxt = [
+          `AGENT_TOKEN=${JSON.stringify(agentToken)}`,
+          `WALLET_MNEMONIC=${JSON.stringify(mnemonic)}`,
+        ].join('\n');
+
+        console.log('building agent src...', { monaco, sourceCode });
+        const agentTsxFile = new File([ sourceCode ], 'agent.tsx');
+        const agentJsonFile = new File([ agentJsonString ], 'agent.json');
+        const envTxtFile = new File([ envTxt ], '.env.txt');
+        const agentModuleSrc = await buildAgentSrc({
+          files: [
+            agentTsxFile,
+            agentJsonFile,
+            envTxtFile,
+          ],
+        });
+        console.log('built agent src', { agentModuleSrc });
+
         const newWorker = new ReactAgentsWorker({
           agentJson,
-          agentSrc,
-          apiKey: agentToken,
-          mnemonic,
+          agentModuleSrc,
+          auth,
         });
         setWorker(newWorker);
 

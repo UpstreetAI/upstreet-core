@@ -27,32 +27,34 @@ const ensureEsbuild = (() => {
   };
 })();
 
-/* const defaultFiles = [
-  {
-    path: '/example.ts',
-    content: `\
-      export const example = 'This is an example module';
-    `,
-  },
-]; */
-
 //
 
-export const buildAgentSrc = async (sourceCode, {
-  files = [],
-} = {}) => {
+export const buildAgentSrc = async (opts = {}) => {
+  let {
+    files = [],
+  } = opts;
+
   await ensureEsbuild();
 
-  const fileMap = new Map(files.map(file => [file.path, file.content]));
+  const fileMap = await (async () => {
+    const result = new Map();
+    await Promise.all(files.map(async (file) => {
+      const arrayBuffer = await file.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      const p = path.join('/', file.name);
+      result.set(p, uint8Array);
+    }));
+    return result;
+  })();
   const filesNamespace = 'files';
   const globalImportMap = new Map(Array.from(Object.entries(globalImports)));
   const globalNamespace = 'globals';
 
   const result = await esbuild.build({
     stdin: {
-      contents: sourceCode,
+      contents: `export { default } from './agent.tsx';`,
       resolveDir: '/', // Optional: helps with resolving imports
-      sourcefile: 'app.tsx', // Optional: helps with error messages
+      sourcefile: 'entry.ts', // Optional: helps with error messages
       loader: 'tsx', // Set the appropriate loader based on the source type
     },
     bundle: true,
@@ -91,19 +93,36 @@ export const buildAgentSrc = async (sourceCode, {
         name: 'files-plugin',
         setup(build) {
           build.onResolve({ filter: /.*/ }, (args) => {
-            const p = path.resolve(args.resolveDir, args.path);
-            // console.log('got resolve', {args, p});
+            const p = path.resolve(path.dirname(args.importer), args.path);
+            // console.log('got resolve', {args, p, found: fileMap.has(p)});
             if (fileMap.has(p)) {
               return { path: p, namespace: filesNamespace };
             }
             return null; // Continue with the default resolution
           });
           build.onLoad({ filter: /.*/, namespace: filesNamespace }, (args) => {
-            // console.log('got load', args);
             const p = args.path;
             const contents = fileMap.get(p);
             if (contents) {
-              return { contents, loader: 'tsx' };
+              const ext = path.extname(p).slice(1);
+              const loader = (() => {
+                if (/^(?:tsx?|jsx?)$/.test(ext)) {
+                  return 'tsx';
+                } else if (/^json$/.test(ext)) {
+                  return 'json';
+                } else if (/^txt$/.test(ext)) {
+                  return 'text';
+                } else {
+                  return 'tsx';
+                }
+              })();
+              // console.log('got load', { p, args, ext, loader, });
+              return {
+                contents,
+                loader,
+              };
+            } else {
+              console.warn('no contents for', p, Array.from(fileMap.keys()));
             }
             return null; // Continue with the default loading
           });

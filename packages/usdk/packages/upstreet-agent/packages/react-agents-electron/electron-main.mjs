@@ -160,13 +160,14 @@ const makeViteServer = (directory) => {
     cacheDir: path.join(homeDir, '.usdk', 'vite'),
     esbuild: {
       jsx: 'transform',
-      // jsxFactory: 'React.createElement',
-      // jsxFragment: 'React.Fragment',
     },
     optimizeDeps: {
       entries: [
-        './packages/upstreet-agent/packages/react-agents-node/entry.mjs',
+        './entry.mjs',
       ],
+    },
+    ssr: {
+      external: ['react', 'react-reconciler'],
     },
   });
 };

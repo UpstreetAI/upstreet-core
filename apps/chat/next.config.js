@@ -88,7 +88,7 @@ module.exports = {
       use: [options.defaultLoaders.babel],
     }); */
 
-    /* // fix react resolution in sdk subpackage
+    // fix react resolution in sdk subpackage
     const usdkPath = path.resolve(__dirname, '../../packages/usdk');
     const upstreetAgentPath = path.resolve(__dirname, '../../packages/usdk/packages/upstreet-agent');
     const reactAgentsPath = path.resolve(__dirname, '../../packages/usdk/packages/upstreet-agent/packages/react-agents');
@@ -110,7 +110,7 @@ module.exports = {
       replacePlugin(reactAgentsBrowserPath, /^react/),
       replacePlugin(upstreetAgentPath, /^react/),
       replacePlugin(usdkPath, /^react/),
-    ); */
+    );
 
     // config.experiments = {
     //   ...config.experiments,

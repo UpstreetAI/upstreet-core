@@ -8,6 +8,7 @@ import { serve } from '@hono/node-server';
 
 //
 
+const dirname = path.dirname(import.meta.url.replace('file://', ''));
 ['uncaughtException', 'unhandledRejection'].forEach(event => {
   process.on(event, err => {
     process.send({
@@ -99,7 +100,6 @@ const makeViteServer = async (directory) => {
     root: directory,
     server: { middlewareMode: 'ssr' },
     cacheDir: path.join(homeDir, '.usdk', 'vite'),
-    // resolve,
     esbuild: {
       jsx: 'transform',
     },
@@ -107,6 +107,9 @@ const makeViteServer = async (directory) => {
       entries: [
         './entry.mjs',
       ],
+    },
+    ssr: {
+      external: ['react', 'react-reconciler'],
     },
   });
 };

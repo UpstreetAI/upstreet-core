@@ -1,8 +1,7 @@
 import { FetchOpts } from './types';
 // import {
-//   SUPABASE_URL,
-//   SUPABASE_PUBLIC_API_KEY,
-// } from './secrets.mjs';
+//   dotenvFormat,
+// } from '../util/dotenv-util.mjs';
 
 //
 
@@ -10,51 +9,53 @@ export class ReactAgentsWorker {
   worker: Worker;
   constructor({
     agentJson,
-    agentSrc,
-    apiKey,
-    mnemonic,
+    agentModuleSrc,
+    auth,
+    // apiKey,
+    // mnemonic,
   }: {
     agentJson: any,
-    agentSrc: string,
-    apiKey: string,
-    mnemonic: string,
+    agentModuleSrc: string,
+    auth: any,
+    // apiKey: string,
+    // mnemonic: string,
   }) {
     if (
       !agentJson ||
-      !agentSrc ||
-      !apiKey ||
-      !mnemonic
+      !agentModuleSrc ||
+      !auth
+      // !apiKey ||
+      // !mnemonic
     ) {
       throw new Error('missing required options: ' + JSON.stringify({
         agentJson,
-        agentSrc,
-        apiKey,
-        mnemonic,
+        agentModuleSrc,
+        auth,
+        // apiKey,
+        // mnemonic,
       }));
     }
-
-    console.log('got agent src', agentSrc);
+    console.log('got agent src', agentModuleSrc);
 
     this.worker = new Worker(new URL('./worker.ts', import.meta.url));
 
-    const env = {
-      // AGENT_JSON: JSON.stringify(agentJson),
-      // SUPABASE_URL,
-      // SUPABASE_PUBLIC_API_KEY,
-      WORKER_ENV: 'development', // 'production',
-    };
-    const auth = {
-      AGENT_TOKEN: apiKey,
-      WALLET_MNEMONIC: mnemonic,
-    };
-    console.log('starting worker with env:', env);
+    // const env = {
+    //   // AGENT_JSON: JSON.stringify(agentJson),
+    //   // SUPABASE_URL,
+    //   // SUPABASE_PUBLIC_API_KEY,
+    //   WORKER_ENV: 'development', // 'production',
+    // };
+    // const auth = {
+    //   AGENT_TOKEN: apiKey,
+    //   WALLET_MNEMONIC: mnemonic,
+    // };
+    // console.log('starting worker with env:', env);
     this.worker.postMessage({
       method: 'init',
       args: {
-        env,
+        agentJson,
         auth,
-        config: agentJson,
-        agentSrc,
+        agentModuleSrc,
       },
     });
     this.worker.addEventListener('error', e => {

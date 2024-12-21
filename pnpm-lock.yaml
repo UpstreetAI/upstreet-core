@@ -997,8 +997,8 @@ importers:
         specifier: file:./packages/queue-manager
         version: link:packages/queue-manager
       react:
-        specifier: 19.0.0-rc-df5f2736-20240712
-        version: 19.0.0-rc-df5f2736-20240712
+        specifier: file:./packages/react
+        version: link:packages/react
       react-agents:
         specifier: file:./packages/react-agents
         version: link:packages/react-agents
@@ -1009,8 +1009,8 @@ importers:
         specifier: file:./packages/react-agents-node
         version: link:packages/react-agents-node
       react-reconciler:
-        specifier: 0.31.0-rc-df5f2736-20240712
-        version: 0.31.0-rc-df5f2736-20240712(react@19.0.0-rc-df5f2736-20240712)
+        specifier: file:./packages/react-reconciler
+        version: link:packages/react-reconciler
       stripe:
         specifier: ^16.10.0
         version: 16.12.0
@@ -1079,6 +1079,8 @@ importers:
 
   packages/usdk/packages/upstreet-agent/packages/queue-manager: {}
 
+  packages/usdk/packages/upstreet-agent/packages/react: {}
+
   packages/usdk/packages/upstreet-agent/packages/react-agents: {}
 
   packages/usdk/packages/upstreet-agent/packages/react-agents-browser:
@@ -1128,6 +1130,15 @@ importers:
       jest:
         specifier: ^29.7.0
         version: 29.7.0(@types/node@22.8.1)(babel-plugin-macros@3.1.0)(ts-node@10.9.1(@swc/core@1.10.1(@swc/helpers@0.5.13))(@types/node@22.8.1)(typescript@5.7.2))
+
+  packages/usdk/packages/upstreet-agent/packages/react-reconciler:
+    dependencies:
+      react:
+        specifier: file:../react
+        version: link:../react
+      scheduler:
+        specifier: 0.25.0-rc-df5f2736-20240712
+        version: 0.25.0-rc-df5f2736-20240712
 
 packages:
 
@@ -12290,11 +12301,11 @@ packages:
     peerDependencies:
       react: ^18.0.0
 
-  react-reconciler@0.31.0-rc-df5f2736-20240712:
-    resolution: {integrity: sha512-dISmKM+MEZ0jRpE+jXkqLR+mTpYRhQuMLJNyYRcieECYmR3ka3c8XTyo/U0iTueSJltzUM4p59VnBm42jLbkqQ==}
+  react-reconciler@file:packages/usdk/packages/upstreet-agent/packages/react-reconciler:
+    resolution: {directory: packages/usdk/packages/upstreet-agent/packages/react-reconciler, type: directory}
     engines: {node: '>=0.10.0'}
     peerDependencies:
-      react: 19.0.0-rc-df5f2736-20240712
+      react: file:../react
 
   react-refresh@0.14.2:
     resolution: {integrity: sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA==}
@@ -12370,8 +12381,8 @@ packages:
     resolution: {integrity: sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==}
     engines: {node: '>=0.10.0'}
 
-  react@19.0.0-rc-df5f2736-20240712:
-    resolution: {integrity: sha512-EskZQiyMOtoyC5P22HjB2vfLywcdko3TxknC6c+NBmlqjWxi4P70iR5/79PD6xj5f49jljuV9+/CH0N0brSxJg==}
+  react@file:packages/usdk/packages/upstreet-agent/packages/react:
+    resolution: {directory: packages/usdk/packages/upstreet-agent/packages/react, type: directory}
     engines: {node: '>=0.10.0'}
 
   read-cache@1.0.0:
@@ -28781,9 +28792,9 @@ snapshots:
       react: 18.2.0
       scheduler: 0.21.0
 
-  react-reconciler@0.31.0-rc-df5f2736-20240712(react@19.0.0-rc-df5f2736-20240712):
+  react-reconciler@file:packages/usdk/packages/upstreet-agent/packages/react-reconciler(react@file:packages/usdk/packages/upstreet-agent/packages/react):
     dependencies:
-      react: 19.0.0-rc-df5f2736-20240712
+      react: file:packages/usdk/packages/upstreet-agent/packages/react
       scheduler: 0.25.0-rc-df5f2736-20240712
 
   react-refresh@0.14.2: {}
@@ -28916,7 +28927,7 @@ snapshots:
     dependencies:
       loose-envify: 1.4.0
 
-  react@19.0.0-rc-df5f2736-20240712: {}
+  react@file:packages/usdk/packages/upstreet-agent/packages/react: {}
 
   read-cache@1.0.0:
     dependencies:
@@ -30924,11 +30935,11 @@ snapshots:
       openai: 4.76.1(zod@3.24.1)
       playwright-core-lite: file:packages/usdk/packages/upstreet-agent/packages/playwright-core-lite
       queue-manager: file:packages/usdk/packages/upstreet-agent/packages/queue-manager
-      react: 19.0.0-rc-df5f2736-20240712
+      react: file:packages/usdk/packages/upstreet-agent/packages/react
       react-agents: file:packages/usdk/packages/upstreet-agent/packages/react-agents
       react-agents-client: file:packages/usdk/packages/upstreet-agent/packages/react-agents-client
       react-agents-node: file:packages/usdk/packages/upstreet-agent/packages/react-agents-node
-      react-reconciler: 0.31.0-rc-df5f2736-20240712(react@19.0.0-rc-df5f2736-20240712)
+      react-reconciler: file:packages/usdk/packages/upstreet-agent/packages/react-reconciler(react@file:packages/usdk/packages/upstreet-agent/packages/react)
       stripe: 16.12.0
       together-ai: 0.6.0
       ts-jest: 29.2.5(@babel/core@7.26.0)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.0))(esbuild@0.20.2)(jest@29.7.0(@types/node@18.19.68)(babel-plugin-macros@3.1.0)(ts-node@10.9.1(@swc/core@1.10.1(@swc/helpers@0.5.13))(@types/node@18.19.68)(typescript@4.9.5)))(typescript@5.7.2)
@@ -30978,11 +30989,11 @@ snapshots:
       openai: 4.76.1(zod@3.24.1)
       playwright-core-lite: file:packages/usdk/packages/upstreet-agent/packages/playwright-core-lite
       queue-manager: file:packages/usdk/packages/upstreet-agent/packages/queue-manager
-      react: 19.0.0-rc-df5f2736-20240712
+      react: file:packages/usdk/packages/upstreet-agent/packages/react
       react-agents: file:packages/usdk/packages/upstreet-agent/packages/react-agents
       react-agents-client: file:packages/usdk/packages/upstreet-agent/packages/react-agents-client
       react-agents-node: file:packages/usdk/packages/upstreet-agent/packages/react-agents-node
-      react-reconciler: 0.31.0-rc-df5f2736-20240712(react@19.0.0-rc-df5f2736-20240712)
+      react-reconciler: file:packages/usdk/packages/upstreet-agent/packages/react-reconciler(react@file:packages/usdk/packages/upstreet-agent/packages/react)
       stripe: 16.12.0
       together-ai: 0.6.0
       ts-jest: 29.2.5(@babel/core@7.26.0)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.0))(jest@29.7.0(babel-plugin-macros@3.1.0))(typescript@5.7.2)
@@ -31032,11 +31043,11 @@ snapshots:
       openai: 4.76.1(zod@3.24.1)
       playwright-core-lite: file:packages/usdk/packages/upstreet-agent/packages/playwright-core-lite
       queue-manager: file:packages/usdk/packages/upstreet-agent/packages/queue-manager
-      react: 19.0.0-rc-df5f2736-20240712
+      react: file:packages/usdk/packages/upstreet-agent/packages/react
       react-agents: file:packages/usdk/packages/upstreet-agent/packages/react-agents
       react-agents-client: file:packages/usdk/packages/upstreet-agent/packages/react-agents-client
       react-agents-node: file:packages/usdk/packages/upstreet-agent/packages/react-agents-node
-      react-reconciler: 0.31.0-rc-df5f2736-20240712(react@19.0.0-rc-df5f2736-20240712)
+      react-reconciler: file:packages/usdk/packages/upstreet-agent/packages/react-reconciler(react@file:packages/usdk/packages/upstreet-agent/packages/react)
       stripe: 16.12.0
       together-ai: 0.6.0
       ts-jest: 29.2.5(jest@29.7.0(@types/node@20.11.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.1(@swc/core@1.10.1(@swc/helpers@0.5.13))(@types/node@20.11.5)(typescript@5.7.2)))(typescript@5.7.2)

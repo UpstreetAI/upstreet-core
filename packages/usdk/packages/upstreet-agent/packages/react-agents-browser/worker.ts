@@ -1,4 +1,4 @@
-import 'upstreet-agent/packages/react-agents/util/worker-globals.mjs';
+import 'react-agents/util/worker-globals.mjs';
 import * as codecs from 'codecs/ws-codec-runtime-worker.mjs';
 import { AgentMain } from 'react-agents/entry.ts';
 
@@ -24,18 +24,19 @@ globalThis.onmessage = (event: any) => {
       if (!agentMainPromise) {
         agentMainPromise = (async () => {
           const { args } = event.data;
-          const { env, auth, config, agentSrc } = args;
-          if (typeof agentSrc !== 'string') {
-            throw new Error('agent worker: missing agentSrc');
+          const { agentJson, auth, agentModuleSrc } = args;
+          if (typeof agentModuleSrc !== 'string') {
+            throw new Error('agent worker: missing agentModuleSrc');
           }
 
-          const agentModule = await nativeImport(`data:application/javascript,${encodeURIComponent(agentSrc)}`);
+          const agentModule = await nativeImport(`data:application/javascript,${encodeURIComponent(agentModuleSrc)}`);
           const userRender = agentModule.default;
           // console.log('got user render', userRender.toString());
 
+          const env = {};
           let alarmTimestamp: number | null = null;
           const state = {
-            config,
+            config: agentJson,
             userRender,
             codecs,
             storage: {
@@ -47,18 +48,7 @@ globalThis.onmessage = (event: any) => {
               },
             },
           };
-          // console.log('worker init 1', {
-          //   state,
-          //   env,
-          // });
           const agentMain = new AgentMain(state, env, auth);
-          // console.log('worker init 2', {
-          //   agentMain,
-          // });
-
-          // wait for first render
-          // await agentMain.waitForLoad();
-
           return agentMain;
         })();
       } else {

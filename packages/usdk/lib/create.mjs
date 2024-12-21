@@ -354,7 +354,6 @@ export const create = async (args, opts) => {
   const source = args.source;
   const features = typeof args.feature === 'string' ? JSON.parse(args.feature) : (args.feature || {});
   const yes = args.yes;
-  const force = !!args.force;
   const noInstall = !!args.noInstall;
   const forceNoConfirm = !!args.forceNoConfirm;
   // opts
@@ -403,7 +402,6 @@ export const create = async (args, opts) => {
   const _prepareDirectory = async () => {
     console.log(pc.italic('Preparing directory...'));
     await cleanDir(dstDir, {
-      force,
       forceNoConfirm,
     });
     // bootstrap destination directory

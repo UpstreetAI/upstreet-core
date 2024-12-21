@@ -342,7 +342,7 @@ const uploadImage = async (file, {
 
 export const create = async (args, opts) => {
   // args
-  let dstDir = args._[0] ?? '';
+  let dstDir = args._[0] ?? cwd;
   const prompt = args.prompt ?? '';
   const inputStream = args.inputStream ?? null;
   const outputStream = args.outputStream ?? null;
@@ -387,30 +387,10 @@ export const create = async (args, opts) => {
     throw new Error('The --json flag is required when using the --source flag.');
   }
 
-  // create the destination directory if not present
-  if (!dstDir) {
-    const dirname = makeId(8);
-    dstDir = path.join(homeDir, '.usdk', 'agents', dirname);
-    await mkdirp(dstDir);
-  }
-
   // load source file
   const sourceFile = source ?
     await fs.promises.readFile(source)
   : null;
-
-  // remove old directory
-  const _prepareDirectory = async () => {
-    console.log(pc.italic('Preparing directory...'));
-    await cleanDir(dstDir, {
-      force,
-      forceNoConfirm,
-    });
-    // bootstrap destination directory
-    await mkdirp(dstDir);
-    console.log(pc.italic('Directory prepared...'));
-  };
-  await _prepareDirectory();
 
   console.log(pc.italic('Generating Agent...'));
   // generate the agent
@@ -455,6 +435,26 @@ export const create = async (args, opts) => {
  
   agentJson = updateAgentJsonAuth(agentJson, agentAuthSpec);
   agentJson = ensureAgentJsonDefaults(agentJson);
+
+  // update destination directory if no specific path was provided
+  if (dstDir === cwd) {
+    const sanitizedName = agentJson.name.replace(/\s+/g, '_');
+    dstDir = path.join(cwd, sanitizedName);
+  }
+
+  // remove old directory
+  const _prepareDirectory = async () => {
+    console.log(pc.italic('Preparing directory...'));
+    await cleanDir(dstDir, {
+      force,
+      forceNoConfirm,
+    });
+    // bootstrap destination directory
+    await mkdirp(dstDir);
+    console.log(pc.italic('Directory prepared...'));
+  };
+  await _prepareDirectory();
+
   console.log(pc.italic('Agent generated...'));
   console.log(pc.green('Name:'), agentJson.name);
   console.log(pc.green('Bio:'), agentJson.bio);

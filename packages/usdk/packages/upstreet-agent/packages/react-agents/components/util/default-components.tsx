@@ -117,29 +117,23 @@ const ScenePrompt = () => {
 };
 const CharactersPrompt = () => {
   const conversation = useConversation();
-  const agent = useAgent();
-  const name = useName();
-  const bio = usePersonality();
   if (conversation) {
     const agents = conversation.getAgents();
-    const currentAgentSpec = {
-      id: agent.id,
-      name,
-      bio,
-    };
+    const currentAgentPlayerSpec = conversation.getCurrentAgentPlayer().getPlayerSpec();
     const agentSpecs = agents.map((agent) =>  {
-      const agentSpec = agent.getPlayerSpec() as any;
-      return {
-        name: agentSpec?.name,
+      const agentSpecs = agent.getPlayerSpec() as any;
+      const agentSpec = {
         id: agent.playerId,
-        bio: agentSpec?.bio,
-      };
+        name: agentSpecs?.name,
+        bio: agentSpecs?.bio,
+      }
+      return agentSpec;
     });
 
     const formatAgent = (agent: any) => {
       return [
-        `Name: ${agent.name}`,
         `UserId: ${agent.id}`,
+        `Name: ${agent.name}`,
         `Bio: ${agent.bio}`,
       ].join('\n');
     };
@@ -150,7 +144,7 @@ const CharactersPrompt = () => {
           # Your Character
         ` +
           '\n\n' +
-          formatAgent(currentAgentSpec) +
+          formatAgent(currentAgentPlayerSpec) +
           (agents.length > 0
             ? (
               '\n\n' +

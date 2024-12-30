@@ -127,7 +127,8 @@ export class ConversationObject extends EventTarget {
     const allAgents: object[] = [
       ...Array.from(this.agentsMap.values()).map(player => player.playerSpec),
     ];
-    this.agent && allAgents.push(this.agent.agentJson);
+
+    this.agent && allAgents.push(this.agent.config);
     return allAgents;
   }
   getEmbeddingString() {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAgent } from '../hooks';
 import { Perception } from '../components/core/perception';
-import { LoopProps } from '../types';
+import { EvaluateOpts, LoopProps } from '../types';
 import { BasicEvaluator } from '../evaluators/basic-evaluator';
 
 export const ChatLoop = (props: LoopProps) => {
@@ -35,6 +35,27 @@ export const ChatLoop = (props: LoopProps) => {
             await targetAgent.evaluate(evaluator, {
               signal,
             });
+          })();
+        }}
+        priority={-1}
+      />
+      <Perception
+        type="messageReaction"
+        handler={async (e) => {
+          const { targetAgent } = e.data;
+
+
+          console.log('messageReaction: ', e.data);
+          (async () => {
+            const abortController = new AbortController();
+            const { signal } = abortController;
+            
+            const opts: EvaluateOpts = {
+              signal,
+              sendTyping: false,
+              generativeAgent: targetAgent,
+            };
+            await targetAgent.evaluate(evaluator, opts);
           })();
         }}
         priority={-1}

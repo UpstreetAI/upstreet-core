@@ -8,6 +8,7 @@ import {
   PlayableAudioStream,
   GetHashFn,
   MessageCache,
+  MessageReactionEventData,
 } from '../types'
 import { SceneObject } from '../classes/scene-object';
 import { Player } from 'react-agents-client/util/player.mjs';

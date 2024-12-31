@@ -194,6 +194,7 @@ export type EvaluatorOpts = {
 export type EvaluateOpts = {
   generativeAgent: GenerativeAgentObject,
   signal?: AbortSignal,
+  sendTyping?: boolean,
 };
 export type Evaluator = {
   evaluate: (opts: EvaluateOpts) => Promise<ActionStep>;

@@ -309,7 +309,6 @@ export type Player = {
 };
 export type GetHashFn = () => string;
 export type ConversationObject = EventTarget & {
-  agent: ActiveAgentObject;
   agentsMap: Map<string, Player>;
   scene: SceneObject | null;
   getHash: GetHashFn;
@@ -330,9 +329,6 @@ export type ConversationObject = EventTarget & {
 
   getScene: () => SceneObject | null;
   setScene: (scene: SceneObject | null) => void;
-
-  getAgent: () => ActiveAgentObject | null;
-  // setAgent: (agent: ActiveAgentObject) => void;
 
   getAgents: () => Player[];
   getAgentIds: () => string[];

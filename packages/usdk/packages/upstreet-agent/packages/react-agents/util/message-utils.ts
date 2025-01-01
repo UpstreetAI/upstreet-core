@@ -1,9 +1,12 @@
 import {
   PendingActionMessage,
   AgentSpec,
+  ActiveAgentObject,
   // AgentObject,
   // ActiveAgentObject,
 } from '../types';
+import { MessageCache, CACHED_MESSAGES_LIMIT } from '../classes/message-cache';
+import { loadMessagesFromDatabase } from './loadMessagesFromDatabase';
 
 export const formatConversationMessage = (rawMessage: PendingActionMessage, {
   agent,
@@ -24,4 +27,28 @@ export const formatConversationMessage = (rawMessage: PendingActionMessage, {
     hidden: false,
   };
   return newMessage;
+};
+
+
+export const createMessageCache = ({
+  agent,
+  conversationId,
+  agentId,
+}: {
+  agent: ActiveAgentObject;
+  conversationId: string;
+  agentId: string;
+}) => {
+  const supabase = agent.appContextValue.useSupabase();
+  return new MessageCache({
+    loader: async () => {
+      const messages = await loadMessagesFromDatabase({
+        supabase,
+        conversationId,
+        agentId,
+        limit: CACHED_MESSAGES_LIMIT,
+      });
+      return messages;
+    },
+  });
 };

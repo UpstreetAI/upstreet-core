@@ -183,6 +183,7 @@ export function MultiplayerActionsProvider({ children }: MultiplayerActionsProvi
 
         const timestamp = new Date();
         const message: ActionMessage = {
+          id: crypto.randomUUID(),
           method,
           userId,
           name,

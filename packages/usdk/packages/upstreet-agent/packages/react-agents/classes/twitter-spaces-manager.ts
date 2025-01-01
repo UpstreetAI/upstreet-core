@@ -14,7 +14,7 @@ import {
   bindConversationToAgent,
 } from '../runtime';
 import { AudioDecodeStream } from 'codecs/audio-decode.mjs';
-import { formatConversationMessage } from '../util/message-utils';
+import { createMessageCache, formatConversationMessage } from '../util/message-utils';
 import {
   QueueManager,
 } from 'queue-manager';
@@ -24,6 +24,7 @@ import {
 import {
   TranscribedVoiceInput,
 } from '../devices/audio-transcriber.mjs';
+import { Player } from 'react-agents-client/util/player.mjs';
 
 //
 
@@ -80,11 +81,20 @@ class TwitterSpacesBot {
         live = false;
       });
 
+      const agentPlayer = new Player(this.agent.id, {
+        name: this.agent.name,
+        bio: this.agent.bio,
+      });
       const conversation = new ConversationObject({
-        agent,
+        agentPlayer,
         getHash: () => {
           return `twitterSpaces:channel:${url}`;
         },
+        messageCache: createMessageCache({
+          agent,
+          conversationId: `twitterSpaces:channel:${url}`,
+          agentId: agent.id,
+        }),
       });
 
       this.agent.conversationManager.addConversation(conversation);

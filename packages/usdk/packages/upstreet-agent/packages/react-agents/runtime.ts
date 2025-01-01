@@ -17,7 +17,7 @@ import {
   ActionPropsAux,
   AbortableMessageEvent,
   PendingActionEventData,
-  // PerceptionPropsAux,
+  PerceptionPropsAux,
 } from './types';
 import {
   PendingActionEvent,

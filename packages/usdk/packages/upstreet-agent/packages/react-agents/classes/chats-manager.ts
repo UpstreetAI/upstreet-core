@@ -21,7 +21,7 @@ import {
 import {
   bindConversationToAgent,
 } from '../runtime';
-// import { Player } from 'react-agents-client/util/player.mjs';
+import { Player } from 'react-agents-client/util/player.mjs';
 import { ReactAgentsMultiplayerConnection } from 'react-agents-client/react-agents-client.mjs';
 import {
   ExtendableMessageEvent,
@@ -35,7 +35,7 @@ import {
 import {
   TranscribedVoiceInput,
 } from 'react-agents/devices/audio-transcriber.mjs';
-import { formatConversationMessage } from '../util/message-utils';
+import { createMessageCache, formatConversationMessage } from '../util/message-utils';
 
 //
 
@@ -91,14 +91,23 @@ export class ChatsManager {
         agent,
       } = this;
 
+      const agentPlayer = new Player(agent.id, {
+        name: agent.name,
+        bio: agent.bio,
+      });
       const conversation = new ConversationObject({
-        agent,
+        agentPlayer,
         getHash: () => {
           return getChatKey({
             room,
             endpointUrl,
           });
         },
+        messageCache: createMessageCache({
+          agent,
+          conversationId: key,
+          agentId: agent.id,
+        }),
       });
       this.agent.conversationManager.addConversation(conversation);
 

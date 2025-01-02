@@ -5,6 +5,9 @@ import { extractZip } from './zip-util.mjs';
 import { npmInstall } from './npm-util.mjs';
 import { aiProxyHost } from '../packages/upstreet-agent/packages/react-agents/util/endpoints.mjs';
 import pc from 'picocolors';
+import { makeId } from '../packages/upstreet-agent/packages/react-agents/util/util.mjs';
+import path from 'path';
+import { mkdirp } from 'mkdirp';
 
 export const pull = async (args, opts) => {
   const agentId = args._[0] ?? '';
@@ -64,19 +67,18 @@ export const pull = async (args, opts) => {
           }
         } catch (err) {
           console.warn('npm install failed:', err.stack);
-          process.exit(1);
+          throw err;
         }
       } else {
         const text = await req.text();
         console.warn('pull request error', text);
-        process.exit(1);
+        throw new Error(`pull request error: ${text}`);
       }
     } catch (err) {
       console.warn('pull request failed', err);
-      process.exit(1);
+      throw err;
     }
   } else {
     console.log('not logged in');
-    process.exit(1);
   }
 };

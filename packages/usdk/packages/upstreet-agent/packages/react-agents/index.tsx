@@ -1,29 +1,24 @@
 export * from './components/core/action';
 export * from './components/core/agent';
-export * from './components/plugins/browser';
 export * from './components/core/chat';
 export * from './components/core/conversation';
-export * from './components/util/default-components';
-export * from './components/plugins/discord';
-export * from './components/plugins/live-mode';
-export * from './components/plugins/media-generator';
-export * from './components/plugins/rag-memory';
-export * from './components/util/message-utils';
 export * from './components/core/name';
 export * from './components/core/perception';
 export * from './components/core/personality';
 export * from './components/core/prompt';
-export * from './components/plugins/rate-limit';
-export * from './components/plugins/status-updates';
-export * from './components/plugins/store';
-export * from './components/plugins/telnyx';
-export * from './components/plugins/tts';
-export * from './components/plugins/twitter-spaces';
-export * from './components/plugins/twitter';
 export * from './components/core/uniform';
-export * from './components/plugins/video-perception';
+export * from './components/core/features';
+export * from './components/core/clients';
+export * from './components/core/plugins';
+
+export * from './components/features/index';
+
+export * from './components/plugins/index';
+
+export * from './components/util/default-components';
+export * from './components/util/message-utils';
+
 export * from './loops/chat-loop';
 export * from './loops/action-loop';
-export * from './components/plugins/auto-task';
 
 export * from './hooks';

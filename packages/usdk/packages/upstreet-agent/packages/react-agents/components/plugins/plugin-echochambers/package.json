@@ -1,0 +1,12 @@
+{
+  "name": "@elizaos/plugin-echochambers",
+  "version": "0.1.7-alpha.2",
+  "main": "src/index.ts",
+  "type": "module",
+  "dependencies": {
+  },
+  "scripts": {
+    "build": "tsup --format esm --dts",
+    "dev": "tsup --format esm --dts --watch"
+  }
+}

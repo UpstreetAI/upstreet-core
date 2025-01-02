@@ -1,8 +1,7 @@
+import './init.ts';
 export { DurableObject } from './durable-object.tsx';
 import { headers } from 'react-agents/constants.mjs';
 import agentJsonSource from './agent.json';
-
-Error.stackTraceLimit = 300;
 
 const parseAgentJson = (agentJsonSource) => {
   try {

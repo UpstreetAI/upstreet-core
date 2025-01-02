@@ -1,0 +1,22 @@
+{
+  "name": "@elizaos/client-lens",
+  "version": "0.1.7-alpha.2",
+  "main": "src/index.ts",
+  "type": "module",
+  "dependencies": {
+    "@lens-protocol/client": "2.2.0",
+    "@lens-protocol/metadata": "1.2.0",
+    "axios": "^1.7.9",
+    "viem": "^2.13.8"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5"
+  },
+  "peerDependencies": {
+    "@elizaos/core": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsup --format esm --dts",
+    "dev": "tsup --format esm --dts --watch"
+  }
+}

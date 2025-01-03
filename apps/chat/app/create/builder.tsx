@@ -912,6 +912,7 @@ export default function AgentEditor({
                                 <p className={featureTextClass}>
                                   {featureSpec.displayName ?? featureSpec.name}
                                 </p>
+                                <p className='absolute bottom-3 right-0 left-0 text-xs'>In development.</p>
                               </div>
                             </div>
                           </div>
@@ -927,7 +928,7 @@ export default function AgentEditor({
               <div className={cn('flex flex-row h-full items-center justify-center', step !== 2 && 'hidden')}>
                 <div className={`flex flex-col w-[400px] h-full`}>
 
-                  <div className='text-lg font-bold flex flex-row items-center justify-center mb-4'><Icon icon="Chat" className='size-5 mr-2' /> <h2>Test Agent</h2></div>
+                  {/* <div className='text-lg font-bold flex flex-row items-center justify-center mb-4'><Icon icon="Chat" className='size-5 mr-2' /> <h2>Test Agent</h2></div> */}
                   <div className='h-full w-full relative'>
                     <Chat
                       room={room}
@@ -947,6 +948,7 @@ export default function AgentEditor({
               <div className={cn('flex flex-col items-center justify-center h-full', step !== 3 && 'hidden')}>
 
                 <Button
+                  size='large'
                   onClick={() => {
                     setDeploying(true);
                     editorForm.current?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
@@ -977,7 +979,7 @@ export default function AgentEditor({
 
           {/* assistant */}
 
-          <div className={`flex-col relative right-4 bottom-4 h-full w-[300px] bg-white ${isAssistantVisible ? '' : 'hidden'}`}>
+          <div className={`flex-col relative right-4 bottom-4 h-full w-[300px] ${isAssistantVisible ? '' : ''}`}>
             <div className="flex flex-col flex-1 h-[calc(100%-40px)] overflow-scroll px-1 pb-8 pt-6">
               {builderMessages.map((message, index) => (
                 <div key={index} className={cn('flex gap-2 mb-4 px-4')}>

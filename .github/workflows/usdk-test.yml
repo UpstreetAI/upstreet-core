@@ -10,6 +10,9 @@ on:
 jobs:
   test-usdk:
     runs-on: ubuntu-22.04
+    env:
+      FAL_API_KEY: ${{ secrets.FAL_API_KEY }}
+
     strategy:
       matrix:
         node-version: [22]

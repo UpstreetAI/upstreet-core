@@ -126,6 +126,10 @@ export class ReactAgentsWranglerRuntime {
       {
         stdio: 'pipe',
         cwd: dstDir,
+        env: {
+          ...process.env,
+          NODE_OPTIONS: '--stack-trace-limit=300',
+        },
       },
     );
     cp.on('exit', (code) => {

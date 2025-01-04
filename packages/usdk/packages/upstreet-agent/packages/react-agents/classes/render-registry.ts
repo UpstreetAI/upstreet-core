@@ -60,7 +60,6 @@ export class AgentRegistry {
   perceptionsMap: Map<symbol, PerceptionPropsAux | null> = new Map();
   uniformsMap: Map<symbol, UniformPropsAux | null> = new Map();
   deferMap: Map<symbol, DeferProps | null> = new Map();
-  tasksMap: Map<symbol, TaskProps | null> = new Map();
 
   namesMap: Map<symbol, NameProps | null> = new Map();
   personalitiesMap: Map<symbol, PersonalityProps | null> = new Map();
@@ -80,9 +79,6 @@ export class AgentRegistry {
   }
   get uniforms() {
     return Array.from(this.uniformsMap.values()).filter(Boolean);
-  }
-  get tasks() {
-    return Array.from(this.tasksMap.values()).filter(Boolean);
   }
   get names() {
     return Array.from(this.namesMap.values()).filter(Boolean);
@@ -235,9 +231,6 @@ export class RenderRegistry extends EventTarget {
           // }
           // if (childInstance.type === 'perception') {
           //   agentRegistry.perceptions.push(childInstance.props.value);
-          // }
-          // if (childInstance.type === 'task') {
-          //   agentRegistry.tasks.push(childInstance.props.value);
           // }
           // if (childInstance.type === 'name') {
           //   agentRegistry.names.push(childInstance.props.value);

@@ -69,6 +69,10 @@ const runAgent = async (directory, opts) => {
   const init = initString && JSON.parse(initString);
   const debug = parseInt(opts.debug, 10);
 
+  globalThis.dynamicImport = async (specifier) => {
+    return await loadModule(directory, specifier);
+  };
+
   // we load it lioke this to perform a compilation
   const createRootMain = await loadModule(directory, 'root-main.tsx');
   const root = createRootMain({
@@ -95,7 +99,6 @@ const runAgent = async (directory, opts) => {
 const makeViteServer = async (directory) => {
   return await createViteServer({
     root: directory,
-    server: { middlewareMode: 'ssr' },
     cacheDir: path.join(homeDir, '.usdk', 'vite'),
     esbuild: {
       jsx: 'transform',
@@ -108,6 +111,14 @@ const makeViteServer = async (directory) => {
     ssr: {
       external: ['react', 'react-reconciler'],
     },
+    resolve: {
+      mainFields: ['main', 'module', 'browser'],
+      // these proxies are necessary for vite to polyfill node builtins
+      fs: import.meta.resolve('fs').replace('file://', ''),
+      child_process: import.meta.resolve('child_process').replace('file://', ''),
+      tls: import.meta.resolve('tls').replace('file://', ''),
+    },
+    assetsInclude: [/\.cdc$/],
   });
 };
 

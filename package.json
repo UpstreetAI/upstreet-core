@@ -4,9 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test": "npm run usdk test",
     "clean": "find . -type d -name node_modules -exec rm -rf {} +",
     "chat": "npm run -w @upstreet/chat --",
-    "docs": "npm run -w @upstreet/docs --"
+    "docs": "npm run -w @upstreet/docs --",
+    "usdk": "npm run -w usdk --"
   },
   "workspaces": [
     "apps/*",

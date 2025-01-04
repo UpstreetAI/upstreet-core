@@ -2,6 +2,7 @@
 
 const path = require('path');
 const webpack = require('webpack');
+const { builtinModules } = require('module');
 
 module.exports = {
   // experimental: {
@@ -14,6 +15,7 @@ module.exports = {
     'react-agents-client',
     'ecctrl',
     'ucom',
+    '@elizaos/core',
   ],
   async redirects() {
     return [
@@ -88,28 +90,42 @@ module.exports = {
       use: [options.defaultLoaders.babel],
     }); */
 
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(/^node:(.*)$/, (resource) => {
+        resource.request = resource.request.replace(/^node:/, '');
+      })
+    );
+
     // fix react resolution in sdk subpackage
     const usdkPath = path.resolve(__dirname, '../../packages/usdk');
     const upstreetAgentPath = path.resolve(__dirname, '../../packages/usdk/packages/upstreet-agent');
     const reactAgentsPath = path.resolve(__dirname, '../../packages/usdk/packages/upstreet-agent/packages/react-agents');
     const reactAgentsClientPath = path.resolve(__dirname, '../../packages/usdk/packages/upstreet-agent/packages/react-agents-client');
     const reactAgentsBrowserPath = path.resolve(__dirname, '../../packages/usdk/packages/upstreet-agent/packages/react-agents-browser');
-    const replacePlugin = (scopePath, moduleRegexp) => {
+    const replacePlugin = (scopePath, moduleRegexp, importPath) => {
       return new webpack.NormalModuleReplacementPlugin(moduleRegexp, (resource) => {
-        if (resource.context.includes(scopePath)) {
+        if (
+          (typeof scopePath == 'string' && resource.context.includes(scopePath)) ||
+          (scopePath instanceof RegExp && scopePath.test(resource.context))
+        ) {
+          if (builtinModules.includes(resource.request)) {
+            resource.request = path.join(importPath, 'node_modules', resource.request);
+          }
           const p = require.resolve(resource.request, {
-            paths: [scopePath],
+            paths: [importPath],
           });
           resource.request = p;
         }
       });
     };
+    const modulesRegex = /^react|^fs$|^child_process$/;
     config.plugins.push(
-      replacePlugin(reactAgentsPath, /^react/),
-      replacePlugin(reactAgentsClientPath, /^react/),
-      replacePlugin(reactAgentsBrowserPath, /^react/),
-      replacePlugin(upstreetAgentPath, /^react/),
-      replacePlugin(usdkPath, /^react/),
+      replacePlugin(reactAgentsPath, modulesRegex, upstreetAgentPath),
+      replacePlugin(reactAgentsClientPath, modulesRegex, upstreetAgentPath),
+      replacePlugin(reactAgentsBrowserPath, modulesRegex, upstreetAgentPath),
+      replacePlugin(upstreetAgentPath, modulesRegex, upstreetAgentPath),
+      replacePlugin(usdkPath, modulesRegex, upstreetAgentPath),
+      replacePlugin(/\/path-scurry\/|\/0g-ts-sdk\//, modulesRegex, upstreetAgentPath),
     );
 
     // config.experiments = {
@@ -121,6 +137,11 @@ module.exports = {
     config.module.rules.push({
       test: /\.wasm$/,
       type: 'asset/resource',
+    });
+
+    config.module.rules.push({
+      test: /\.cdc$/,
+      type: 'asset/source'
     });
 
     return config;

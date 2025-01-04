@@ -1,3 +1,5 @@
+import './init.ts';
+import './main.jsx';
 import React from 'react';
 import dotenv from 'dotenv';
 import { createRoot, Root } from 'react-agents/root.ts';
@@ -5,8 +7,6 @@ import * as codecs from 'codecs/ws-codec-runtime-edge.mjs';
 import App from './agent.tsx';
 import agentJsonSource from './agent.json';
 import envTxt from './.env.txt';
-
-Error.stackTraceLimit = 300;
 
 const alarmTimeout = 10 * 1000;
 

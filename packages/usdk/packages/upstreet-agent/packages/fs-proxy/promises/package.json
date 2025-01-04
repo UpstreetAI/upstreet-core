@@ -1,0 +1,4 @@
+{
+  "name": "fs-promises",
+  "main": "promises.mjs"
+}

@@ -415,6 +415,8 @@ export const fetchJsonCompletion = async ({
     throw new Error('no jwt');
   }
 
+  console.log('fetchJsonCompletion', messages);
+
   const match = model.match(/^([^:]+?):/);
   if (match) {
     const modelType = match[1];
@@ -430,6 +432,7 @@ export const fetchJsonCompletion = async ({
       }, {
         jwt,
       });
+      console.log('result', result);
       return result;
     } else {
       throw new Error('invalid model type: ' + JSON.stringify(modelType));

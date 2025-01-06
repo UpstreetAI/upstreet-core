@@ -34,6 +34,7 @@ import {
 } from './conversation-manager';
 import { PingManager } from './ping-manager';
 import { AgentRegistry } from './render-registry';
+import { DataSourceManager } from './data-source-manager';
 
 //
 
@@ -51,7 +52,7 @@ export class ActiveAgentObject extends AgentObject {
   telnyxManager: TelnyxManager;
   pingManager: PingManager;
   generativeAgentsMap = new WeakMap<ConversationObject, GenerativeAgentObject>();
-
+  dataSourceManager: DataSourceManager;
   //
   
   constructor(
@@ -91,6 +92,9 @@ export class ActiveAgentObject extends AgentObject {
       codecs: appContextValue.useCodecs(),
     });
     this.telnyxManager = new TelnyxManager();
+
+    this.dataSourceManager = new DataSourceManager();
+
     this.pingManager = new PingManager({
       userId: this.id,
       supabase: this.useSupabase(),

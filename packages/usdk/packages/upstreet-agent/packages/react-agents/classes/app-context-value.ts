@@ -38,6 +38,7 @@ export class AppContextValue {
   chatsSpecification: ChatsSpecification;
   codecs: any;
   init: any;
+  runtime: any;
   debug: number;
   registry: RenderRegistry;
 
@@ -53,6 +54,7 @@ export class AppContextValue {
     chatsSpecification,
     codecs,
     init,
+    runtime,
     debug,
     registry,
   }: {
@@ -67,6 +69,7 @@ export class AppContextValue {
     chatsSpecification: ChatsSpecification;
     codecs: any;
     init: any;
+    runtime: any;
     debug: number;
     registry: RenderRegistry;
   }) {
@@ -81,6 +84,7 @@ export class AppContextValue {
     this.chatsSpecification = chatsSpecification;
     this.codecs = codecs;
     this.init = init;
+    this.runtime = runtime;
     this.debug = debug;
     this.registry = registry;
   }
@@ -116,6 +120,9 @@ export class AppContextValue {
   }
   useInit() {
     return this.init;
+  }
+  useRuntime() {
+    return this.runtime;
   }
   useDebug() {
     return this.debug;

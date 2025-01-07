@@ -71,6 +71,10 @@ export const useInit: () => any = () => {
   const appContextValue = useContext(AppContext);
   return appContextValue.useInit();
 };
+export const useRuntime = () => {
+  const appContextValue = useContext(AppContext);
+  return appContextValue.useRuntime();
+};
 // get the passed-down agent debug flag
 export const useDebug: () => number = () => {
   const appContextValue = useContext(AppContext);

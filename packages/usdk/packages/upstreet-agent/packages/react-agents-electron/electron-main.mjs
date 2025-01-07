@@ -149,7 +149,6 @@ const runAgent = async (directory, opts) => {
 const makeViteServer = (directory) => {
   return createViteServer({
     root: directory,
-    server: { middlewareMode: 'ssr' },
     cacheDir: path.join(homeDir, '.usdk', 'vite'),
     esbuild: {
       jsx: 'transform',
@@ -162,6 +161,14 @@ const makeViteServer = (directory) => {
     ssr: {
       external: ['react', 'react-reconciler'],
     },
+    resolve: {
+      mainFields: ['main', 'module', 'browser'],
+      // these proxies are necessary for vite to polyfill node builtins
+      fs: import.meta.resolve('fs').replace('file://', ''),
+      child_process: import.meta.resolve('child_process').replace('file://', ''),
+      tls: import.meta.resolve('tls').replace('file://', ''),
+    },
+    assetsInclude: [/\.cdc$/],
   });
 };
 

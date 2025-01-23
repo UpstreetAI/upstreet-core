@@ -151,7 +151,7 @@ export const deploy = async (args, opts) => {
 
     const uint8Array = await packZip(directory, {
       exclude: [
-        // /[\/\\]node_modules[\/\\]/, // linux and windows
+        /[\/\\]node_modules[\/\\]/, // linux and windows
         {
           test: (p) => {
             p = p.slice(directory.length + 1);

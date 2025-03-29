@@ -7,6 +7,9 @@ import { AudioEncodeStream } from 'codecs/audio-encode.mjs';
 import { QueueManager } from 'queue-manager';
 import {
   aiHost,
+  realtimeSTTHost,
+  realtimeSTTControlPort,
+  realtimeSTTDataPort,
 } from './endpoints.mjs';
 
 const defaultTranscriptionModel = 'whisper-1';
@@ -386,6 +389,117 @@ export const transcribeRealtime = ({
     return transcription;
   } catch (error) {
     console.warn('error creating transcription', error);
+    throw error;
+  }
+};
+
+export const transcribeRealtimeSTT = async ({ sampleRate }) => {
+  if (!sampleRate) {
+    throw new Error('no sample rate');
+  }
+
+  try {
+    // const controlUrl = `ws://${serverConfig.host}:${serverConfig.controlPort}`;
+    // const dataUrl = `ws://${serverConfig.host}:${serverConfig.dataPort}`;
+
+    const controlUrl = `wss://${realtimeSTTHost}-${realtimeSTTControlPort}.proxy.runpod.net`;
+    const dataUrl = `wss://${realtimeSTTHost}-${realtimeSTTDataPort}.proxy.runpod.net`;
+
+
+    const controlSocket = new WebSocket(controlUrl);
+    const dataSocket = new WebSocket(dataUrl);
+
+    const transcription = new EventTarget();
+
+    controlSocket.addEventListener('open', () => {
+      console.log('Control socket connected');
+      const configs = [
+        {
+          command: "set_parameter",
+          parameter: "language",
+          value: "en"
+        },
+      ];
+      configs.forEach(config => {
+        controlSocket.send(JSON.stringify(config));
+        console.log(`Configured ${config.parameter}: ${config.value}`);
+      });
+      transcription.dispatchEvent(new MessageEvent('open', { data: null }));
+    });
+
+    controlSocket.addEventListener('message', (data) => {
+      console.log('Control message:', data);
+    });
+
+    dataSocket.addEventListener('open', () => {
+      console.log('Data socket connected');
+    });
+
+    dataSocket.addEventListener('message', (data) => {
+      try {
+        const result = JSON.parse(data.data);
+        if (result.type === 'realtime') {
+          transcription.dispatchEvent(new MessageEvent('partial', {
+            data: {
+              transcript: result.text,
+            },
+          }));
+        } else if (result.type === 'fullSentence') {
+          transcription.dispatchEvent(new MessageEvent('transcription', {
+            data: {
+              transcript: result.text,
+            },
+          }));
+        }
+      } catch (err) {
+        console.log('Raw message:', data.data);
+      }
+    });
+
+    controlSocket.addEventListener('error', (e) => {
+      console.warn('Control socket error:', e);
+      transcription.dispatchEvent(new MessageEvent('error', { data: e }));
+    });
+
+    dataSocket.addEventListener('error', (e) => {
+      console.warn('Data socket error:', e);
+      transcription.dispatchEvent(new MessageEvent('error', { data: e }));
+    });
+
+    transcription.write = (f32) => {
+      const i16 = floatTo16Bit(f32);
+      const metadata = {
+        sampleRate: sampleRate,
+        channels: 1,
+        encoding: 'PCM16'
+      };
+      const metadataStr = JSON.stringify(metadata);
+      const metadataLength = Buffer.alloc(4);
+      metadataLength.writeUInt32LE(metadataStr.length);
+
+      const message = Buffer.concat([
+        metadataLength,
+        Buffer.from(metadataStr),
+        Buffer.from(i16.buffer)
+      ]);
+
+      if (dataSocket.readyState === WebSocket.OPEN) {
+        dataSocket.send(message);
+      }
+    };
+
+    transcription.close = () => {
+      if (controlSocket.readyState === WebSocket.OPEN) {
+        controlSocket.close();
+      }
+      if (dataSocket.readyState === WebSocket.OPEN) {
+        dataSocket.close();
+      }
+    };
+
+    return transcription;
+  } catch (error) {
+    console.warn('error creating STT transcription:', error);
     throw error;
   }
 };

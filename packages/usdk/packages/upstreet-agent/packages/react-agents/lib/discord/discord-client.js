@@ -21,6 +21,7 @@ import {
   discordBotEndpointUrl,
 } from '../../util/endpoints.mjs';
 import {
+  RealtimeTranscribedVoiceInput,
   TranscribedVoiceInput,
 } from '../../devices/audio-transcriber.mjs';
 
@@ -264,7 +265,14 @@ export class DiscordOutput extends EventTarget {
         this.userStreams.delete(userId);
       });
 
-      const transcribedVoiceInput = new TranscribedVoiceInput({
+      // const transcribedVoiceInput = new TranscribedVoiceInput({
+      //   audioInput: userStream,
+      //   sampleRate,
+      //   codecs,
+      //   jwt,
+      // });
+
+      const transcribedVoiceInput = new RealtimeTranscribedVoiceInput({
         audioInput: userStream,
         sampleRate,
         codecs,

@@ -79,6 +79,9 @@ export const installAgent = async (directory) => {
   const srcWranglerToml = path.join(upstreetAgentDir, 'wrangler.toml');
   const dstWranglerToml = path.join(directory, `wrangler.toml`);
 
+  const srcInitTs = path.join(upstreetAgentDir, 'init.ts');
+  const dstInitTs = path.join(directory, `init.ts`);
+
   const agentPath = directory;
 
   // remove old dependencies in node_modules
@@ -129,6 +132,8 @@ export const installAgent = async (directory) => {
       });
       return toml.stringify(t);
     }),
+    // init.ts
+    copyWithStringTransform(srcInitTs, dstInitTs),
     // main.jsx
     copyWithStringTransform(srcMainJsx, dstMainJsx),
     // durable-object.tsx
@@ -143,6 +148,7 @@ export const installAgent = async (directory) => {
       rimraf(dstMainJsx),
       rimraf(dstDurableObjectTsx),
       rimraf(dstRootMainTsx),
+      rimraf(dstInitTs),
       removeDependencies(),
     ]);
   };

@@ -37,6 +37,8 @@ export type AgentObjectData = {
   smallModel?: string;
   largeModel?: string;
   features?: string[];
+  clients?: string[];
+  plugins?: string[];
   address?: string;
   stripeConnectAccountId?: string;
 };
@@ -765,6 +767,7 @@ export type AppContextValue = {
   useChatsSpecification: () => ChatsSpecification;
   useCodecs: () => any;
   useInit: () => any;
+  useRuntime: () => any;
   useDebug: () => number;
   useRegistry: () => RenderRegistry;
 

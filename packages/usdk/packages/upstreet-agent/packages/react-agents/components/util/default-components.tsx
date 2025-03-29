@@ -120,21 +120,24 @@ const CharactersPrompt = () => {
   const agent = useAgent();
   const name = useName();
   const bio = usePersonality();
+  const [agents, setAgents] = useState([]);
   if (conversation) {
-    const agents = conversation.getAgents();
     const currentAgentSpec = {
       id: agent.id,
       name,
       bio,
     };
-    const agentSpecs = agents.map((agent) =>  {
-      const agentSpec = agent.getPlayerSpec() as any;
-      return {
-        name: agentSpec?.name,
-        id: agent.playerId,
-        bio: agentSpec?.bio,
-      };
-    });
+  
+    const agentSpecs = agents
+      .filter(mapAgent => mapAgent.playerId !== agent.id)
+      .map((agent) =>  {
+        const agentSpec = agent.getPlayerSpec() as any;
+        return {
+          name: agentSpec?.name,
+          id: agent.playerId,
+          bio: agentSpec?.bio,
+        };
+      });
 
     const formatAgent = (agent: any) => {
       return [
@@ -143,6 +146,18 @@ const CharactersPrompt = () => {
         `Bio: ${agent.bio}`,
       ].join('\n');
     };
+
+    useEffect(() => {
+      const updateAgents = () => {
+        const agents = conversation.getAgents();
+        setAgents(agents);
+      };
+      conversation.addEventListener('agentschange', updateAgents);
+
+      return () => {
+        conversation.removeEventListener('agentschange', updateAgents);
+      };
+    }, [conversation]);
 
     return (
       <Prompt>

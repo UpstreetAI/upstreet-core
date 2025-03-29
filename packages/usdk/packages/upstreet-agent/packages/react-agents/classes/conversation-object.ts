@@ -111,9 +111,11 @@ export class ConversationObject extends EventTarget {
   }
   addAgent(agentId: string, player: Player) {
     this.agentsMap.set(agentId, player);
+    this.dispatchEvent(new Event('agentschange'));
   }
   removeAgent(agentId: string) {
     this.agentsMap.delete(agentId);
+    this.dispatchEvent(new Event('agentschange'));
   }
 
   getKey() {

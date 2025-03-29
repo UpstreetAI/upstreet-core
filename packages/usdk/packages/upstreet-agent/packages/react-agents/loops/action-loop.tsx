@@ -5,6 +5,8 @@ import { ReACTEvaluator } from '../evaluators/react-evaluator';
 // import { PerceptionEvent } from '../classes/perception-event';
 import { ConversationObject } from '../classes/conversation-object';
 import { DeferConversation } from '../components/core/conversation';
+import { createMessageCache } from '../util/message-utils';
+import { Player } from 'react-agents-client/util/player.mjs';
 
 export const ActionLoop = (props: LoopProps) => {
   return (
@@ -39,10 +41,19 @@ const ActionLoopInner = (props: LoopProps) => {
     if (contextConversation) {
       return contextConversation;
     } else {
+      const agentPlayer = new Player(agent.id, {
+        name: agent.name,
+        bio: agent.bio,
+      });
       const conversationId = crypto.randomUUID();
       return new ConversationObject({
-        agent,
+        agentPlayer,
         getHash: () => conversationId,
+        messageCache: createMessageCache({
+          agent,
+          conversationId,
+          agentId: agent.id,
+        }),
       });
     }
   });

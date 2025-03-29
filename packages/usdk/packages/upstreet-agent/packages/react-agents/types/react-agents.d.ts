@@ -121,12 +121,14 @@ export type DiscordRoomSpec = RegExp | string;
 export type DiscordRoomSpecs = DiscordRoomSpec | DiscordRoomSpec[];
 export type DiscordProps = {
   token: string;
+  appId: string;
   channels?: DiscordRoomSpecs;
   dms?: DiscordRoomSpecs;
   userWhitelist?: string[];
 };
 export type DiscordArgs = {
   token: string;
+  appId: string;
   channels: DiscordRoomSpec[];
   dms: DiscordRoomSpec[];
   userWhitelist: string[];
@@ -194,6 +196,7 @@ export type EvaluatorOpts = {
 export type EvaluateOpts = {
   generativeAgent: GenerativeAgentObject,
   signal?: AbortSignal,
+  sendTyping?: boolean,
 };
 export type Evaluator = {
   evaluate: (opts: EvaluateOpts) => Promise<ActionStep>;
@@ -214,6 +217,7 @@ export type Attachment = FormattedAttachment & {
   url?: string;
 };
 export type ActionMessage = {
+  id: string; // 8 characters max for prompt optimisation
   userId: string;
   name: string;
   method: string;
@@ -222,6 +226,7 @@ export type ActionMessage = {
   human: boolean; // XXX can be converted to flags
   hidden: boolean;
   timestamp: Date;
+  metadata?: any;
 };
 export type PendingActionMessage = {
   method: string;
@@ -309,7 +314,6 @@ export type Player = {
 };
 export type GetHashFn = () => string;
 export type ConversationObject = EventTarget & {
-  agent: ActiveAgentObject;
   agentsMap: Map<string, Player>;
   scene: SceneObject | null;
   getHash: GetHashFn;
@@ -330,9 +334,6 @@ export type ConversationObject = EventTarget & {
 
   getScene: () => SceneObject | null;
   setScene: (scene: SceneObject | null) => void;
-
-  getAgent: () => ActiveAgentObject | null;
-  // setAgent: (agent: ActiveAgentObject) => void;
 
   getAgents: () => Player[];
   getAgentIds: () => string[];

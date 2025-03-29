@@ -4,6 +4,7 @@ import type {
   AgentObject,
   Attachment,
   FormattedAttachment,
+  Player,
 } from '../../types';
 import {
   useAgent,
@@ -117,59 +118,47 @@ const ScenePrompt = () => {
 };
 const CharactersPrompt = () => {
   const conversation = useConversation();
-  const agent = useAgent();
-  const name = useName();
-  const bio = usePersonality();
-  if (conversation) {
-    const agents = conversation.getAgents();
-    const currentAgentSpec = {
-      id: agent.id,
-      name,
-      bio,
-    };
-    const agentSpecs = agents.map((agent) =>  {
-      const agentSpec = agent.getPlayerSpec() as any;
-      return {
-        name: agentSpec?.name,
-        id: agent.playerId,
-        bio: agentSpec?.bio,
-      };
-    });
+  const activeAgent = useAgent();
 
-    const formatAgent = (agent: any) => {
-      return [
-        `Name: ${agent.name}`,
-        `UserId: ${agent.id}`,
-        `Bio: ${agent.bio}`,
-      ].join('\n');
-    };
+  if (!conversation) return null;
 
-    return (
-      <Prompt>
-        {dedent`
-          # Your Character
-        ` +
-          '\n\n' +
-          formatAgent(currentAgentSpec) +
-          (agents.length > 0
-            ? (
-              '\n\n' +
-              dedent`
-                # Other Characters
-              ` +
-              '\n\n' +
-              agentSpecs
-                .map(formatAgent)
-                .join('\n\n')
-            )
-            : ''
+  const agents = conversation.getAgents();
+  const agentCharacter = agents.find(agent => agent.playerId === activeAgent.id);
+    const otherAgents = agents
+      .filter(agent => agent.playerId !== activeAgent.id);
+
+  const formatAgent = (agent: Player) => {
+    const agentSpecs = agent.getPlayerSpec() as any;
+    return [
+      `Name: ${agentSpecs?.name}`,
+      `UserId: ${agent.playerId}`,
+      `Bio: ${agentSpecs?.bio}`,
+    ].join('\n');
+  };
+
+  return (
+    <Prompt>
+      {dedent`
+        # Your Character
+      ` +
+        '\n\n' +
+        formatAgent(agentCharacter) +
+        (agents.length > 0
+          ? (
+            '\n\n' +
+            dedent`
+              # Other Characters
+            ` +
+            '\n\n' +
+            otherAgents
+              .map(formatAgent)
+              .join('\n\n')
           )
-        }
-      </Prompt>
-    );
-  } else {
-    return null;
-  }
+          : ''
+        )
+      }
+    </Prompt>
+  );
 };
 const ActionsPromptInternal = () => {
   const actions = useActions();
@@ -288,8 +277,9 @@ const CachedMessagesPrompt = () => {
               '\n' +
               cachedMessages
                 .map((action) => {
-                  const { /*userId,*/ name, method, args, attachments = [], timestamp } = action;
+                  const { id, /*userId,*/ name, method, args, attachments = [], timestamp } = action;
                   const j = {
+                    id,
                     // userId,
                     name,
                     method,

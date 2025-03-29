@@ -11,6 +11,7 @@ import type {
   ActionStep,
   Evaluator,
   DebugOptions,
+  EvaluateOpts,
 } from '../types';
 import {
   ConversationObject,
@@ -110,7 +111,7 @@ export class GenerativeAgentObject {
       });
     // });
   }
-  async evaluate(evaluator: Evaluator) {
+  async evaluate(evaluator: Evaluator, opts?: EvaluateOpts) {
     return await this.conversation.typing(async () => {
       const step = await evaluator.evaluate({
         generativeAgent: this,

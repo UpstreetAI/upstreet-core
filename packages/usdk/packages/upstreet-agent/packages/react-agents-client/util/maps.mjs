@@ -43,19 +43,28 @@ export class PlayersMap extends EventTarget {
 }
 export class TypingMap extends EventTarget {
   #internalMap = new Map(); // playerId: string -> { userId: string, name: string, typing: boolean }
-  getMap() {
-    return this.#internalMap;
+  // getMap() {
+  //   return this.#internalMap;
+  // }
+  get(playerId) {
+    return this.#internalMap.get(playerId);
   }
-  set(playerId, spec) {
-    this.#internalMap.set(playerId, spec);
+  set(playerId, typing) {
+    this.#internalMap.set(playerId, typing);
     this.dispatchEvent(new MessageEvent('typingchange', {
-      data: spec,
+      data: {
+        playerId,
+        typing,
+      },
     }));
   }
   clear() {
-    for (const [playerId, spec] of this.#internalMap) {
+    for (const [playerId, typing] of this.#internalMap) {
       this.dispatchEvent(new MessageEvent('typingchange', {
-        data: spec,
+        data: {
+          playerId,
+          typing,
+        },
       }));
     }
     this.#internalMap.clear();
@@ -63,7 +72,34 @@ export class TypingMap extends EventTarget {
 }
 export class SpeakerMap extends EventTarget {
   #internalMap = new Map(); // playerId: string -> boolean
-  #localSpeakingCount = 0;
+  // getMap() {
+  //   return this.#internalMap;
+  // }
+  get(playerId) {
+    return this.#internalMap.get(playerId);
+  }
+  set(playerId, speaking) {
+    this.#internalMap.set(playerId, speaking);
+    this.dispatchEvent(new MessageEvent('speakingchange', {
+      data: {
+        playerId,
+        speaking,
+      },
+    }));
+  }
+  clear() {
+    for (const [playerId, speaking] of this.#internalMap) {
+      this.dispatchEvent(new MessageEvent('speakingchange', {
+        data: {
+          playerId,
+          speaking,
+        },
+      }));
+    }
+    this.#internalMap.clear();
+  }
+
+  /* #localSpeakingCount = 0;
   #lastPlaying = false;
   getRemote(playerId) {
     return this.#internalMap.get(playerId) ?? 0;
@@ -172,5 +208,5 @@ export class SpeakerMap extends EventTarget {
     this.#internalMap.clear();
     this.#localSpeakingCount = 0;
     this.#lastPlaying = false;
-  }
+  } */
 }

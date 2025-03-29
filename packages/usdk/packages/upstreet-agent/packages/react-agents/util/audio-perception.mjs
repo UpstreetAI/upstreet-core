@@ -2,9 +2,9 @@ import { mulaw } from '../lib/alawmulaw/dist/alawmulaw.mjs';
 import {
   floatTo16Bit,
   // int16ToFloat32,
-} from 'codecs/convert.mjs';
-import { AudioEncodeStream } from 'codecs/audio-encode.mjs';
-import { QueueManager } from 'queue-manager';
+} from 'agent-codecs/convert.mjs';
+import { AudioEncodeStream } from 'agent-codecs/audio-encode.mjs';
+import { QueueManager } from 'queue-manager-async';
 import {
   aiHost,
 } from './endpoints.mjs';

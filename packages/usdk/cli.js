@@ -13,7 +13,7 @@ import { rimraf } from 'rimraf';
 
 import Table from 'cli-table3';
 
-import { QueueManager } from './packages/upstreet-agent/packages/queue-manager/queue-manager.mjs';
+import { QueueManager } from 'queue-manager-async';
 import { parseAgentSpecs } from './lib/agent-spec-utils.mjs';
 import {
   getAgentPublicUrl,
@@ -87,11 +87,11 @@ import {
 // import {
 //   env,
 // } from './lib/env.mjs';
-import { timeAgo } from './packages/upstreet-agent/packages/react-agents/util/time-ago.mjs';
+// import { timeAgo } from './packages/upstreet-agent/packages/react-agents/util/time-ago.mjs';
 import { featureSpecs } from './packages/upstreet-agent/packages/react-agents/util/agent-features-spec.mjs';
-import { AudioDecodeStream } from './packages/upstreet-agent/packages/codecs/audio-decode.mjs';
-import { WebPEncoder } from './packages/upstreet-agent/packages/codecs/webp-codec.mjs';
-import * as codecs from './packages/upstreet-agent/packages/codecs/ws-codec-runtime-fs.mjs';
+import { AudioDecodeStream } from 'agent-codecs/audio-decode.mjs';
+import { WebPEncoder } from 'agent-codecs/webp-codec.mjs';
+import * as codecs from 'agent-codecs/ws-codec-runtime-fs.mjs';
 // import { runJest } from './lib/jest-util.mjs';
 import { logUpstreetBanner } from './util/logger/log-utils.mjs';
 import { makeCorsHeaders, getServerOpts } from './util/server-utils.mjs';
@@ -99,7 +99,7 @@ import { makeCorsHeaders, getServerOpts } from './util/server-utils.mjs';
 //   generateMnemonic,
 // } from './util/ethereum-utils.mjs';
 import LoggerFactory from './util/logger/logger-factory.mjs';
-import { getLatestVersion } from './lib/version.mjs';
+// import { getLatestVersion } from './lib/version.mjs';
 // import {
 //   getDirectoryHash,
 // } from './util/hash-util.mjs';

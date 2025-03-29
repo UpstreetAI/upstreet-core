@@ -1,8 +1,9 @@
 import {
   multiplayerEndpointUrl,
 } from 'react-agents/util/endpoints.mjs';
-import { NetworkRealms } from './packages/multiplayer/public/network-realms.mjs'; // XXX should be a deduplicated import, in a separate npm module
-// import { webbrowserActionsToText } from './packages/upstreet-agent/packages/react-agents/util/browser-action-utils.mjs';
+import * as agentMultiplayer from 'agent-multiplayer';
+import { METHODS, METHOD_NAMES } from 'agent-multiplayer';
+// import type { AgentMultiplayerApi } from 'agent-multiplayer';
 import {
   Player,
 } from './util/player.mjs';
@@ -12,7 +13,8 @@ import {
   SpeakerMap,
 } from './util/maps.mjs';
 
-export class ReactAgentsClient {
+// XXX handle joins
+/* export class ReactAgentsClient {
   url;
   constructor(url) {
     this.url = url;
@@ -56,9 +58,230 @@ export class ReactAgentsClient {
       }
     }
   }
-}
+} */
 
-export class ReactAgentsMultiplayerConnection extends EventTarget {
+const waitForMessageType = (agentMultiplayerApi, method) => {
+  const methodName = METHOD_NAMES[method];
+  if (!methodName) {
+    throw new Error(`Unknown method: ${method}`);
+  }
+
+  return new Promise((resolve, reject) => {
+    const onmethod = (o) => {
+      resolve(o);
+      webSocket.removeEventListener(methodName, onmethod);
+      webSocket.removeEventListener('close', onclose);
+      webSocket.removeEventListener('error', onerror);
+    };
+    agentMultiplayerApi.addEventListener(methodName, onmethod);
+
+    const onclose = () => {
+      reject(new Error('AgentMultiplayerApi closed'));
+    };
+    agentMultiplayerApi.addEventListener('close', onclose);
+
+    const onerror = (e) => {
+      reject(e);
+    };
+    agentMultiplayerApi.addEventListener('error', onerror);
+  });
+};
+
+// type ReactAgentsMultiplayerConnectionApi = {
+//   playersMap: PlayersMap;
+//   typingMap: TypingMap;
+//   speakerMap: SpeakerMap;
+//   log: (...args: any[]) => void;
+// };
+
+class ReactAgentsMultiplayerConnection {
+  static async connect({
+    agentMultiplayerConnection,
+    profile,
+    signal,
+  }) {
+    // 1. set the player data
+    // 2. wait for network init message
+    // 3. bind listeners
+
+    agentMultiplayerConnection.send({
+      method: METHODS.SET_PLAYER_DATA,
+      args: {
+        playerData: profile,
+      },
+    });
+
+    const networkInitMessage = await waitForMessageType(agentMultiplayerConnection, METHODS.NETWORK_INIT);
+    if (signal?.aborted) {
+      throw new Error('Connection aborted');
+    }
+    const {
+      playerId,
+      players,
+    } = networkInitMessage.args;
+
+    // set up result
+    const result = new EventTarget();
+    // members
+    result.playerId = playerId;
+    const playersMap = new PlayersMap();
+    result.playersMap = playersMap;
+    const typingMap = new TypingMap();
+    result.typingMap = typingMap;
+    const speakerMap = new SpeakerMap();
+    result.speakerMap = speakerMap;
+    // methods
+    result.log = (...args) => {
+      agentMultiplayerConnection.send({
+        method: METHODS.LOG,
+        args: {
+          playerId,
+          args,
+        },
+      });
+    };
+    result.sendChatMessage = (message, attachments) => {
+      agentMultiplayerConnection.send({
+        method: METHODS.CHAT,
+        args: {
+          playerId,
+          message,
+          attachments,
+        },
+      });
+    };
+    result.setTyping = (typing) => {
+      agentMultiplayerConnection.send({
+        method: METHODS.TYPING,
+        args: {
+          playerId,
+          typing,
+        },
+      });
+    };
+    result.setSpeaking = (speaking) => {
+      agentMultiplayerConnection.send({
+        method: METHODS.SPEAKING,
+        args: {
+          playerId,
+          speaking,
+        },
+      });
+    };
+
+    // initialize local player
+    const localPlayer = new Player(playerId, profile);
+    playersMap.add(playerId, localPlayer);
+
+    // initialize remote players
+    for (const player of players) {
+      const {
+        playerId,
+        playerData,
+      } = player;
+      const remotePlayer = new Player(playerId, playerData);
+      playersMap.add(playerId, remotePlayer);
+    }
+
+    // bind listeners
+    [
+      [METHODS.CHAT, 'chat'],
+      [METHODS.LOG, 'log'],
+      [METHODS.AUDIO, 'audio'],
+      [METHODS.AUDIOSTART, 'audiostart'],
+      [METHODS.AUDIOEND, 'audioend'],
+      [METHODS.VIDEO, 'video'],
+      [METHODS.VIDEOSTART, 'videostart'],
+      [METHODS.VIDEOEND, 'videoend'],
+    ].forEach(([method, eventName]) => {
+      const methodName = METHOD_NAMES[method];
+      if (!methodName) {
+        throw new Error(`Unknown method: ${method}`);
+      }
+      agentMultiplayerConnection.addEventListener(methodName, e => {
+        result.dispatchEvent(new MessageEvent(eventName, {
+          data: e.data,
+        }));
+      });
+    });
+    agentMultiplayerConnection.addEventListener(METHOD_NAMES[METHODS.JOIN], e => {
+      const {
+        playerId,
+        playerData,
+      } = e.data;
+      let remotePlayer = playersMap.get(playerId);
+      if (!remotePlayer) {
+        remotePlayer = new Player(playerId, playerData);
+        playersMap.add(playerId, remotePlayer);
+
+        result.dispatchEvent(new MessageEvent('join', {
+          data: {
+            player: remotePlayer,
+          },
+        }));
+      } else {
+        result.log('remote player already in playersMap', playerId);
+        throw new Error('remote player already in playersMap: ' + playerId);
+      }
+    });
+    agentMultiplayerConnection.addEventListener(METHOD_NAMES[METHODS.LEAVE], e => {
+      const {
+        playerId,
+      } = e.data;
+      const remotePlayer = playersMap.get(playerId);
+      if (remotePlayer) {
+        playersMap.remove(playerId);
+        result.dispatchEvent(new MessageEvent('leave', {
+          data: {
+            player: remotePlayer,
+          },
+        }));
+      } else {
+        result.log('remote player not found during leave', playerId);
+        throw new Error('remote player not found during leave');
+      }
+    });
+    agentMultiplayerConnection.addEventListener(METHOD_NAMES[METHODS.TYPING], e => {
+      const {
+        playerId,
+        typing,
+      } = e.data;
+      typingMap.set(playerId, typing);
+    });
+    agentMultiplayerConnection.addEventListener(METHOD_NAMES[METHODS.SPEAKING], e => {
+      const {
+        playerId,
+        speaking,
+      } = e.data;
+      speakerMap.set(playerId, speaking);
+    });
+    agentMultiplayerConnection.addEventListener(METHOD_NAMES[METHODS.SET_PLAYER_DATA], e => {
+      const {
+        playerId,
+        playerData,
+      } = e.data;
+      const player = playersMap.get(playerId);
+      if (player) {
+        player.setPlayerData(playerData);
+      } else {
+        result.log('player not found during set player data', playerId);
+        throw new Error('player not found during set player data: ' + playerId);
+      }
+    });
+    [
+      'close',
+      'error',
+    ].forEach(eventName => {
+      agentMultiplayerConnection.addEventListener(eventName, e => {
+        result.dispatchEvent(new MessageEvent(eventName, {
+          data: e.data,
+        }));
+      });
+    });
+
+    return result;
+  }
+
   static logLevels = {
     error: 0,
     warn: 1,
@@ -66,7 +289,8 @@ export class ReactAgentsMultiplayerConnection extends EventTarget {
     debug: 3,
   };
   static defaultLogLevel = ReactAgentsMultiplayerConnection.logLevels.info;
-  room;
+
+  /* room;
   profile;
   metadata;
   playersMap = new PlayersMap();
@@ -74,19 +298,19 @@ export class ReactAgentsMultiplayerConnection extends EventTarget {
   speakerMap = new SpeakerMap();
   realms;
   connectPromise;
-  constructor({
-    room,
-    profile,
-    metadata = {},
-  }) {
-    super();
+  // constructor({
+  //   room,
+  //   profile,
+  //   metadata = {},
+  // }) {
+  //   super();
 
-    this.room = room;
-    this.profile = profile;
-    this.metadata = metadata;
+  //   this.room = room;
+  //   this.profile = profile;
+  //   this.metadata = metadata;
 
-    this.connectPromise = this.connect();
-  }
+  //   this.connectPromise = this.connect();
+  // }
   log(...args) {
     this.dispatchEvent(new MessageEvent('log', {
       data: {
@@ -313,16 +537,22 @@ export class ReactAgentsMultiplayerConnection extends EventTarget {
   }
   removeVideoSource(videoSource) {
     return this.realms.removeVideoSource(videoSource);
-  }
+  } */
 }
+
 export const connect = async ({
   room,
   profile,
+  signal,
 }) => {
-  const connection = new ReactAgentsMultiplayerConnection({
-    room,
-    profile,
+  const u = `${multiplayerEndpointUrl}/room/${room}/websocket`;
+  const agentMultiplayerConnection = await agentMultiplayer.connect(u, {
+    signal,
   });
-  await connection.waitForConnect();
-  return connection;
+  const ramConnection = await ReactAgentsMultiplayerConnection.connect({
+    agentMultiplayerConnection,
+    profile,
+    signal,
+  });
+  return ramConnection;
 };

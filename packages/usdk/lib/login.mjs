@@ -5,15 +5,15 @@ import readline from 'readline';
 
 import open from 'open';
 // import { mkdirp } from 'mkdirp';
-import { rimraf } from 'rimraf';
-import { QueueManager } from '../packages/upstreet-agent/packages/queue-manager/queue-manager.mjs';
+// import { rimraf } from 'rimraf';
+import { QueueManager } from 'queue-manager-async';
 import {
   localPort,
   callbackPort,
 } from '../util/ports.mjs';
 import { getLoginJwt } from '../util/login-util.mjs';
 import { makeCorsHeaders, getServerOpts } from '../util/server-utils.mjs';
-import { loginLocation } from './locations.mjs';
+// import { loginLocation } from './locations.mjs';
 
 //
 

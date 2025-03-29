@@ -2,7 +2,7 @@ import { z } from 'zod';
 import dedent from 'dedent';
 import { defaultModels } from '../packages/upstreet-agent/packages/react-agents/constants.mjs';
 import { fetchJsonCompletion } from '../packages/upstreet-agent/packages/react-agents/util/fetch.mjs';
-import { QueueManager } from 'queue-manager';
+import { QueueManager } from 'queue-manager-async';
 
 //
 

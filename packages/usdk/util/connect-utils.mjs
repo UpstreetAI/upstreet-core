@@ -7,7 +7,7 @@ import alea from 'alea';
 import pc from 'picocolors';
 import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
 
-import { QueueManager } from '../packages/upstreet-agent/packages/queue-manager/queue-manager.mjs';
+import { QueueManager } from 'queue-manager-async';
 // import { lembed } from '../packages/upstreet-agent/packages/react-agents/util/embedding.mjs';
 import { makeId } from '../packages/upstreet-agent/packages/react-agents/util/util.mjs';
 import { parseAgentSpecs } from '../lib/agent-spec-utils.mjs';
@@ -19,6 +19,7 @@ import {
   workersHost,
   aiProxyHost,
   usdkDiscordUrl,
+  multiplayerEndpointUrl,
 } from '../packages/upstreet-agent/packages/react-agents/util/endpoints.mjs';
 
 import {
@@ -32,9 +33,11 @@ import {
   TerminalVideoRenderer,
 } from '../packages/upstreet-agent/packages/react-agents/devices/video-input.mjs';
 import { getLoginJwt } from '../util/login-util.mjs';
-import { ReactAgentsClient, ReactAgentsMultiplayerConnection } from '../packages/upstreet-agent/packages/react-agents-client/react-agents-client.mjs';
-import { AudioDecodeStream } from '../packages/upstreet-agent/packages/codecs/audio-decode.mjs';
-import * as codecs from '../packages/upstreet-agent/packages/codecs/ws-codec-runtime-fs.mjs';
+// import { ReactAgentsClient, ReactAgentsMultiplayerConnection } from '../packages/upstreet-agent/packages/react-agents-client/react-agents-client.mjs';
+import * as reactAgentsClient from '../packages/upstreet-agent/packages/react-agents-client/react-agents-client.mjs';
+// XXX finish this
+import { AudioDecodeStream } from 'agent-codecs/audio-decode.mjs';
+import * as codecs from 'agent-codecs/ws-codec-runtime-fs.mjs';
 import { webbrowserActionsToText } from '../packages/upstreet-agent/packages/react-agents/util/browser-action-utils.mjs';
 
 import {
@@ -85,6 +88,40 @@ const getUserProfile = async () => {
   }
 
   return user;
+};
+
+const agentJoin = async ({
+  agentUrl,
+  endpointUrl,
+  room,
+  only,
+}) => {
+  const res = await fetch(`${agentUrl}/join`, {
+    method: 'POST',
+    body: JSON.stringify({
+      endpointUrl,
+      room,
+      only,
+    }),
+  });
+  const json = await res.json();
+  return json;
+};
+
+const agentLeave = async ({
+  agentUrl,
+  endpointUrl,
+  room,
+}) => {
+  const res = await fetch(`${agentUrl}/leave`, {
+    method: 'POST',
+    body: JSON.stringify({
+      endpointUrl,
+      room,
+    }),
+  });
+  const json = await res.json();
+  return json;
 };
 
 const startMultiplayerRepl = ({
@@ -930,11 +967,19 @@ export const join = async (args) => {
   if (room) {
     try {
       const joinPromises = agentSpecs.map(async (agentSpec) => {
-        const u = `${getAgentSpecHost(agentSpec)}`;
-        const agentClient = new ReactAgentsClient(u);
-        await agentClient.join(room, {
+        const agentUrl = `${getAgentSpecHost(agentSpec)}`;
+        await agentJoin({
+          agentUrl,
+          endpointUrl: multiplayerEndpointUrl,
+          room,
           only: true,
         });
+
+        // const u = `${getAgentSpecHost(agentSpec)}`;
+        // const agentClient = new ReactAgentsClient(u);
+        // await agentClient.join(room, {
+        //   only: true,
+        // });
       });
       await Promise.all(joinPromises);
     } catch (err) {
@@ -953,15 +998,21 @@ export const leave = async (args) => {
   if (agentSpecs.length === 1) {
     if (room) {
       const _leaveAgent = async (agentSpec, room) => {
-        const u = `${getAgentSpecHost(agentSpec)}/leave`;
-        const leaveReq = await fetch(u, {
-          method: 'POST',
-          body: JSON.stringify({
-            room,
-          }),
+        const agentUrl = `${getAgentSpecHost(agentSpec)}`;
+        await agentLeave({
+          agentUrl,
+          endpointUrl: multiplayerEndpointUrl,
+          room,
         });
-        const leaveJson = await leaveReq.json();
-        // console.log('leave json', leaveJson);
+
+        // const u = `${getAgentSpecHost(agentSpec)}/leave`;
+        // const leaveReq = await fetch(u, {
+        //   method: 'POST',
+        //   body: JSON.stringify({
+        //     room,
+        //   }),
+        // });
+        // const leaveJson = await leaveReq.json();
       };
 
       return await _leaveAgent(agentSpecs[0], room);

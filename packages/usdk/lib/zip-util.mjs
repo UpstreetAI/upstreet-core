@@ -5,7 +5,7 @@ import { mkdirp } from 'mkdirp';
 import { rimraf } from 'rimraf';
 import JSZip from 'jszip';
 import archiver from 'archiver';
-import { QueueManager } from 'queue-manager';
+import { QueueManager } from 'queue-manager-async';
 
 // Helper function to filter files with regular expressions
 const filterFiles = (files, excludePatterns) => {

@@ -4,8 +4,8 @@ import { Jimp } from 'jimp';
 import { intToRGBA } from '@jimp/utils';
 import chalk from 'chalk';
 import ansiEscapeSequences from 'ansi-escape-sequences';
-import { QueueManager } from 'queue-manager';
-import { WebPEncoder } from 'codecs/webp-codec.mjs';
+import { QueueManager } from 'queue-manager-async';
+import { WebPEncoder } from 'agent-codecs/webp-codec.mjs';
 
 //
 

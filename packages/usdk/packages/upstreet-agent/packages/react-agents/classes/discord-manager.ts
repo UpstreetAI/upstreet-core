@@ -97,6 +97,42 @@ const bindOutgoing = ({
         channelId,
         userId,
       });
+    } else if (method === 'messageReaction') {
+      const {
+        reaction,
+        messageId,
+        userId,
+      } = args as {
+        reaction: string,
+        messageId: string,
+        userId: string,
+      };
+
+
+      // TODO: current agent mentionId needs to be set
+      const getDiscordIdForUserId = (userId: string) => {
+        const agents = conversation.getAgents();
+        const currentAgent = conversation.agent;
+        const agent = agents.find(
+          agent => agent.playerId === userId
+        ) || (currentAgent.id === userId ? currentAgent : undefined);
+
+        const discordId = agent?.playerSpec?.mentionId;
+        return discordId;
+      };
+
+      const discordId = getDiscordIdForUserId(userId);
+      console.log('discord manager message reaction', {
+        reaction,
+        messageId,
+        userId,
+        channelId,
+        discordId,
+      });
+      discordBotClient.input.reactToMessage(reaction, messageId, {
+        channelId,
+        userId: discordId,
+      });
     } else {
       // ignore
     }
@@ -370,6 +406,7 @@ export class DiscordBot extends EventTarget {
           text,
           channelId, // if there is no channelId, it's a DM
           // XXX discord channel/dm distinction can be made more explicit with a type: string field...
+          messageId,
         } = e.data;
 
         // look up conversation
@@ -390,6 +427,7 @@ export class DiscordBot extends EventTarget {
             method: 'say',
             args: {
               text: formattedMessage,
+              messageId,
             },
           };
           const id = getIdFromUserId(userId);
@@ -411,11 +449,71 @@ export class DiscordBot extends EventTarget {
       });
     };
 
+    // message reactions
+    const _bindIncomingMessageReactions = () => {
+      const handleReaction = (e: MessageEvent, eventType: string) => {
+        const {
+          userId,
+          messageId,
+          emoji,
+          channelId,
+          userDisplayName,
+        } = e.data;
+
+        console.log(eventType, {
+          userId,
+          userDisplayName,
+          messageId,
+          emoji,
+          channelId,
+        });
+
+        // look up conversation
+        const conversation = this.dmConversations.has(userId)
+          ? this.dmConversations.get(userId) ?? null
+          : this.channelConversations.get(channelId) ?? null;
+
+        if (!conversation) return;
+
+        const rawMessageReaction = {
+          userId,
+          name: userDisplayName,
+          method: 'messageReaction',
+          args: {
+            reaction: emoji,
+            messageId,
+            userId,
+            context: {
+              action: eventType === 'messagereactionadd' ? 'Reaction added' : 'Reaction removed',
+            },
+          },
+        };
+
+        const newMessageReaction = formatConversationMessage(rawMessageReaction, {
+          agent: {
+            id: getIdFromUserId(userId),
+            name: userDisplayName,
+          },
+        });
+
+        conversation.addLocalMessage(newMessageReaction);
+      };
+
+      discordBotClient.output.addEventListener('messagereactionadd', 
+        (e) => handleReaction(e, 'messagereactionadd')
+      );
+
+      discordBotClient.output.addEventListener('messagereactionremove', 
+        (e) => handleReaction(e, 'messagereactionremove')
+      );
+    };
+
     (async () => {
       _bindChannels();
       _bindGuildMemberAdd();
       _bindGuildMemberRemove();
       _bindIncoming();
+      _bindIncomingMessageReactions();
       await _connect();
     })().catch(err => {
       console.warn('discord bot error', err);
